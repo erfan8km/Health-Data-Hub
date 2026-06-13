@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Iran Epidemiology Data Repository"
+version = "1.0.0"
+id = "artifacts/iedr"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19420
+
+[services.development]
+run = "pnpm --filter @workspace/iedr run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/iedr", "run", "build" ]
+publicDir = "artifacts/iedr/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19420"
+BASE_PATH = "/"
