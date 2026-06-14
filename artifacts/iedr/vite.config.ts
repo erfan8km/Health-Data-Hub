@@ -2,46 +2,37 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
-import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
+const isReplit = process.env.REPL_ID !== undefined;
+const isProd = process.env.NODE_ENV === "production";
+
+// PORT: required for the dev server; not needed for `vite build`
 const rawPort = process.env.PORT;
+const port = rawPort ? Number(rawPort) : 3000;
 
-if (!rawPort) {
-  throw new Error(
-    "PORT environment variable is required but was not provided.",
-  );
-}
-
-const port = Number(rawPort);
-
-if (Number.isNaN(port) || port <= 0) {
-  throw new Error(`Invalid PORT value: "${rawPort}"`);
-}
-
-const basePath = process.env.BASE_PATH;
-
-if (!basePath) {
-  throw new Error(
-    "BASE_PATH environment variable is required but was not provided.",
-  );
-}
+// BASE_PATH: the public base URL for all assets.
+// Defaults to "/" for standard deployments (nginx serves from root).
+// On Replit the workflow runner injects the correct sub-path.
+const basePath = process.env.BASE_PATH ?? "/";
 
 export default defineConfig({
   base: basePath,
   plugins: [
     react(),
     tailwindcss(),
-    runtimeErrorOverlay(),
-    ...(process.env.NODE_ENV !== "production" &&
-    process.env.REPL_ID !== undefined
+    // Replit-specific dev plugins — only load inside Replit environment
+    ...(isReplit && !isProd
       ? [
+          await import("@replit/vite-plugin-runtime-error-modal").then((m) =>
+            m.default()
+          ),
           await import("@replit/vite-plugin-cartographer").then((m) =>
             m.cartographer({
               root: path.resolve(import.meta.dirname, ".."),
-            }),
+            })
           ),
           await import("@replit/vite-plugin-dev-banner").then((m) =>
-            m.devBanner(),
+            m.devBanner()
           ),
         ]
       : []),

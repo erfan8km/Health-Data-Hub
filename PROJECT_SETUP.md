@@ -132,10 +132,14 @@ This produces `artifacts/api-server/dist/index.mjs`.
 
 ```bash
 cd /home/iedr/app
-pnpm --filter @workspace/iedr run build
+BASE_PATH=/ NODE_ENV=production pnpm --filter @workspace/iedr run build
 ```
 
-This produces static files in `artifacts/iedr/dist/`.
+This produces static files in `artifacts/iedr/dist/public/`.
+
+> `BASE_PATH=/` tells Vite that all assets are served from the root path. If you
+> deploy the frontend under a sub-path (e.g. `/iedr/`), set `BASE_PATH=/iedr/` instead
+> and update the nginx `root` and `location` blocks accordingly.
 
 ---
 
