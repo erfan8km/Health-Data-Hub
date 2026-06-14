@@ -1,7 +1,8 @@
 import { Router, type IRouter } from "express";
-import { db, variablesTable } from "@workspace/db";
-import { eq, and } from "drizzle-orm";
+import { db, variablesTable, datasetsTable } from "@workspace/db";
+import { eq, and, or, ilike, sql } from "drizzle-orm";
 import {
+  ListAllVariablesQueryParams,
   ListVariablesParams,
   CreateVariableParams,
   CreateVariableBody,
@@ -12,6 +13,72 @@ import {
 
 const router: IRouter = Router();
 
+// Flat listing across all datasets (admin)
+router.get("/variables", async (req, res) => {
+  const query = ListAllVariablesQueryParams.safeParse(req.query);
+  if (!query.success) {
+    res.status(400).json({ error: "Invalid query params" });
+    return;
+  }
+  const { search, datasetId, type, page, limit } = query.data;
+  const offset = (page - 1) * limit;
+
+  try {
+    const conditions = [];
+    if (datasetId != null) conditions.push(eq(variablesTable.datasetId, datasetId));
+    if (type != null) conditions.push(eq(variablesTable.type, type));
+    if (search) {
+      conditions.push(
+        or(
+          ilike(variablesTable.name, `%${search}%`),
+          ilike(variablesTable.label, `%${search}%`),
+          ilike(variablesTable.description, `%${search}%`),
+          ilike(variablesTable.nameFa, `%${search}%`),
+          ilike(variablesTable.labelFa, `%${search}%`),
+        )
+      );
+    }
+    const where = conditions.length ? and(...conditions) : undefined;
+
+    const [rows, countResult] = await Promise.all([
+      db
+        .select({
+          id: variablesTable.id,
+          datasetId: variablesTable.datasetId,
+          datasetTitle: datasetsTable.title,
+          datasetTitleFa: datasetsTable.titleFa,
+          name: variablesTable.name,
+          nameFa: variablesTable.nameFa,
+          label: variablesTable.label,
+          labelFa: variablesTable.labelFa,
+          type: variablesTable.type,
+          description: variablesTable.description,
+          descriptionFa: variablesTable.descriptionFa,
+          valuesRange: variablesTable.valuesRange,
+          valuesRangeFa: variablesTable.valuesRangeFa,
+          missingValueNotes: variablesTable.missingValueNotes,
+          missingValueNotesFa: variablesTable.missingValueNotesFa,
+        })
+        .from(variablesTable)
+        .leftJoin(datasetsTable, eq(variablesTable.datasetId, datasetsTable.id))
+        .where(where)
+        .orderBy(variablesTable.id)
+        .limit(limit)
+        .offset(offset),
+      db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(variablesTable)
+        .where(where),
+    ]);
+
+    res.json({ data: rows, total: countResult[0]?.count ?? 0, page, limit });
+  } catch (err) {
+    req.log.error({ err }, "Error listing all variables");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Per-dataset listing
 router.get("/datasets/:datasetId/variables", async (req, res) => {
   const params = ListVariablesParams.safeParse({ datasetId: Number(req.params.datasetId) });
   if (!params.success) {

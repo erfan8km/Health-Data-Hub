@@ -29,10 +29,12 @@ import type {
   DatasetListResponse,
   DatasetUpdate,
   HealthStatus,
+  ListAllVariablesParams,
   ListDatasetsParams,
   RepoStats,
   Variable,
   VariableInput,
+  VariableListResponse,
   VariableUpdate
 } from './api.schemas';
 
@@ -866,6 +868,90 @@ export const useDeleteCategory = <TError = ErrorType<unknown>,
       > => {
       return useMutation(getDeleteCategoryMutationOptions(options));
     }
+
+export const getListAllVariablesUrl = (params?: ListAllVariablesParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/variables?${stringifiedParams}` : `/api/variables`
+}
+
+/**
+ * @summary List all variables across all datasets (admin use)
+ */
+export const listAllVariables = async (params?: ListAllVariablesParams, options?: RequestInit): Promise<VariableListResponse> => {
+
+  return customFetch<VariableListResponse>(getListAllVariablesUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAllVariablesQueryKey = (params?: ListAllVariablesParams,) => {
+    return [
+    `/api/variables`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListAllVariablesQueryOptions = <TData = Awaited<ReturnType<typeof listAllVariables>>, TError = ErrorType<unknown>>(params?: ListAllVariablesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAllVariables>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAllVariablesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAllVariables>>> = ({ signal }) => listAllVariables(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAllVariables>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListAllVariablesQueryResult = NonNullable<Awaited<ReturnType<typeof listAllVariables>>>
+export type ListAllVariablesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List all variables across all datasets (admin use)
+ */
+
+export function useListAllVariables<TData = Awaited<ReturnType<typeof listAllVariables>>, TError = ErrorType<unknown>>(
+ params?: ListAllVariablesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAllVariables>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListAllVariablesQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export const getListVariablesUrl = (datasetId: number,) => {
 

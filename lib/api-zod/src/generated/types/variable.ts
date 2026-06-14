@@ -5,17 +5,28 @@
  * Iran Epidemiology Data Repository API
  * OpenAPI spec version: 0.1.0
  */
+import type { VariableType } from './variableType';
 
 export interface Variable {
   id: number;
   datasetId: number;
+  /** @nullable */
+  datasetTitle?: string | null;
+  /** @nullable */
+  datasetTitleFa?: string | null;
   name: string;
   nameFa: string;
-  type: string;
+  label: string;
+  labelFa: string;
+  type: VariableType;
   description: string;
   descriptionFa: string;
   /** @nullable */
   valuesRange?: string | null;
   /** @nullable */
   valuesRangeFa?: string | null;
+  /** @nullable */
+  missingValueNotes?: string | null;
+  /** @nullable */
+  missingValueNotesFa?: string | null;
 }

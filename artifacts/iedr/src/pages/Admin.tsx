@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   useListDatasets,
@@ -9,10 +9,15 @@ import {
   useCreateCategory,
   useUpdateCategory,
   useDeleteCategory,
+  useListAllVariables,
+  useCreateVariable,
+  useUpdateVariable,
+  useDeleteVariable,
   getListDatasetsQueryKey,
   getListCategoriesQueryKey,
+  getListAllVariablesQueryKey,
 } from '@workspace/api-client-react';
-import type { Dataset, Category } from '@workspace/api-client-react';
+import type { Dataset, Category, Variable } from '@workspace/api-client-react';
 import { useLanguage } from '@/lib/language';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -46,10 +51,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, Pencil, Trash2, ShieldAlert, Lock, Eye, EyeOff, LogOut } from 'lucide-react';
+import { Plus, Pencil, Trash2, ShieldAlert, Lock, Eye, EyeOff, LogOut, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const SESSION_KEY = 'iedr_admin_auth';
+
+// ─── Login screen ────────────────────────────────────────────────────────────
 
 function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
   const { t } = useLanguage();
@@ -109,6 +116,7 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={t('Enter admin password', 'رمز عبور را وارد کنید')}
+                autoComplete="current-password"
                 autoFocus
                 className="pr-10"
               />
@@ -134,6 +142,8 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
   );
 }
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 type DatasetForm = {
   title: string; titleFa: string;
   description: string; descriptionFa: string;
@@ -158,6 +168,422 @@ const emptyDatasetForm: DatasetForm = {
 type CategoryForm = { name: string; nameFa: string; slug: string; description: string; descriptionFa: string; };
 const emptyCategoryForm: CategoryForm = { name: '', nameFa: '', slug: '', description: '', descriptionFa: '' };
 
+type VariableForm = {
+  name: string; nameFa: string;
+  label: string; labelFa: string;
+  type: 'numeric' | 'categorical' | 'date' | 'text';
+  description: string; descriptionFa: string;
+  valuesRange: string; valuesRangeFa: string;
+  missingValueNotes: string; missingValueNotesFa: string;
+  datasetId: string;
+};
+
+const emptyVariableForm: VariableForm = {
+  name: '', nameFa: '',
+  label: '', labelFa: '',
+  type: 'numeric',
+  description: '', descriptionFa: '',
+  valuesRange: '', valuesRangeFa: '',
+  missingValueNotes: '', missingValueNotesFa: '',
+  datasetId: '',
+};
+
+const VARIABLE_TYPES: { value: VariableForm['type']; labelEn: string; labelFa: string }[] = [
+  { value: 'numeric', labelEn: 'Numeric', labelFa: 'عددی' },
+  { value: 'categorical', labelEn: 'Categorical', labelFa: 'طبقه‌ای' },
+  { value: 'date', labelEn: 'Date', labelFa: 'تاریخ' },
+  { value: 'text', labelEn: 'Text', labelFa: 'متنی' },
+];
+
+// ─── Variables Tab ─────────────────────────────────────────────────────────────
+
+function VariablesTab({
+  datasets,
+}: {
+  datasets: Dataset[];
+}) {
+  const { t } = useLanguage();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [filterDataset, setFilterDataset] = useState<string>('all');
+  const [filterType, setFilterType] = useState<string>('all');
+  const [page, setPage] = useState(1);
+  const limit = 20;
+
+  const [varDialog, setVarDialog] = useState<{ open: boolean; mode: 'create' | 'edit'; data?: Variable }>({ open: false, mode: 'create' });
+  const [varForm, setVarForm] = useState<VariableForm>(emptyVariableForm);
+  const [deleteVar, setDeleteVar] = useState<Variable | null>(null);
+
+  const handleSearchChange = useCallback((value: string) => {
+    setSearch(value);
+    const timer = setTimeout(() => { setDebouncedSearch(value); setPage(1); }, 400);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const { data: variablesResp, isLoading } = useListAllVariables({
+    search: debouncedSearch || undefined,
+    datasetId: filterDataset !== 'all' ? Number(filterDataset) : undefined,
+    type: filterType !== 'all' ? filterType : undefined,
+    page,
+    limit,
+  });
+
+  const variables = variablesResp?.data ?? [];
+  const total = variablesResp?.total ?? 0;
+  const totalPages = Math.ceil(total / limit);
+
+  const createVariable = useCreateVariable();
+  const updateVariable = useUpdateVariable();
+  const deleteVariable = useDeleteVariable();
+
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: getListAllVariablesQueryKey() });
+
+  const openCreate = () => { setVarForm(emptyVariableForm); setVarDialog({ open: true, mode: 'create' }); };
+  const openEdit = (v: Variable) => {
+    setVarForm({
+      name: v.name, nameFa: v.nameFa,
+      label: v.label, labelFa: v.labelFa,
+      type: v.type as VariableForm['type'],
+      description: v.description, descriptionFa: v.descriptionFa,
+      valuesRange: v.valuesRange ?? '', valuesRangeFa: v.valuesRangeFa ?? '',
+      missingValueNotes: v.missingValueNotes ?? '', missingValueNotesFa: v.missingValueNotesFa ?? '',
+      datasetId: String(v.datasetId),
+    });
+    setVarDialog({ open: true, mode: 'edit', data: v });
+  };
+
+  const handleSave = () => {
+    const payload = {
+      name: varForm.name, nameFa: varForm.nameFa,
+      label: varForm.label, labelFa: varForm.labelFa,
+      type: varForm.type,
+      description: varForm.description, descriptionFa: varForm.descriptionFa,
+      valuesRange: varForm.valuesRange || undefined,
+      valuesRangeFa: varForm.valuesRangeFa || undefined,
+      missingValueNotes: varForm.missingValueNotes || undefined,
+      missingValueNotesFa: varForm.missingValueNotesFa || undefined,
+    };
+    const dsId = parseInt(varForm.datasetId);
+    if (!dsId) {
+      toast({ title: t('Please select a dataset', 'لطفاً یک مجموعه داده انتخاب کنید'), variant: 'destructive' });
+      return;
+    }
+    if (varDialog.mode === 'create') {
+      createVariable.mutate({ datasetId: dsId, data: payload }, {
+        onSuccess: () => { toast({ title: t('Variable created', 'متغیر ایجاد شد') }); setVarDialog({ open: false, mode: 'create' }); invalidate(); },
+        onError: () => toast({ title: t('Error creating variable', 'خطا'), variant: 'destructive' }),
+      });
+    } else if (varDialog.data) {
+      updateVariable.mutate({ datasetId: varDialog.data.datasetId, id: varDialog.data.id, data: payload }, {
+        onSuccess: () => { toast({ title: t('Variable updated', 'متغیر به‌روز شد') }); setVarDialog({ open: false, mode: 'create' }); invalidate(); },
+        onError: () => toast({ title: t('Error updating variable', 'خطا'), variant: 'destructive' }),
+      });
+    }
+  };
+
+  const handleDelete = () => {
+    if (!deleteVar) return;
+    deleteVariable.mutate({ datasetId: deleteVar.datasetId, id: deleteVar.id }, {
+      onSuccess: () => { toast({ title: t('Variable deleted', 'متغیر حذف شد') }); setDeleteVar(null); invalidate(); },
+      onError: () => toast({ title: t('Error deleting', 'خطا'), variant: 'destructive' }),
+    });
+  };
+
+  const typeColor: Record<string, string> = {
+    numeric: 'bg-blue-50 text-blue-700 border-blue-200',
+    categorical: 'bg-amber-50 text-amber-700 border-amber-200',
+    date: 'bg-green-50 text-green-700 border-green-200',
+    text: 'bg-purple-50 text-purple-700 border-purple-200',
+  };
+
+  return (
+    <div>
+      {/* Toolbar */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-4">
+        <div className="relative flex-1">
+          <Search className="absolute top-1/2 left-3 -translate-y-1/2 h-4 w-4 text-muted-foreground rtl:left-auto rtl:right-3" />
+          <Input
+            placeholder={t('Search name, label, description…', 'جستجو نام، برچسب، توضیح…')}
+            value={search}
+            onChange={e => handleSearchChange(e.target.value)}
+            className="pl-9 rtl:pr-9 rtl:pl-3"
+          />
+        </div>
+        <Select value={filterDataset} onValueChange={v => { setFilterDataset(v); setPage(1); }}>
+          <SelectTrigger className="w-full sm:w-52">
+            <SelectValue placeholder={t('All datasets', 'همه مجموعه داده‌ها')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('All datasets', 'همه مجموعه داده‌ها')}</SelectItem>
+            {datasets.map(ds => <SelectItem key={ds.id} value={String(ds.id)}>{ds.title}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={filterType} onValueChange={v => { setFilterType(v); setPage(1); }}>
+          <SelectTrigger className="w-full sm:w-40">
+            <SelectValue placeholder={t('All types', 'همه انواع')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('All types', 'همه انواع')}</SelectItem>
+            {VARIABLE_TYPES.map(vt => <SelectItem key={vt.value} value={vt.value}>{t(vt.labelEn, vt.labelFa)}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Button size="sm" onClick={openCreate} className="gap-2 shrink-0">
+          <Plus className="h-4 w-4" />
+          {t('Add Variable', 'افزودن متغیر')}
+        </Button>
+      </div>
+
+      <p className="text-xs text-muted-foreground mb-3">
+        {total} {t('variables', 'متغیر')}
+      </p>
+
+      {/* Table */}
+      <div className="rounded-lg border overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50 text-muted-foreground text-xs uppercase tracking-wider">
+              <tr>
+                <th className="text-start px-4 py-3 font-semibold">{t('Name', 'نام')}</th>
+                <th className="text-start px-4 py-3 font-semibold">{t('Label', 'برچسب')}</th>
+                <th className="text-start px-4 py-3 font-semibold">{t('Type', 'نوع')}</th>
+                <th className="text-start px-4 py-3 font-semibold hidden lg:table-cell">{t('Dataset', 'مجموعه داده')}</th>
+                <th className="text-start px-4 py-3 font-semibold hidden xl:table-cell">{t('Allowed Values', 'مقادیر مجاز')}</th>
+                <th className="text-start px-4 py-3 font-semibold">{t('Actions', 'عملیات')}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i}>
+                    {Array.from({ length: 6 }).map((_, j) => (
+                      <td key={j} className="px-4 py-3">
+                        <div className="h-4 bg-muted rounded animate-pulse" />
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              ) : variables.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
+                    {t('No variables found', 'متغیری یافت نشد')}
+                  </td>
+                </tr>
+              ) : (
+                variables.map(v => (
+                  <tr key={v.id} className="hover:bg-muted/30 transition-colors">
+                    <td className="px-4 py-3 font-mono text-xs font-medium">{v.name}</td>
+                    <td className="px-4 py-3 max-w-[180px] truncate" title={v.label}>{v.label || <span className="text-muted-foreground italic">{t('—', '—')}</span>}</td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${typeColor[v.type] ?? 'bg-muted text-muted-foreground border-border'}`}>
+                        {t(VARIABLE_TYPES.find(vt => vt.value === v.type)?.labelEn ?? v.type, VARIABLE_TYPES.find(vt => vt.value === v.type)?.labelFa ?? v.type)}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 hidden lg:table-cell">
+                      <span className="text-muted-foreground text-xs truncate max-w-[140px] block" title={v.datasetTitle ?? ''}>
+                        {v.datasetTitle ?? '—'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 hidden xl:table-cell text-muted-foreground text-xs max-w-[160px] truncate" title={v.valuesRange ?? ''}>
+                      {v.valuesRange ?? '—'}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(v)}>
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => setDeleteVar(v)}>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-4">
+          <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            {t(`Page ${page} of ${totalPages}`, `صفحه ${page} از ${totalPages}`)}
+          </span>
+          <Button variant="outline" size="sm" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
+
+      {/* Create / Edit Dialog */}
+      <Dialog open={varDialog.open} onOpenChange={open => setVarDialog(s => ({ ...s, open }))}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {varDialog.mode === 'create' ? t('Add Variable', 'افزودن متغیر') : t('Edit Variable', 'ویرایش متغیر')}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
+
+            {/* Dataset assignment */}
+            <div className="space-y-1 md:col-span-2">
+              <Label>{t('Dataset', 'مجموعه داده')}<span className="text-destructive ms-0.5">*</span></Label>
+              <Select
+                value={varForm.datasetId}
+                onValueChange={v => setVarForm(f => ({ ...f, datasetId: v }))}
+              >
+                <SelectTrigger><SelectValue placeholder={t('Select dataset', 'انتخاب مجموعه داده')} /></SelectTrigger>
+                <SelectContent>
+                  {datasets.map(ds => <SelectItem key={ds.id} value={String(ds.id)}>{ds.title}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Name */}
+            <div className="space-y-1">
+              <Label>{t('Variable Name (EN)', 'نام متغیر (EN)')}<span className="text-destructive ms-0.5">*</span></Label>
+              <Input
+                placeholder="e.g. age_at_diagnosis"
+                value={varForm.name}
+                onChange={e => setVarForm(f => ({ ...f, name: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label>{t('Variable Name (FA)', 'نام متغیر (FA)')}</Label>
+              <Input
+                dir="rtl"
+                placeholder="مثال: سن_تشخیص"
+                value={varForm.nameFa}
+                onChange={e => setVarForm(f => ({ ...f, nameFa: e.target.value }))}
+              />
+            </div>
+
+            {/* Label */}
+            <div className="space-y-1">
+              <Label>{t('Label (EN)', 'برچسب (EN)')}<span className="text-destructive ms-0.5">*</span></Label>
+              <Input
+                placeholder={t('e.g. Age at Diagnosis', 'مثال: سن در زمان تشخیص')}
+                value={varForm.label}
+                onChange={e => setVarForm(f => ({ ...f, label: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label>{t('Label (FA)', 'برچسب (FA)')}</Label>
+              <Input
+                dir="rtl"
+                placeholder="مثال: سن در زمان تشخیص"
+                value={varForm.labelFa}
+                onChange={e => setVarForm(f => ({ ...f, labelFa: e.target.value }))}
+              />
+            </div>
+
+            {/* Type */}
+            <div className="space-y-1 md:col-span-2">
+              <Label>{t('Data Type', 'نوع داده')}<span className="text-destructive ms-0.5">*</span></Label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {VARIABLE_TYPES.map(vt => (
+                  <button
+                    key={vt.value}
+                    type="button"
+                    onClick={() => setVarForm(f => ({ ...f, type: vt.value }))}
+                    className={`px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                      varForm.type === vt.value
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'bg-background hover:bg-muted border-border'
+                    }`}
+                  >
+                    {t(vt.labelEn, vt.labelFa)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="space-y-1 md:col-span-2">
+              <Label>{t('Description (EN)', 'توضیح (EN)')}<span className="text-destructive ms-0.5">*</span></Label>
+              <Textarea rows={2} placeholder={t('What does this variable measure?', 'این متغیر چه چیزی را اندازه می‌گیرد؟')} value={varForm.description} onChange={e => setVarForm(f => ({ ...f, description: e.target.value }))} />
+            </div>
+            <div className="space-y-1 md:col-span-2">
+              <Label>{t('Description (FA)', 'توضیح (FA)')}</Label>
+              <Textarea rows={2} dir="rtl" value={varForm.descriptionFa} onChange={e => setVarForm(f => ({ ...f, descriptionFa: e.target.value }))} />
+            </div>
+
+            {/* Allowed values */}
+            <div className="space-y-1">
+              <Label>{t('Allowed Values (EN)', 'مقادیر مجاز (EN)')}</Label>
+              <Input
+                placeholder={t('e.g. 1=Male, 2=Female or 0–120', 'مثال: ۱=مرد، ۲=زن')}
+                value={varForm.valuesRange}
+                onChange={e => setVarForm(f => ({ ...f, valuesRange: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label>{t('Allowed Values (FA)', 'مقادیر مجاز (FA)')}</Label>
+              <Input
+                dir="rtl"
+                value={varForm.valuesRangeFa}
+                onChange={e => setVarForm(f => ({ ...f, valuesRangeFa: e.target.value }))}
+              />
+            </div>
+
+            {/* Missing value notes */}
+            <div className="space-y-1">
+              <Label>{t('Missing Value Notes (EN)', 'یادداشت مقادیر گمشده (EN)')}</Label>
+              <Input
+                placeholder={t('e.g. -9 = Not collected, blank = Unknown', 'مثال: ۹- = جمع‌آوری نشده')}
+                value={varForm.missingValueNotes}
+                onChange={e => setVarForm(f => ({ ...f, missingValueNotes: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label>{t('Missing Value Notes (FA)', 'یادداشت مقادیر گمشده (FA)')}</Label>
+              <Input
+                dir="rtl"
+                value={varForm.missingValueNotesFa}
+                onChange={e => setVarForm(f => ({ ...f, missingValueNotesFa: e.target.value }))}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild><Button variant="outline">{t('Cancel', 'لغو')}</Button></DialogClose>
+            <Button onClick={handleSave}>{t('Save', 'ذخیره')}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete confirmation */}
+      <AlertDialog open={deleteVar !== null} onOpenChange={open => !open && setDeleteVar(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('Delete Variable?', 'حذف متغیر؟')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t(
+                `"${deleteVar?.name}" will be permanently removed from dataset "${deleteVar?.datasetTitle ?? ''}"`,
+                `متغیر "${deleteVar?.nameFa || deleteVar?.name}" به طور دائمی حذف می‌شود.`
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('Cancel', 'لغو')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {t('Delete', 'حذف')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
+
+// ─── Admin Panel ───────────────────────────────────────────────────────────────
+
 function AdminPanel() {
   const { t } = useLanguage();
   const { toast } = useToast();
@@ -171,7 +597,7 @@ function AdminPanel() {
   const [categoryForm, setCategoryForm] = useState<CategoryForm>(emptyCategoryForm);
   const [deleteCategoryId, setDeleteCategoryId] = useState<number | null>(null);
 
-  const { data: datasetsResp } = useListDatasets({ limit: 100 });
+  const { data: datasetsResp } = useListDatasets({ limit: 200 });
   const { data: categories } = useListCategories();
   const datasets = datasetsResp?.data ?? [];
 
@@ -279,7 +705,7 @@ function AdminPanel() {
           <ShieldAlert className="h-7 w-7 text-primary" />
           <div>
             <h1 className="text-2xl font-bold">{t('Admin Panel', 'پنل مدیریت')}</h1>
-            <p className="text-sm text-muted-foreground">{t('Manage datasets, categories, and metadata', 'مدیریت مجموعه داده‌ها، دسته‌بندی‌ها و متادیتا')}</p>
+            <p className="text-sm text-muted-foreground">{t('Manage datasets, variables, and categories', 'مدیریت مجموعه داده‌ها، متغیرها و دسته‌بندی‌ها')}</p>
           </div>
         </div>
         <Button variant="ghost" size="sm" onClick={handleSignOut} className="gap-2 text-muted-foreground hover:text-foreground">
@@ -288,12 +714,19 @@ function AdminPanel() {
         </Button>
       </div>
 
-      <Tabs defaultValue="datasets">
+      <Tabs defaultValue="variables">
         <TabsList className="mb-6">
+          <TabsTrigger value="variables">{t('Variables', 'متغیرها')}</TabsTrigger>
           <TabsTrigger value="datasets">{t('Datasets', 'مجموعه داده‌ها')}</TabsTrigger>
           <TabsTrigger value="categories">{t('Categories', 'دسته‌بندی‌ها')}</TabsTrigger>
         </TabsList>
 
+        {/* Variables tab */}
+        <TabsContent value="variables">
+          <VariablesTab datasets={datasets} />
+        </TabsContent>
+
+        {/* Datasets tab */}
         <TabsContent value="datasets">
           <div className="flex justify-between items-center mb-4">
             <p className="text-sm text-muted-foreground">{datasets.length} {t('datasets', 'مجموعه داده')}</p>
@@ -330,6 +763,7 @@ function AdminPanel() {
           </div>
         </TabsContent>
 
+        {/* Categories tab */}
         <TabsContent value="categories">
           <div className="flex justify-between items-center mb-4">
             <p className="text-sm text-muted-foreground">{categories?.length ?? 0} {t('categories', 'دسته‌بندی')}</p>
@@ -374,10 +808,10 @@ function AdminPanel() {
             <DialogTitle>{datasetDialog.mode === 'create' ? t('Add Dataset', 'افزودن مجموعه داده') : t('Edit Dataset', 'ویرایش مجموعه داده')}</DialogTitle>
           </DialogHeader>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
-            <div className="space-y-1"><Label>{t('Title (EN)', 'عنوان (انگلیسی)')}</Label><Input value={datasetForm.title} onChange={e => setDatasetForm(f => ({ ...f, title: e.target.value }))} /></div>
-            <div className="space-y-1"><Label>{t('Title (FA)', 'عنوان (فارسی)')}</Label><Input value={datasetForm.titleFa} dir="rtl" onChange={e => setDatasetForm(f => ({ ...f, titleFa: e.target.value }))} /></div>
-            <div className="space-y-1 md:col-span-2"><Label>{t('Description (EN)', 'توضیح (انگلیسی)')}</Label><Textarea rows={2} value={datasetForm.description} onChange={e => setDatasetForm(f => ({ ...f, description: e.target.value }))} /></div>
-            <div className="space-y-1 md:col-span-2"><Label>{t('Description (FA)', 'توضیح (فارسی)')}</Label><Textarea rows={2} dir="rtl" value={datasetForm.descriptionFa} onChange={e => setDatasetForm(f => ({ ...f, descriptionFa: e.target.value }))} /></div>
+            <div className="space-y-1"><Label>{t('Title (EN)', 'عنوان (EN)')}</Label><Input value={datasetForm.title} onChange={e => setDatasetForm(f => ({ ...f, title: e.target.value }))} /></div>
+            <div className="space-y-1"><Label>{t('Title (FA)', 'عنوان (FA)')}</Label><Input value={datasetForm.titleFa} dir="rtl" onChange={e => setDatasetForm(f => ({ ...f, titleFa: e.target.value }))} /></div>
+            <div className="space-y-1 md:col-span-2"><Label>{t('Description (EN)', 'توضیح (EN)')}</Label><Textarea rows={2} value={datasetForm.description} onChange={e => setDatasetForm(f => ({ ...f, description: e.target.value }))} /></div>
+            <div className="space-y-1 md:col-span-2"><Label>{t('Description (FA)', 'توضیح (FA)')}</Label><Textarea rows={2} dir="rtl" value={datasetForm.descriptionFa} onChange={e => setDatasetForm(f => ({ ...f, descriptionFa: e.target.value }))} /></div>
             <div className="space-y-1"><Label>{t('Records Count', 'تعداد رکورد')}</Label><Input type="number" value={datasetForm.recordsCount} onChange={e => setDatasetForm(f => ({ ...f, recordsCount: e.target.value }))} /></div>
             <div className="space-y-1"><Label>{t('Variables Count', 'تعداد متغیر')}</Label><Input type="number" value={datasetForm.variablesCount} onChange={e => setDatasetForm(f => ({ ...f, variablesCount: e.target.value }))} /></div>
             <div className="space-y-1"><Label>{t('Year Start', 'سال شروع')}</Label><Input type="number" value={datasetForm.yearStart} onChange={e => setDatasetForm(f => ({ ...f, yearStart: e.target.value }))} /></div>
@@ -432,7 +866,7 @@ function AdminPanel() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('Delete Dataset?', 'حذف مجموعه داده؟')}</AlertDialogTitle>
-            <AlertDialogDescription>{t('This action cannot be undone.', 'این عملیات قابل بازگشت نیست.')}</AlertDialogDescription>
+            <AlertDialogDescription>{t('This action cannot be undone. All variables in this dataset will also be deleted.', 'این عملیات قابل بازگشت نیست. تمام متغیرهای این مجموعه داده نیز حذف می‌شوند.')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('Cancel', 'لغو')}</AlertDialogCancel>
@@ -457,6 +891,8 @@ function AdminPanel() {
     </div>
   );
 }
+
+// ─── Root export ───────────────────────────────────────────────────────────────
 
 export default function Admin() {
   const [authenticated, setAuthenticated] = useState(() => sessionStorage.getItem(SESSION_KEY) === '1');

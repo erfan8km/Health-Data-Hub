@@ -235,6 +235,45 @@ paths:
         "204":
           description: Deleted
 
+  /variables:
+    get:
+      operationId: listAllVariables
+      tags: [variables]
+      summary: List all variables across all datasets (admin use)
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search by name, label, or description
+        - name: datasetId
+          in: query
+          schema:
+            type: ["integer", "null"]
+          description: Filter by dataset ID
+        - name: type
+          in: query
+          schema:
+            type: ["string", "null"]
+          description: Filter by variable type
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Paginated list of variables
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VariableListResponse"
+
   /datasets/{datasetId}/variables:
     get:
       operationId: listVariables
@@ -582,18 +621,27 @@ components:
 
     Variable:
       type: object
-      required: [id, datasetId, name, nameFa, type, description, descriptionFa]
+      required: [id, datasetId, name, nameFa, label, labelFa, type, description, descriptionFa]
       properties:
         id:
           type: integer
         datasetId:
           type: integer
+        datasetTitle:
+          type: ["string", "null"]
+        datasetTitleFa:
+          type: ["string", "null"]
         name:
           type: string
         nameFa:
           type: string
+        label:
+          type: string
+        labelFa:
+          type: string
         type:
           type: string
+          enum: [numeric, categorical, date, text]
         description:
           type: string
         descriptionFa:
@@ -602,17 +650,26 @@ components:
           type: ["string", "null"]
         valuesRangeFa:
           type: ["string", "null"]
+        missingValueNotes:
+          type: ["string", "null"]
+        missingValueNotesFa:
+          type: ["string", "null"]
 
     VariableInput:
       type: object
-      required: [name, nameFa, type, description, descriptionFa]
+      required: [name, nameFa, label, labelFa, type, description, descriptionFa]
       properties:
         name:
           type: string
         nameFa:
           type: string
+        label:
+          type: string
+        labelFa:
+          type: string
         type:
           type: string
+          enum: [numeric, categorical, date, text]
         description:
           type: string
         descriptionFa:
@@ -620,6 +677,10 @@ components:
         valuesRange:
           type: string
         valuesRangeFa:
+          type: string
+        missingValueNotes:
+          type: string
+        missingValueNotesFa:
           type: string
 
     VariableUpdate:
@@ -629,8 +690,13 @@ components:
           type: string
         nameFa:
           type: string
+        label:
+          type: string
+        labelFa:
+          type: string
         type:
           type: string
+          enum: [numeric, categorical, date, text]
         description:
           type: string
         descriptionFa:
@@ -639,6 +705,25 @@ components:
           type: string
         valuesRangeFa:
           type: string
+        missingValueNotes:
+          type: string
+        missingValueNotesFa:
+          type: string
+
+    VariableListResponse:
+      type: object
+      required: [data, total, page, limit]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Variable"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
 
     RepoStats:
       type: object

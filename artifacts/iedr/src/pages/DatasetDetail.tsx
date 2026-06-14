@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useRoute } from 'wouter';
-import { useGetDataset } from '@workspace/api-client-react';
+import { useGetDataset, getGetDatasetQueryOptions } from '@workspace/api-client-react';
 import { useLanguage } from '@/lib/language';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,7 @@ export default function DatasetDetail() {
   const [citationCopied, setCitationCopied] = useState(false);
 
   const { data: dataset, isLoading, isError } = useGetDataset(id, {
-    query: { enabled: !!id && !isNaN(id) },
+    query: { ...getGetDatasetQueryOptions(id), enabled: !!id && !isNaN(id) },
   });
 
   const handleCopyCitation = () => {

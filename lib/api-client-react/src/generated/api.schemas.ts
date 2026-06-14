@@ -64,18 +64,38 @@ export interface Dataset {
   createdAt: string;
 }
 
+export type VariableType = typeof VariableType[keyof typeof VariableType];
+
+
+export const VariableType = {
+  numeric: 'numeric',
+  categorical: 'categorical',
+  date: 'date',
+  text: 'text',
+} as const;
+
 export interface Variable {
   id: number;
   datasetId: number;
+  /** @nullable */
+  datasetTitle?: string | null;
+  /** @nullable */
+  datasetTitleFa?: string | null;
   name: string;
   nameFa: string;
-  type: string;
+  label: string;
+  labelFa: string;
+  type: VariableType;
   description: string;
   descriptionFa: string;
   /** @nullable */
   valuesRange?: string | null;
   /** @nullable */
   valuesRangeFa?: string | null;
+  /** @nullable */
+  missingValueNotes?: string | null;
+  /** @nullable */
+  missingValueNotesFa?: string | null;
 }
 
 export interface DatasetDetail {
@@ -151,24 +171,59 @@ export interface DatasetListResponse {
   limit: number;
 }
 
+export type VariableInputType = typeof VariableInputType[keyof typeof VariableInputType];
+
+
+export const VariableInputType = {
+  numeric: 'numeric',
+  categorical: 'categorical',
+  date: 'date',
+  text: 'text',
+} as const;
+
 export interface VariableInput {
   name: string;
   nameFa: string;
-  type: string;
+  label: string;
+  labelFa: string;
+  type: VariableInputType;
   description: string;
   descriptionFa: string;
   valuesRange?: string;
   valuesRangeFa?: string;
+  missingValueNotes?: string;
+  missingValueNotesFa?: string;
 }
+
+export type VariableUpdateType = typeof VariableUpdateType[keyof typeof VariableUpdateType];
+
+
+export const VariableUpdateType = {
+  numeric: 'numeric',
+  categorical: 'categorical',
+  date: 'date',
+  text: 'text',
+} as const;
 
 export interface VariableUpdate {
   name?: string;
   nameFa?: string;
-  type?: string;
+  label?: string;
+  labelFa?: string;
+  type?: VariableUpdateType;
   description?: string;
   descriptionFa?: string;
   valuesRange?: string;
   valuesRangeFa?: string;
+  missingValueNotes?: string;
+  missingValueNotesFa?: string;
+}
+
+export interface VariableListResponse {
+  data: Variable[];
+  total: number;
+  page: number;
+  limit: number;
 }
 
 export interface RepoStats {
@@ -195,6 +250,25 @@ categoryId?: number | null;
  * @nullable
  */
 featured?: boolean | null;
+page?: number;
+limit?: number;
+};
+
+export type ListAllVariablesParams = {
+/**
+ * Search by name, label, or description
+ */
+search?: string;
+/**
+ * Filter by dataset ID
+ * @nullable
+ */
+datasetId?: number | null;
+/**
+ * Filter by variable type
+ * @nullable
+ */
+type?: string | null;
 page?: number;
 limit?: number;
 };

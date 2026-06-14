@@ -142,13 +142,19 @@ export const GetDatasetResponse = zod.object({
   "variables": zod.array(zod.object({
   "id": zod.number(),
   "datasetId": zod.number(),
+  "datasetTitle": zod.string().nullish(),
+  "datasetTitleFa": zod.string().nullish(),
   "name": zod.string(),
   "nameFa": zod.string(),
-  "type": zod.string(),
+  "label": zod.string(),
+  "labelFa": zod.string(),
+  "type": zod.enum(['numeric', 'categorical', 'date', 'text']),
   "description": zod.string(),
   "descriptionFa": zod.string(),
   "valuesRange": zod.string().nullish(),
-  "valuesRangeFa": zod.string().nullish()
+  "valuesRangeFa": zod.string().nullish(),
+  "missingValueNotes": zod.string().nullish(),
+  "missingValueNotesFa": zod.string().nullish()
 }))
 })
 
@@ -273,6 +279,44 @@ export const DeleteCategoryParams = zod.object({
 
 
 /**
+ * @summary List all variables across all datasets (admin use)
+ */
+export const listAllVariablesQueryPageDefault = 1;
+export const listAllVariablesQueryLimitDefault = 20;
+
+export const ListAllVariablesQueryParams = zod.object({
+  "search": zod.coerce.string().optional().describe('Search by name, label, or description'),
+  "datasetId": zod.coerce.number().nullish().describe('Filter by dataset ID'),
+  "type": zod.coerce.string().nullish().describe('Filter by variable type'),
+  "page": zod.coerce.number().default(listAllVariablesQueryPageDefault),
+  "limit": zod.coerce.number().default(listAllVariablesQueryLimitDefault)
+})
+
+export const ListAllVariablesResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number(),
+  "datasetId": zod.number(),
+  "datasetTitle": zod.string().nullish(),
+  "datasetTitleFa": zod.string().nullish(),
+  "name": zod.string(),
+  "nameFa": zod.string(),
+  "label": zod.string(),
+  "labelFa": zod.string(),
+  "type": zod.enum(['numeric', 'categorical', 'date', 'text']),
+  "description": zod.string(),
+  "descriptionFa": zod.string(),
+  "valuesRange": zod.string().nullish(),
+  "valuesRangeFa": zod.string().nullish(),
+  "missingValueNotes": zod.string().nullish(),
+  "missingValueNotesFa": zod.string().nullish()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number()
+})
+
+
+/**
  * @summary List variables for a dataset
  */
 export const ListVariablesParams = zod.object({
@@ -282,13 +326,19 @@ export const ListVariablesParams = zod.object({
 export const ListVariablesResponseItem = zod.object({
   "id": zod.number(),
   "datasetId": zod.number(),
+  "datasetTitle": zod.string().nullish(),
+  "datasetTitleFa": zod.string().nullish(),
   "name": zod.string(),
   "nameFa": zod.string(),
-  "type": zod.string(),
+  "label": zod.string(),
+  "labelFa": zod.string(),
+  "type": zod.enum(['numeric', 'categorical', 'date', 'text']),
   "description": zod.string(),
   "descriptionFa": zod.string(),
   "valuesRange": zod.string().nullish(),
-  "valuesRangeFa": zod.string().nullish()
+  "valuesRangeFa": zod.string().nullish(),
+  "missingValueNotes": zod.string().nullish(),
+  "missingValueNotesFa": zod.string().nullish()
 })
 export const ListVariablesResponse = zod.array(ListVariablesResponseItem)
 
@@ -303,11 +353,15 @@ export const CreateVariableParams = zod.object({
 export const CreateVariableBody = zod.object({
   "name": zod.string(),
   "nameFa": zod.string(),
-  "type": zod.string(),
+  "label": zod.string(),
+  "labelFa": zod.string(),
+  "type": zod.enum(['numeric', 'categorical', 'date', 'text']),
   "description": zod.string(),
   "descriptionFa": zod.string(),
   "valuesRange": zod.string().optional(),
-  "valuesRangeFa": zod.string().optional()
+  "valuesRangeFa": zod.string().optional(),
+  "missingValueNotes": zod.string().optional(),
+  "missingValueNotesFa": zod.string().optional()
 })
 
 
@@ -322,23 +376,33 @@ export const UpdateVariableParams = zod.object({
 export const UpdateVariableBody = zod.object({
   "name": zod.string().optional(),
   "nameFa": zod.string().optional(),
-  "type": zod.string().optional(),
+  "label": zod.string().optional(),
+  "labelFa": zod.string().optional(),
+  "type": zod.enum(['numeric', 'categorical', 'date', 'text']).optional(),
   "description": zod.string().optional(),
   "descriptionFa": zod.string().optional(),
   "valuesRange": zod.string().optional(),
-  "valuesRangeFa": zod.string().optional()
+  "valuesRangeFa": zod.string().optional(),
+  "missingValueNotes": zod.string().optional(),
+  "missingValueNotesFa": zod.string().optional()
 })
 
 export const UpdateVariableResponse = zod.object({
   "id": zod.number(),
   "datasetId": zod.number(),
+  "datasetTitle": zod.string().nullish(),
+  "datasetTitleFa": zod.string().nullish(),
   "name": zod.string(),
   "nameFa": zod.string(),
-  "type": zod.string(),
+  "label": zod.string(),
+  "labelFa": zod.string(),
+  "type": zod.enum(['numeric', 'categorical', 'date', 'text']),
   "description": zod.string(),
   "descriptionFa": zod.string(),
   "valuesRange": zod.string().nullish(),
-  "valuesRangeFa": zod.string().nullish()
+  "valuesRangeFa": zod.string().nullish(),
+  "missingValueNotes": zod.string().nullish(),
+  "missingValueNotesFa": zod.string().nullish()
 })
 
 
