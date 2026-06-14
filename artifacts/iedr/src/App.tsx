@@ -9,6 +9,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Datasets from "@/pages/Datasets";
 import DatasetDetail from "@/pages/DatasetDetail";
+import VariableDictionary from "@/pages/VariableDictionary";
 import About from "@/pages/About";
 import Admin from "@/pages/Admin";
 
@@ -28,6 +29,7 @@ function Router() {
         <Route path="/" component={Home} />
         <Route path="/datasets" component={Datasets} />
         <Route path="/datasets/:id" component={DatasetDetail} />
+        <Route path="/variables" component={VariableDictionary} />
         <Route path="/about" component={About} />
         <Route path="/admin" component={Admin} />
         <Route component={NotFound} />

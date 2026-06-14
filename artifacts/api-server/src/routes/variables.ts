@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { db, variablesTable, datasetsTable } from "@workspace/db";
+import { db, variablesTable, datasetsTable, categoriesTable } from "@workspace/db";
 import { eq, and, or, ilike, sql } from "drizzle-orm";
 import {
   ListAllVariablesQueryParams,
@@ -13,20 +13,22 @@ import {
 
 const router: IRouter = Router();
 
-// Flat listing across all datasets (admin)
+// Flat listing across all datasets (public variable dictionary)
 router.get("/variables", async (req, res) => {
   const query = ListAllVariablesQueryParams.safeParse(req.query);
   if (!query.success) {
     res.status(400).json({ error: "Invalid query params" });
     return;
   }
-  const { search, datasetId, type, page, limit } = query.data;
+  const { search, name, datasetId, categoryId, type, page, limit } = query.data;
   const offset = (page - 1) * limit;
 
   try {
     const conditions = [];
     if (datasetId != null) conditions.push(eq(variablesTable.datasetId, datasetId));
+    if (categoryId != null) conditions.push(eq(datasetsTable.categoryId, categoryId));
     if (type != null) conditions.push(eq(variablesTable.type, type));
+    if (name != null) conditions.push(eq(variablesTable.name, name));
     if (search) {
       conditions.push(
         or(
@@ -35,40 +37,46 @@ router.get("/variables", async (req, res) => {
           ilike(variablesTable.description, `%${search}%`),
           ilike(variablesTable.nameFa, `%${search}%`),
           ilike(variablesTable.labelFa, `%${search}%`),
+          ilike(variablesTable.descriptionFa, `%${search}%`),
         )
       );
     }
     const where = conditions.length ? and(...conditions) : undefined;
 
+    const baseQuery = db
+      .select({
+        id: variablesTable.id,
+        datasetId: variablesTable.datasetId,
+        datasetTitle: datasetsTable.title,
+        datasetTitleFa: datasetsTable.titleFa,
+        categoryId: datasetsTable.categoryId,
+        categoryName: categoriesTable.name,
+        categoryNameFa: categoriesTable.nameFa,
+        name: variablesTable.name,
+        nameFa: variablesTable.nameFa,
+        label: variablesTable.label,
+        labelFa: variablesTable.labelFa,
+        type: variablesTable.type,
+        description: variablesTable.description,
+        descriptionFa: variablesTable.descriptionFa,
+        valuesRange: variablesTable.valuesRange,
+        valuesRangeFa: variablesTable.valuesRangeFa,
+        missingValueNotes: variablesTable.missingValueNotes,
+        missingValueNotesFa: variablesTable.missingValueNotesFa,
+      })
+      .from(variablesTable)
+      .leftJoin(datasetsTable, eq(variablesTable.datasetId, datasetsTable.id))
+      .leftJoin(categoriesTable, eq(datasetsTable.categoryId, categoriesTable.id));
+
+    const countQuery = db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(variablesTable)
+      .leftJoin(datasetsTable, eq(variablesTable.datasetId, datasetsTable.id))
+      .leftJoin(categoriesTable, eq(datasetsTable.categoryId, categoriesTable.id));
+
     const [rows, countResult] = await Promise.all([
-      db
-        .select({
-          id: variablesTable.id,
-          datasetId: variablesTable.datasetId,
-          datasetTitle: datasetsTable.title,
-          datasetTitleFa: datasetsTable.titleFa,
-          name: variablesTable.name,
-          nameFa: variablesTable.nameFa,
-          label: variablesTable.label,
-          labelFa: variablesTable.labelFa,
-          type: variablesTable.type,
-          description: variablesTable.description,
-          descriptionFa: variablesTable.descriptionFa,
-          valuesRange: variablesTable.valuesRange,
-          valuesRangeFa: variablesTable.valuesRangeFa,
-          missingValueNotes: variablesTable.missingValueNotes,
-          missingValueNotesFa: variablesTable.missingValueNotesFa,
-        })
-        .from(variablesTable)
-        .leftJoin(datasetsTable, eq(variablesTable.datasetId, datasetsTable.id))
-        .where(where)
-        .orderBy(variablesTable.id)
-        .limit(limit)
-        .offset(offset),
-      db
-        .select({ count: sql<number>`count(*)::int` })
-        .from(variablesTable)
-        .where(where),
+      baseQuery.where(where).orderBy(variablesTable.name, variablesTable.id).limit(limit).offset(offset),
+      countQuery.where(where),
     ]);
 
     res.json({ data: rows, total: countResult[0]?.count ?? 0, page, limit });

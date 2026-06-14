@@ -14,6 +14,12 @@ export interface Variable {
   datasetTitle?: string | null;
   /** @nullable */
   datasetTitleFa?: string | null;
+  /** @nullable */
+  categoryId?: number | null;
+  /** @nullable */
+  categoryName?: string | null;
+  /** @nullable */
+  categoryNameFa?: string | null;
   name: string;
   nameFa: string;
   label: string;

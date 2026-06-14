@@ -16,6 +16,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const navLinks = [
     { href: '/', labelEn: 'Home', labelFa: 'خانه' },
     { href: '/datasets', labelEn: 'Datasets', labelFa: 'داده‌ها' },
+    { href: '/variables', labelEn: 'Variables', labelFa: 'متغیرها' },
     { href: '/about', labelEn: 'About', labelFa: 'درباره ما' },
     { href: '/admin', labelEn: 'Admin', labelFa: 'مدیریت' },
   ];

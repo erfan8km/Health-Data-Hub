@@ -12,10 +12,20 @@ export type ListAllVariablesParams = {
  */
 search?: string;
 /**
+ * Exact match on variable name (for cross-dataset lookup)
+ * @nullable
+ */
+name?: string | null;
+/**
  * Filter by dataset ID
  * @nullable
  */
 datasetId?: number | null;
+/**
+ * Filter by category ID
+ * @nullable
+ */
+categoryId?: number | null;
 /**
  * Filter by variable type
  * @nullable

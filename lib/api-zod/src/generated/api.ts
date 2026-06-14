@@ -144,6 +144,9 @@ export const GetDatasetResponse = zod.object({
   "datasetId": zod.number(),
   "datasetTitle": zod.string().nullish(),
   "datasetTitleFa": zod.string().nullish(),
+  "categoryId": zod.number().nullish(),
+  "categoryName": zod.string().nullish(),
+  "categoryNameFa": zod.string().nullish(),
   "name": zod.string(),
   "nameFa": zod.string(),
   "label": zod.string(),
@@ -279,14 +282,16 @@ export const DeleteCategoryParams = zod.object({
 
 
 /**
- * @summary List all variables across all datasets (admin use)
+ * @summary List all variables across all datasets (public variable dictionary)
  */
 export const listAllVariablesQueryPageDefault = 1;
 export const listAllVariablesQueryLimitDefault = 20;
 
 export const ListAllVariablesQueryParams = zod.object({
   "search": zod.coerce.string().optional().describe('Search by name, label, or description'),
+  "name": zod.coerce.string().nullish().describe('Exact match on variable name (for cross-dataset lookup)'),
   "datasetId": zod.coerce.number().nullish().describe('Filter by dataset ID'),
+  "categoryId": zod.coerce.number().nullish().describe('Filter by category ID'),
   "type": zod.coerce.string().nullish().describe('Filter by variable type'),
   "page": zod.coerce.number().default(listAllVariablesQueryPageDefault),
   "limit": zod.coerce.number().default(listAllVariablesQueryLimitDefault)
@@ -298,6 +303,9 @@ export const ListAllVariablesResponse = zod.object({
   "datasetId": zod.number(),
   "datasetTitle": zod.string().nullish(),
   "datasetTitleFa": zod.string().nullish(),
+  "categoryId": zod.number().nullish(),
+  "categoryName": zod.string().nullish(),
+  "categoryNameFa": zod.string().nullish(),
   "name": zod.string(),
   "nameFa": zod.string(),
   "label": zod.string(),
@@ -328,6 +336,9 @@ export const ListVariablesResponseItem = zod.object({
   "datasetId": zod.number(),
   "datasetTitle": zod.string().nullish(),
   "datasetTitleFa": zod.string().nullish(),
+  "categoryId": zod.number().nullish(),
+  "categoryName": zod.string().nullish(),
+  "categoryNameFa": zod.string().nullish(),
   "name": zod.string(),
   "nameFa": zod.string(),
   "label": zod.string(),
@@ -392,6 +403,9 @@ export const UpdateVariableResponse = zod.object({
   "datasetId": zod.number(),
   "datasetTitle": zod.string().nullish(),
   "datasetTitleFa": zod.string().nullish(),
+  "categoryId": zod.number().nullish(),
+  "categoryName": zod.string().nullish(),
+  "categoryNameFa": zod.string().nullish(),
   "name": zod.string(),
   "nameFa": zod.string(),
   "label": zod.string(),

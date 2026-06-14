@@ -239,18 +239,28 @@ paths:
     get:
       operationId: listAllVariables
       tags: [variables]
-      summary: List all variables across all datasets (admin use)
+      summary: List all variables across all datasets (public variable dictionary)
       parameters:
         - name: search
           in: query
           schema:
             type: string
           description: Search by name, label, or description
+        - name: name
+          in: query
+          schema:
+            type: ["string", "null"]
+          description: Exact match on variable name (for cross-dataset lookup)
         - name: datasetId
           in: query
           schema:
             type: ["integer", "null"]
           description: Filter by dataset ID
+        - name: categoryId
+          in: query
+          schema:
+            type: ["integer", "null"]
+          description: Filter by category ID
         - name: type
           in: query
           schema:
@@ -630,6 +640,12 @@ components:
         datasetTitle:
           type: ["string", "null"]
         datasetTitleFa:
+          type: ["string", "null"]
+        categoryId:
+          type: ["integer", "null"]
+        categoryName:
+          type: ["string", "null"]
+        categoryNameFa:
           type: ["string", "null"]
         name:
           type: string

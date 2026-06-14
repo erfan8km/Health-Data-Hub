@@ -885,7 +885,7 @@ export const getListAllVariablesUrl = (params?: ListAllVariablesParams,) => {
 }
 
 /**
- * @summary List all variables across all datasets (admin use)
+ * @summary List all variables across all datasets (public variable dictionary)
  */
 export const listAllVariables = async (params?: ListAllVariablesParams, options?: RequestInit): Promise<VariableListResponse> => {
 
@@ -932,7 +932,7 @@ export type ListAllVariablesQueryError = ErrorType<unknown>
 
 
 /**
- * @summary List all variables across all datasets (admin use)
+ * @summary List all variables across all datasets (public variable dictionary)
  */
 
 export function useListAllVariables<TData = Awaited<ReturnType<typeof listAllVariables>>, TError = ErrorType<unknown>>(

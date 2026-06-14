@@ -81,6 +81,12 @@ export interface Variable {
   datasetTitle?: string | null;
   /** @nullable */
   datasetTitleFa?: string | null;
+  /** @nullable */
+  categoryId?: number | null;
+  /** @nullable */
+  categoryName?: string | null;
+  /** @nullable */
+  categoryNameFa?: string | null;
   name: string;
   nameFa: string;
   label: string;
@@ -260,10 +266,20 @@ export type ListAllVariablesParams = {
  */
 search?: string;
 /**
+ * Exact match on variable name (for cross-dataset lookup)
+ * @nullable
+ */
+name?: string | null;
+/**
  * Filter by dataset ID
  * @nullable
  */
 datasetId?: number | null;
+/**
+ * Filter by category ID
+ * @nullable
+ */
+categoryId?: number | null;
 /**
  * Filter by variable type
  * @nullable
