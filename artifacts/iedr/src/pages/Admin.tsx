@@ -51,10 +51,110 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, Pencil, Trash2, ShieldAlert, Lock, Eye, EyeOff, LogOut, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Pencil, Trash2, ShieldAlert, Lock, Eye, EyeOff, LogOut, Search, ChevronLeft, ChevronRight, Download, FileJson, FileText, DatabaseBackup } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const SESSION_KEY = 'iedr_admin_auth';
+
+// ─── Export tab ──────────────────────────────────────────────────────────────
+
+function ExportTab({ t }: { t: (en: string, fa: string) => string }) {
+  const download = (path: string) => {
+    window.open(`/api${path}`, '_blank');
+  };
+
+  const sections = [
+    {
+      title: t('Full Database Backup (JSON)', 'پشتیبان کامل پایگاه داده (JSON)'),
+      description: t(
+        'All categories, datasets, and variables in a single JSON file.',
+        'همه دسته‌بندی‌ها، مجموعه‌داده‌ها و متغیرها در یک فایل JSON.'
+      ),
+      icon: <DatabaseBackup className="h-5 w-5 text-primary" />,
+      actions: [
+        { label: t('Download JSON', 'دانلود JSON'), path: '/export/json', icon: <FileJson className="h-4 w-4" /> },
+      ],
+    },
+    {
+      title: t('Schema Definition', 'تعریف طرح داده'),
+      description: t(
+        'Database schema: tables, columns, types, and relationships.',
+        'طرح پایگاه داده: جداول، ستون‌ها، انواع، و روابط.'
+      ),
+      icon: <FileText className="h-5 w-5 text-primary" />,
+      actions: [
+        { label: t('Download Schema JSON', 'دانلود JSON طرح'), path: '/export/schema', icon: <FileJson className="h-4 w-4" /> },
+      ],
+    },
+    {
+      title: t('Categories', 'دسته‌بندی‌ها'),
+      description: t('All research categories.', 'همه دسته‌بندی‌های پژوهشی.'),
+      icon: <FileText className="h-5 w-5 text-primary" />,
+      actions: [
+        { label: 'JSON', path: '/export/json/categories', icon: <FileJson className="h-4 w-4" /> },
+        { label: 'CSV', path: '/export/csv/categories', icon: <FileText className="h-4 w-4" /> },
+      ],
+    },
+    {
+      title: t('Datasets', 'مجموعه‌داده‌ها'),
+      description: t(
+        'All dataset metadata. JSON version includes nested variables.',
+        'فراداده همه مجموعه‌داده‌ها. نسخه JSON شامل متغیرهای تو در تو است.'
+      ),
+      icon: <FileJson className="h-5 w-5 text-primary" />,
+      actions: [
+        { label: 'JSON', path: '/export/json/datasets', icon: <FileJson className="h-4 w-4" /> },
+        { label: 'CSV', path: '/export/csv/datasets', icon: <FileText className="h-4 w-4" /> },
+      ],
+    },
+    {
+      title: t('Variables', 'متغیرها'),
+      description: t('All variables across all datasets (flat list).', 'همه متغیرها از همه مجموعه‌داده‌ها (فهرست تخت).'),
+      icon: <FileJson className="h-5 w-5 text-primary" />,
+      actions: [
+        { label: 'JSON', path: '/export/json/variables', icon: <FileJson className="h-4 w-4" /> },
+        { label: 'CSV', path: '/export/csv/variables', icon: <FileText className="h-4 w-4" /> },
+      ],
+    },
+  ];
+
+  return (
+    <div className="space-y-4 max-w-2xl">
+      <p className="text-sm text-muted-foreground">
+        {t(
+          'Download backup copies of the repository data. CSV files include a UTF-8 BOM for compatibility with Excel and Persian text.',
+          'نسخه پشتیبان داده‌های مخزن را دانلود کنید. فایل‌های CSV شامل BOM برای سازگاری با Excel و متن فارسی هستند.'
+        )}
+      </p>
+      {sections.map((section) => (
+        <div key={section.title} className="rounded-lg border bg-card p-5">
+          <div className="flex items-start gap-3 mb-3">
+            <div className="rounded-md bg-primary/10 p-2 shrink-0">{section.icon}</div>
+            <div>
+              <h3 className="font-medium text-sm">{section.title}</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">{section.description}</p>
+            </div>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            {section.actions.map((action) => (
+              <Button
+                key={action.path}
+                variant="outline"
+                size="sm"
+                className="gap-2 h-8 text-xs"
+                onClick={() => download(action.path)}
+              >
+                <Download className="h-3.5 w-3.5" />
+                {action.icon}
+                {action.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 // ─── Login screen ────────────────────────────────────────────────────────────
 
@@ -719,6 +819,7 @@ function AdminPanel() {
           <TabsTrigger value="variables">{t('Variables', 'متغیرها')}</TabsTrigger>
           <TabsTrigger value="datasets">{t('Datasets', 'مجموعه داده‌ها')}</TabsTrigger>
           <TabsTrigger value="categories">{t('Categories', 'دسته‌بندی‌ها')}</TabsTrigger>
+          <TabsTrigger value="export">{t('Export', 'خروجی')}</TabsTrigger>
         </TabsList>
 
         {/* Variables tab */}
@@ -798,6 +899,11 @@ function AdminPanel() {
               </tbody>
             </table>
           </div>
+        </TabsContent>
+
+        {/* Export tab */}
+        <TabsContent value="export">
+          <ExportTab t={t} />
         </TabsContent>
       </Tabs>
 
