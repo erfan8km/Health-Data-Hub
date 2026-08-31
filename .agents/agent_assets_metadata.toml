@@ -1,0 +1,9 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "26PH9n_aLQn1HP_KUUGbK"
+uri = "file://IEDR_PROJECT_AUDIT.md"
+type = "text"
+title = "IEDR Project Audit"
+description = "Inspection-only technical audit covering architecture, database, API, frontend, admin security, privacy, deployment portability, backups, limitations, and recommendations."

@@ -1,0 +1,136 @@
+Please do NOT modify the project or add any new features.
+
+I need a complete technical audit/report of the current IEDR project so I can review the project before making any further decisions.
+
+Create a detailed file named IEDR_PROJECT_AUDIT.md.
+
+The report must include:
+
+1. PROJECT OVERVIEW
+- What the application currently does
+- Current MVP status
+- All currently implemented features
+
+2. TECHNOLOGY STACK
+- Frontend framework
+- Backend framework
+- Database
+- ORM
+- UI libraries
+- Build tools
+- Package manager
+- Node.js version
+- Any other important dependencies
+
+3. PROJECT STRUCTURE
+Explain the important folders and files and what each one does.
+
+4. DATABASE
+Document:
+- All database tables
+- Every field/column
+- Data types
+- Primary keys
+- Foreign keys
+- Relationships
+- Indexes
+- Constraints
+- Seed/sample data
+- Current number of datasets, variables and categories
+
+5. API
+List every API endpoint currently implemented.
+For each endpoint include:
+- HTTP method
+- URL
+- Purpose
+- Authentication requirement
+- Request parameters/body
+- Response
+
+6. FRONTEND PAGES
+Document every page and route:
+- Home
+- Datasets
+- Dataset Detail
+- Variables / Variable Dictionary
+- About
+- Admin
+
+Explain the functionality of each page.
+
+7. ADMIN PANEL
+Document:
+- Authentication mechanism
+- Dataset CRUD
+- Variable CRUD
+- Category management
+- Any other admin functionality
+- Where authentication/session information is stored
+
+8. SEARCH AND FILTERING
+Explain exactly how dataset and variable search works and what fields are searchable.
+
+9. INTERNATIONALIZATION
+Explain:
+- English/Persian support
+- RTL implementation
+- Persian font
+- How translations are handled
+
+10. SECURITY
+Identify:
+- Authentication mechanism
+- Environment variables
+- Password handling
+- Session handling
+- Potential security weaknesses
+- Anything that should be changed before production
+
+11. DATA PRIVACY
+Explain whether the current architecture is suitable for real epidemiological/health registry data.
+Clearly distinguish between metadata and individual-level raw data.
+
+12. DEPLOYMENT
+Explain exactly how the current application can be deployed outside Replit on a standard Ubuntu VPS.
+
+Include:
+- Required software
+- Environment variables
+- Build commands
+- Database setup
+- Production start command
+- Reverse proxy requirements
+- Port configuration
+
+13. REPLIT DEPENDENCIES
+List every dependency on Replit services, if any.
+If there are none, explicitly state that.
+
+14. BACKUP AND DATA PORTABILITY
+Explain how the database and application can currently be backed up and moved to another server.
+
+15. CURRENT LIMITATIONS
+List everything that is NOT implemented but may be needed in the future.
+
+16. KNOWN BUGS / WARNINGS
+List any known errors, warnings, technical debt or unfinished parts.
+
+17. RECOMMENDED NEXT STEPS
+Do NOT implement them.
+Just provide a prioritized list of recommendations.
+
+18. FINAL STATUS
+Give a clear assessment:
+- What is complete
+- What is partially complete
+- What is missing
+- Whether the current MVP is ready for demonstration to a university professor
+- Whether it is ready for real registry data (answer carefully and explain why)
+
+IMPORTANT:
+Do not change any code.
+Do not install packages.
+Do not add features.
+Do not modify the database.
+Only inspect the existing project and create the audit report.
