@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, Download, Copy, Check, ExternalLink, Database } from 'lucide-react';
+import { ArrowLeft, Copy, Check, ExternalLink, Database } from 'lucide-react';
 
 export default function DatasetDetail() {
   const [, params] = useRoute('/datasets/:id');
@@ -66,18 +66,33 @@ export default function DatasetDetail() {
           <h1 className="text-3xl font-bold leading-tight mb-2">{t(dataset.title, dataset.titleFa)}</h1>
           <p className="text-muted-foreground">{t(`Source: ${dataset.dataSource}`, `منبع: ${dataset.dataSourceFa || dataset.dataSource}`)}</p>
         </div>
-        <Button className="shrink-0 gap-2" disabled>
-          <Download className="h-4 w-4" />
-          {t('Request Download', 'درخواست دانلود')}
-        </Button>
+        {dataset.officialSourceUrl ? (
+          <Button asChild className="shrink-0 gap-2">
+            <a href={dataset.officialSourceUrl} target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="h-4 w-4" />
+              {t('Official Source / Data Access', 'منبع رسمی / دسترسی به داده‌ها')}
+            </a>
+          </Button>
+        ) : (
+          <p className="shrink-0 text-sm text-muted-foreground md:max-w-52 md:text-end">
+            {t('Official source link is not available yet.', 'لینک منبع رسمی هنوز ثبت نشده است.')}
+          </p>
+        )}
+      </div>
+
+      <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm leading-relaxed text-muted-foreground">
+        {t(
+          'IEDR is a metadata catalogue. The actual registry data are not hosted or distributed by IEDR. Please visit the official source website for information about data access.',
+          'IEDR یک کاتالوگ فراداده است. داده‌های واقعی ریجستری در IEDR میزبانی یا توزیع نمی‌شوند. برای اطلاعات مربوط به دسترسی به داده‌ها به وب‌سایت منبع رسمی مراجعه کنید.'
+        )}
       </div>
 
       {/* Key metrics */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: t('Records', 'تعداد رکورد'), value: dataset.recordsCount.toLocaleString() },
-          { label: t('Variables', 'تعداد متغیر'), value: dataset.variablesCount },
-          { label: t('Years Covered', 'سال‌های پوشش'), value: `${dataset.yearStart}–${dataset.yearEnd}` },
+          { label: t('Records', 'تعداد رکورد'), value: dataset.recordsCount > 0 ? dataset.recordsCount.toLocaleString() : t('Not available', 'در دسترس نیست') },
+          { label: t('Variables', 'تعداد متغیر'), value: dataset.variablesCount > 0 ? dataset.variablesCount : t('Not available', 'در دسترس نیست') },
+          { label: t('Years Covered', 'سال‌های پوشش'), value: dataset.yearStart > 0 && dataset.yearEnd > 0 ? `${dataset.yearStart}–${dataset.yearEnd}` : t('Not available', 'در دسترس نیست') },
           { label: t('Geographic Coverage', 'پوشش جغرافیایی'), value: t(dataset.geographicCoverage, dataset.geographicCoverageFa) },
         ].map((item) => (
           <div key={item.label} className="bg-muted/50 rounded-lg p-4 border">
@@ -98,9 +113,9 @@ export default function DatasetDetail() {
       <Separator className="my-6" />
 
       {/* Variable Dictionary */}
-      {dataset.variables && dataset.variables.length > 0 && (
-        <section className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">{t('Variable Dictionary', 'فرهنگ متغیرها')}</h2>
+      <section className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">{t('Variable Dictionary', 'فرهنگ متغیرها')}</h2>
+        {dataset.variables && dataset.variables.length > 0 ? (
           <div className="overflow-x-auto rounded-lg border">
             <table className="w-full text-sm">
               <thead>
@@ -123,8 +138,12 @@ export default function DatasetDetail() {
               </tbody>
             </table>
           </div>
-        </section>
-      )}
+        ) : (
+          <div className="rounded-lg border bg-muted/30 p-5 text-sm text-muted-foreground">
+            {t('Variable dictionary is not available yet.', 'فرهنگ متغیرها هنوز در دسترس نیست.')}
+          </div>
+        )}
+      </section>
 
       <Separator className="my-6" />
 

@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import { Link } from 'wouter';
+import React, { useState, useCallback, useEffect } from 'react';
+import { Link, useLocation } from 'wouter';
 import { useListDatasets, useListCategories } from '@workspace/api-client-react';
 import { useLanguage } from '@/lib/language';
 import { Input } from '@/components/ui/input';
@@ -11,11 +11,30 @@ import { Search, Database, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function Datasets() {
   const { t, language } = useLanguage();
+  const [location] = useLocation();
+  const getQueryState = () => {
+    const query = new URLSearchParams(location.split('?')[1] ?? '');
+    const categoryValue = query.get('categoryId');
+    const categoryId = categoryValue ? Number(categoryValue) : undefined;
+    return {
+      search: query.get('search') ?? '',
+      categoryId: Number.isInteger(categoryId) ? categoryId : undefined,
+    };
+  };
+  const initialQueryState = getQueryState();
   const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<number | undefined>(undefined);
+  const [debouncedSearch, setDebouncedSearch] = useState(initialQueryState.search);
+  const [selectedCategory, setSelectedCategory] = useState<number | undefined>(initialQueryState.categoryId);
   const [page, setPage] = useState(1);
   const limit = 12;
+
+  useEffect(() => {
+    const nextQueryState = getQueryState();
+    setSearch(nextQueryState.search);
+    setDebouncedSearch(nextQueryState.search);
+    setSelectedCategory(nextQueryState.categoryId);
+    setPage(1);
+  }, [location]);
 
   const handleSearchChange = useCallback((value: string) => {
     setSearch(value);
@@ -121,9 +140,9 @@ export default function Datasets() {
                           {t(ds.description, ds.descriptionFa)}
                         </p>
                         <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground border-t pt-3">
-                          <span><span className="font-medium text-foreground">{ds.recordsCount.toLocaleString()}</span> {t('records', 'رکورد')}</span>
-                          <span><span className="font-medium text-foreground">{ds.variablesCount}</span> {t('variables', 'متغیر')}</span>
-                          <span>{ds.yearStart}–{ds.yearEnd}</span>
+                          <span><span className="font-medium text-foreground">{ds.recordsCount > 0 ? ds.recordsCount.toLocaleString() : t('N/A', 'نامشخص')}</span> {t('records', 'رکورد')}</span>
+                          <span><span className="font-medium text-foreground">{ds.variablesCount > 0 ? ds.variablesCount : t('N/A', 'نامشخص')}</span> {t('variables', 'متغیر')}</span>
+                          <span>{ds.yearStart > 0 && ds.yearEnd > 0 ? `${ds.yearStart}–${ds.yearEnd}` : t('Study period unavailable', 'دوره مطالعه موجود نیست')}</span>
                           <span className="truncate">{t(ds.geographicCoverage, ds.geographicCoverageFa)}</span>
                         </div>
                       </CardContent>

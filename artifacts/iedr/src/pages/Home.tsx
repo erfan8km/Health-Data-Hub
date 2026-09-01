@@ -36,12 +36,12 @@ export default function Home() {
     {
       icon: <BarChart3 className="h-6 w-6" />,
       label: t('Variables', 'متغیر'),
-      value: stats?.totalVariables ?? 0,
+      value: stats?.totalVariables ? stats.totalVariables : t('N/A', 'نامشخص'),
     },
     {
       icon: <FileText className="h-6 w-6" />,
       label: t('Total Records', 'کل رکوردها'),
-      value: stats?.totalRecords?.toLocaleString() ?? 0,
+      value: stats?.totalRecords ? stats.totalRecords.toLocaleString() : t('N/A', 'نامشخص'),
     },
     {
       icon: <BookOpen className="h-6 w-6" />,
@@ -147,9 +147,9 @@ export default function Home() {
                         {t(ds.description, ds.descriptionFa)}
                       </p>
                       <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground border-t pt-3">
-                        <span><span className="font-medium text-foreground">{ds.recordsCount.toLocaleString()}</span> {t('records', 'رکورد')}</span>
-                        <span><span className="font-medium text-foreground">{ds.variablesCount}</span> {t('variables', 'متغیر')}</span>
-                        <span>{ds.yearStart}–{ds.yearEnd}</span>
+                         <span><span className="font-medium text-foreground">{ds.recordsCount > 0 ? ds.recordsCount.toLocaleString() : t('N/A', 'نامشخص')}</span> {t('records', 'رکورد')}</span>
+                         <span><span className="font-medium text-foreground">{ds.variablesCount > 0 ? ds.variablesCount : t('N/A', 'نامشخص')}</span> {t('variables', 'متغیر')}</span>
+                         <span>{ds.yearStart > 0 && ds.yearEnd > 0 ? `${ds.yearStart}–${ds.yearEnd}` : t('Study period unavailable', 'دوره مطالعه موجود نیست')}</span>
                         <span className="truncate">{t(ds.geographicCoverage, ds.geographicCoverageFa)}</span>
                       </div>
                     </CardContent>

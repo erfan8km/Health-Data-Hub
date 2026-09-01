@@ -19,6 +19,8 @@ export interface DatasetInput {
   geographicCoverageFa?: string;
   dataSource: string;
   dataSourceFa?: string;
+  /** @nullable */
+  officialSourceUrl?: string | null;
   citationText?: string;
   citationDoi?: string;
   isFeatured?: boolean;

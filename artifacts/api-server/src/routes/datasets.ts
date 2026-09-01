@@ -26,6 +26,7 @@ const datasetSelect = {
   geographicCoverageFa: datasetsTable.geographicCoverageFa,
   dataSource: datasetsTable.dataSource,
   dataSourceFa: datasetsTable.dataSourceFa,
+  officialSourceUrl: datasetsTable.officialSourceUrl,
   citationText: datasetsTable.citationText,
   citationDoi: datasetsTable.citationDoi,
   isFeatured: datasetsTable.isFeatured,

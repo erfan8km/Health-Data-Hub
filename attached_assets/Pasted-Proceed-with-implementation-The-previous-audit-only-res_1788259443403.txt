@@ -1,0 +1,209 @@
+Proceed with implementation.
+
+The previous audit-only restriction is now lifted. I want you to implement ONLY the following changes and nothing beyond them.
+
+Goal
+
+IEDR is a bilingual registry metadata catalogue.
+
+The intended user workflow is:
+
+Language selection → Registry catalogue → Registry detail page → Registry metadata → Official university/source link
+
+IEDR does NOT host, upload, store, or distribute the actual registry datasets.
+
+The final registry detail page must clearly direct users to the official university/source website for access to the actual data.
+
+1. Add official source URL
+
+Add an official_source_url field to the existing dataset/registry model.
+
+It must be:
+
+* Optional.
+* Stored in PostgreSQL.
+* Returned by the API.
+* Available in dataset detail responses.
+* Available in dataset list/catalogue responses where appropriate.
+* Included in JSON/CSV exports.
+* Editable from the Admin dataset form.
+
+Do not create a separate unnecessary table for this.
+
+2. Registry detail page
+
+On every registry detail page, replace the current disabled Request Download functionality with an external link such as:
+
+English:
+Official Source / Data Access
+
+Persian:
+منبع رسمی / دسترسی به داده‌ها
+
+The link must open the stored official URL in a new browser tab.
+
+If no URL exists, do not show a broken link. Show an appropriate bilingual message such as:
+
+English:
+Official source link is not available yet.
+
+Persian:
+لینک منبع رسمی هنوز ثبت نشده است.
+
+3. Metadata-only clarification
+
+Add a clearly visible bilingual notice on the registry detail page:
+
+English:
+
+IEDR is a metadata catalogue. The actual registry data are not hosted or distributed by IEDR. Please visit the official source website for information about data access.
+
+Persian:
+
+IEDR یک کاتالوگ فراداده است. داده‌های واقعی ریجستری در IEDR میزبانی یا توزیع نمی‌شوند. برای اطلاعات مربوط به دسترسی به داده‌ها به وب‌سایت منبع رسمی مراجعه کنید.
+
+Do not add any data download system.
+
+4. Add the 21 registries
+
+Replace the current demo registry catalogue with the following 21 registry entries:
+
+1. آترزی مری کودکان — بیمارستان اکبر
+2. چاقی کودکان — بیمارستان اکبر
+3. دیابت نوع ۱ کودکان — بیمارستان اکبر
+4. سرطان کودکان — بیمارستان دکتر شیخ
+5. سرطان بیمارستان امید — مرکز تحقیقات سرطان
+6. فیبروز کیستیک — بیمارستان اکبر
+7. متابولیک مادرزادی کودکان — بیمارستان اکبر
+8. نقص ایمنی اولیه — بیمارستان اکبر
+9. عفونت قارچی موکور — بیمارستان قائم و امام رضا
+10. سرطان کولورکتال — بیمارستان قائم
+11. کاهش شنوایی سادن — بیمارستان قائم و امام رضا
+12. اوتیت خارجی بدخیم — بیمارستان امام رضا و قائم
+13. چاقی و درمان چاقی — کلینیک امام رضا و مراکز همکار در سایر شهرها
+14. رینوسینوزیت مزمن — بیمارستان امام رضا
+15. آپنه انسدادی خواب — بیمارستان روان‌پزشکی ابن‌سینا
+16. اختلالات خواب — بیمارستان روان‌پزشکی ابن‌سینا
+17. تروفوبلاستیک (مول) — بیمارستان قائم
+18. سرطان تخمدان — بیمارستان دکتر شیخ
+19. سقط مکرر — بیمارستان امام رضا
+20. لیکن پلان دندان — دانشکده دندانپزشکی
+21. ناباروری — بیمارستان امام رضا و میلاد
+
+For each registry, store the hospital/center as the source/institution metadata.
+
+IMPORTANT
+
+I have NOT provided verified URLs, descriptions, record counts, variable counts, study periods, or other detailed metadata for these 21 registries.
+
+Do NOT invent any of these values.
+
+Use an explicit empty/unavailable state where necessary.
+
+For example:
+
+* Record count: Not available
+* Variable count: Not available
+* Study period: Not available
+* Official URL: leave empty until verified
+* Description: use only information that is actually provided
+
+Do not fabricate academic information.
+
+5. Bilingual registry names
+
+Where a reliable English translation is straightforward, add an English title.
+
+Keep the Persian title as the authoritative supplied name.
+
+Do not invent institutional names or official English names if uncertain.
+
+6. Admin panel
+
+Update the existing dataset/registry editing form so I can manually enter and edit:
+
+* Official source URL
+* Registry name
+* Persian registry name
+* Institution/source
+* Other existing metadata fields
+
+I want to be able to gradually complete the missing information myself through the Admin panel.
+
+Do NOT add a new authentication system.
+
+Keep the existing admin password gate.
+
+7. Keep the existing design
+
+Do not redesign the application.
+
+Keep:
+
+* Academic UCI-style repository design.
+* Existing typography.
+* Existing cards.
+* Existing navigation.
+* Existing bilingual interface.
+* Existing Persian RTL behavior.
+* Existing responsive design.
+
+Only make the changes necessary for the above requirements.
+
+8. Do NOT add
+
+Do NOT implement:
+
+* Actual dataset hosting.
+* File uploads.
+* Dataset downloads.
+* User accounts.
+* User registration.
+* Payment.
+* Statistical analysis.
+* Machine learning.
+* Analytics dashboard.
+* Citation export.
+* Complex access-request workflow.
+* New authentication system.
+* Unnecessary database tables.
+* Any other new feature.
+
+9. Verify everything
+
+After implementation, verify:
+
+1. Database migration works.
+2. All 21 registries exist.
+3. Persian interface works.
+4. English interface works.
+5. RTL works correctly.
+6. Registry catalogue displays all 21 registries.
+7. Registry detail pages work.
+8. Official URL can be edited from Admin.
+9. Official URL appears correctly on the detail page.
+10. External link opens correctly in a new tab.
+11. Missing URLs do not produce broken links.
+12. Metadata-only clarification appears in both languages.
+13. Existing search/filter functionality still works.
+14. Existing variable dictionary still works.
+15. Existing Admin functionality still works.
+16. JSON/CSV exports include official_source_url.
+17. No raw registry data is stored or exposed by IEDR.
+
+10. Final report
+
+After completing the implementation, provide a concise implementation report containing:
+
+* Files changed.
+* Database changes.
+* API changes.
+* Frontend changes.
+* Number of registries currently in database.
+* Which fields remain unavailable.
+* Verification results.
+* Any remaining warnings.
+
+Do not make any changes outside this scope.
+
+The goal is to finish the IEDR MVP as a professional bilingual registry catalogue, not to turn it into a data-hosting platform.

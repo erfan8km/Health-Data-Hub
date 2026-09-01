@@ -251,6 +251,7 @@ type DatasetForm = {
   yearStart: string; yearEnd: string;
   geographicCoverage: string; geographicCoverageFa: string;
   dataSource: string; dataSourceFa: string;
+  officialSourceUrl: string;
   citationText: string; citationDoi: string;
   isFeatured: boolean; categoryId: string;
 };
@@ -261,6 +262,7 @@ const emptyDatasetForm: DatasetForm = {
   yearStart: '2000', yearEnd: '2023',
   geographicCoverage: '', geographicCoverageFa: '',
   dataSource: '', dataSourceFa: '',
+  officialSourceUrl: '',
   citationText: '', citationDoi: '',
   isFeatured: false, categoryId: '',
 };
@@ -726,6 +728,7 @@ function AdminPanel() {
       yearStart: String(ds.yearStart), yearEnd: String(ds.yearEnd),
       geographicCoverage: ds.geographicCoverage, geographicCoverageFa: ds.geographicCoverageFa || '',
       dataSource: ds.dataSource, dataSourceFa: ds.dataSourceFa || '',
+      officialSourceUrl: ds.officialSourceUrl || '',
       citationText: ds.citationText || '', citationDoi: ds.citationDoi || '',
       isFeatured: ds.isFeatured, categoryId: String(ds.categoryId),
     });
@@ -744,6 +747,7 @@ function AdminPanel() {
       geographicCoverageFa: datasetForm.geographicCoverageFa,
       dataSource: datasetForm.dataSource,
       dataSourceFa: datasetForm.dataSourceFa,
+      officialSourceUrl: datasetForm.officialSourceUrl.trim() || null,
       citationText: datasetForm.citationText,
       citationDoi: datasetForm.citationDoi,
       isFeatured: datasetForm.isFeatured,
@@ -926,6 +930,18 @@ function AdminPanel() {
             <div className="space-y-1"><Label>{t('Geographic Coverage (FA)', 'پوشش جغرافیایی (FA)')}</Label><Input dir="rtl" value={datasetForm.geographicCoverageFa} onChange={e => setDatasetForm(f => ({ ...f, geographicCoverageFa: e.target.value }))} /></div>
             <div className="space-y-1"><Label>{t('Data Source (EN)', 'منبع داده (EN)')}</Label><Input value={datasetForm.dataSource} onChange={e => setDatasetForm(f => ({ ...f, dataSource: e.target.value }))} /></div>
             <div className="space-y-1"><Label>{t('Data Source (FA)', 'منبع داده (FA)')}</Label><Input dir="rtl" value={datasetForm.dataSourceFa} onChange={e => setDatasetForm(f => ({ ...f, dataSourceFa: e.target.value }))} /></div>
+            <div className="space-y-1 md:col-span-2">
+              <Label>{t('Official Source URL', 'نشانی اینترنتی منبع رسمی')}</Label>
+              <Input
+                type="url"
+                placeholder="https://example.org/registry"
+                value={datasetForm.officialSourceUrl}
+                onChange={e => setDatasetForm(f => ({ ...f, officialSourceUrl: e.target.value }))}
+              />
+              <p className="text-xs text-muted-foreground">
+                {t('Optional. Link to the official university, hospital, center, or institution source.', 'اختیاری. پیوند به منبع رسمی دانشگاه، بیمارستان، مرکز یا مؤسسه.')}
+              </p>
+            </div>
             <div className="space-y-1 md:col-span-2"><Label>{t('Citation Text', 'متن استناد')}</Label><Textarea rows={2} value={datasetForm.citationText} onChange={e => setDatasetForm(f => ({ ...f, citationText: e.target.value }))} /></div>
             <div className="space-y-1"><Label>DOI</Label><Input value={datasetForm.citationDoi} onChange={e => setDatasetForm(f => ({ ...f, citationDoi: e.target.value }))} /></div>
             <div className="space-y-1">

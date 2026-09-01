@@ -477,6 +477,9 @@ components:
           type: string
         dataSourceFa:
           type: string
+        officialSourceUrl:
+          type: ["string", "null"]
+          format: uri
         citationText:
           type: ["string", "null"]
         citationDoi:
@@ -522,6 +525,9 @@ components:
           type: string
         dataSourceFa:
           type: string
+        officialSourceUrl:
+          type: ["string", "null"]
+          format: uri
         citationText:
           type: ["string", "null"]
         citationDoi:
@@ -569,6 +575,9 @@ components:
           type: string
         dataSourceFa:
           type: string
+        officialSourceUrl:
+          type: ["string", "null"]
+          format: uri
         citationText:
           type: string
         citationDoi:
@@ -605,6 +614,9 @@ components:
           type: string
         dataSourceFa:
           type: string
+        officialSourceUrl:
+          type: ["string", "null"]
+          format: uri
         citationText:
           type: string
         citationDoi:

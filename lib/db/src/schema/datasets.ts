@@ -17,6 +17,7 @@ export const datasetsTable = pgTable("datasets", {
   geographicCoverageFa: text("geographic_coverage_fa").notNull().default(""),
   dataSource: text("data_source").notNull(),
   dataSourceFa: text("data_source_fa").notNull().default(""),
+  officialSourceUrl: text("official_source_url"),
   citationText: text("citation_text"),
   citationDoi: text("citation_doi"),
   isFeatured: boolean("is_featured").notNull().default(false),
