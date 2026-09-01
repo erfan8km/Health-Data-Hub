@@ -1,0 +1,109 @@
+We are now finalizing the IEDR MVP.
+
+IMPORTANT:
+Do NOT add new features beyond the requirements below.
+Do NOT add statistical analysis, machine learning, user accounts, citation export, file hosting, file upload, or raw-data storage.
+
+The purpose of IEDR is ONLY to be a bilingual metadata catalogue for epidemiological registries.
+
+FINAL USER WORKFLOW:
+
+Language selection
+→ Registry catalogue
+→ Registry detail page
+→ Registry metadata and variable information
+→ Official university/center/source website link
+
+IEDR must NOT host, store, upload, or distribute the actual registry datasets.
+
+For each registry, the detail page should provide:
+- Registry name
+- Persian and English name
+- Description
+- Registration/hosting hospital or research center
+- Geographic coverage
+- Registry period/year range
+- Number of records (metadata only)
+- Number of variables
+- Variable types
+- Variable dictionary
+- Other available registry metadata
+- Official source / university / center link
+
+Add the minimum required field:
+official_source_url
+
+This field must:
+- be stored in the existing dataset/registry database model
+- be available through the API
+- be included in the admin create/edit form
+- be returned by the dataset detail API
+- be included in relevant JSON/CSV exports
+- be displayed on the registry detail page
+
+Replace the current disabled "Request Download" button with:
+
+"Official Source / Data Access"
+
+The button must open official_source_url in a new browser tab.
+
+Add a clear statement on the registry detail page:
+
+"IEDR does not host or distribute the registry data. This repository provides metadata and directs users to the official source or responsible institution for data access."
+
+Provide the same statement in Persian.
+
+Populate the registry catalogue with the 21 registries I provided.
+
+IMPORTANT:
+Do not invent official URLs, registry statistics, variable counts, or other factual metadata.
+If an official URL or metadata value is not known, leave it empty or clearly mark it as unavailable so I can enter it later through the Admin panel.
+
+The 21 registries are:
+
+1. Pediatric Esophageal Atresia — Akbar Hospital
+2. Childhood Obesity — Akbar Hospital
+3. Pediatric Type 1 Diabetes — Akbar Hospital
+4. Pediatric Cancer — Dr. Sheikh Hospital
+5. Cancer Registry, Omid Hospital — Cancer Research Center
+6. Cystic Fibrosis — Akbar Hospital
+7. Pediatric Inborn Errors of Metabolism — Akbar Hospital
+8. Primary Immunodeficiency — Akbar Hospital
+9. Mucormycosis — Ghaem and Imam Reza Hospitals
+10. Colorectal Cancer — Ghaem Hospital
+11. Sudden Hearing Loss — Ghaem and Imam Reza Hospitals
+12. Malignant Otitis Externa — Imam Reza and Ghaem Hospitals
+13. Obesity and Obesity Treatment — Imam Reza Clinic and collaborating centers in other cities
+14. Chronic Rhinosinusitis — Imam Reza Hospital
+15. Obstructive Sleep Apnea — Ibn Sina Psychiatric Hospital
+16. Sleep Disorders — Ibn Sina Psychiatric Hospital
+17. Gestational Trophoblastic Disease / Mole — Ghaem Hospital
+18. Ovarian Cancer — Dr. Sheikh Hospital
+19. Recurrent Miscarriage — Imam Reza Hospital
+20. Oral Lichen Planus — Faculty of Dentistry
+21. Infertility — Imam Reza and Milad Hospitals
+
+Keep:
+- Persian/English language support
+- RTL compatibility
+- Current academic UCI-style design
+- Existing admin password gate
+- Existing search/filter functionality
+- Existing variable dictionary
+
+Do not redesign the application unnecessarily.
+
+Before making changes:
+inspect the current implementation and identify exactly which files need modification.
+
+After implementation:
+1. Verify the application builds successfully.
+2. Verify the database schema is valid.
+3. Verify official_source_url flows from database → API → frontend → external link.
+4. Verify both Persian and English versions.
+5. Verify RTL.
+6. Verify admin create/edit functionality.
+7. Verify the 21 registry records.
+8. Report exactly what was changed.
+
+Do not add anything beyond this scope.
