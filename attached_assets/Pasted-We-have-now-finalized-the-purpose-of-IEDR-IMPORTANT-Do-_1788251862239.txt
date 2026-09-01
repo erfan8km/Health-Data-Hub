@@ -1,0 +1,71 @@
+We have now finalized the purpose of IEDR.
+
+IMPORTANT:
+Do not redesign the project.
+Do not add analytics, machine learning, user accounts, raw data storage, file uploads, data analysis, or download hosting.
+
+IEDR is ONLY a bilingual public registry metadata catalogue.
+
+The intended user flow is:
+
+Language selection (Persian / English)
+→ Registry catalogue
+→ Select a registry
+→ Registry detail page
+→ Registry metadata + variable information
+→ Official source/university link
+
+The actual registry datasets will NOT be stored or hosted on IEDR.
+Users must be redirected to the official university/source website to access or download the actual data.
+
+For the existing Dataset entity, treat each Dataset as a Registry.
+
+Before making changes, inspect the existing project and implement ONLY what is necessary to support this final purpose.
+
+For each Registry, we need these metadata fields:
+
+- Persian registry name
+- English registry name
+- Persian description
+- English description
+- Registration site / hospital / center
+- University / institution
+- Start year (if available)
+- Geographic coverage
+- Record count (if available)
+- Variable count
+- Variable types
+- Variable dictionary
+- Additional metadata
+- Official source URL
+
+Add an official source URL field to the existing dataset/registry model.
+
+The URL must be displayed clearly on the Registry Detail page as a button such as:
+
+"Official Source / Data Access"
+
+When clicked, it must open the official university/source website.
+
+Do NOT create a data-download system inside IEDR.
+
+Do NOT store actual registry files.
+
+Do NOT create authentication for public users.
+
+Keep the existing:
+- Persian/English support
+- RTL support
+- academic UCI-style design
+- search
+- filtering
+- pagination
+- variable dictionary
+- admin panel
+
+The admin panel should allow the administrator to create/edit the official source URL and the registration site/hospital/center information.
+
+Do not implement anything beyond these requirements.
+
+First inspect the existing schema and UI and report exactly which files and database fields need to change.
+Do not modify anything until you have identified the required changes.
