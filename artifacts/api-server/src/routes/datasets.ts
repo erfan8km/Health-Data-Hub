@@ -9,6 +9,7 @@ import {
   UpdateDatasetBody,
   DeleteDatasetParams,
 } from "@workspace/api-zod";
+import { requireAdmin } from "../middleware/admin-auth";
 
 const router: IRouter = Router();
 
@@ -146,7 +147,7 @@ router.get("/datasets/:id", async (req, res) => {
   }
 });
 
-router.post("/datasets", async (req, res) => {
+router.post("/datasets", requireAdmin, async (req, res) => {
   const parsed = CreateDatasetBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -175,7 +176,7 @@ router.post("/datasets", async (req, res) => {
   }
 });
 
-router.put("/datasets/:id", async (req, res) => {
+router.put("/datasets/:id", requireAdmin, async (req, res) => {
   const params = UpdateDatasetParams.safeParse({ id: Number(req.params.id) });
   if (!params.success) {
     res.status(400).json({ error: "Invalid id" });
@@ -215,7 +216,7 @@ router.put("/datasets/:id", async (req, res) => {
   }
 });
 
-router.delete("/datasets/:id", async (req, res) => {
+router.delete("/datasets/:id", requireAdmin, async (req, res) => {
   const params = DeleteDatasetParams.safeParse({ id: Number(req.params.id) });
   if (!params.success) {
     res.status(400).json({ error: "Invalid id" });

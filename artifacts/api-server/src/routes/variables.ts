@@ -10,6 +10,7 @@ import {
   UpdateVariableBody,
   DeleteVariableParams,
 } from "@workspace/api-zod";
+import { requireAdmin } from "../middleware/admin-auth";
 
 const router: IRouter = Router();
 
@@ -106,7 +107,7 @@ router.get("/datasets/:datasetId/variables", async (req, res) => {
   }
 });
 
-router.post("/datasets/:datasetId/variables", async (req, res) => {
+router.post("/datasets/:datasetId/variables", requireAdmin, async (req, res) => {
   const params = CreateVariableParams.safeParse({ datasetId: Number(req.params.datasetId) });
   if (!params.success) {
     res.status(400).json({ error: "Invalid datasetId" });
@@ -129,7 +130,7 @@ router.post("/datasets/:datasetId/variables", async (req, res) => {
   }
 });
 
-router.put("/datasets/:datasetId/variables/:id", async (req, res) => {
+router.put("/datasets/:datasetId/variables/:id", requireAdmin, async (req, res) => {
   const params = UpdateVariableParams.safeParse({
     datasetId: Number(req.params.datasetId),
     id: Number(req.params.id),
@@ -165,7 +166,7 @@ router.put("/datasets/:datasetId/variables/:id", async (req, res) => {
   }
 });
 
-router.delete("/datasets/:datasetId/variables/:id", async (req, res) => {
+router.delete("/datasets/:datasetId/variables/:id", requireAdmin, async (req, res) => {
   const params = DeleteVariableParams.safeParse({
     datasetId: Number(req.params.datasetId),
     id: Number(req.params.id),

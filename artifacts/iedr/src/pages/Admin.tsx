@@ -173,6 +173,7 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
       const res = await fetch('/api/auth/admin-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify({ password }),
       });
       if (res.ok) {
@@ -235,7 +236,7 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
           </Button>
         </form>
         <p className="text-xs text-muted-foreground text-center mt-6">
-          {t('Set ADMIN_PASSWORD in your environment to configure access.', 'متغیر ADMIN_PASSWORD را در محیط خود تنظیم کنید.')}
+          {t('Admin access must be configured on the server.', 'دسترسی مدیریت باید در سمت سرور پیکربندی شود.')}
         </p>
       </div>
     </div>
@@ -715,7 +716,11 @@ function AdminPanel() {
     queryClient.invalidateQueries({ queryKey: getListCategoriesQueryKey() });
   };
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
+    await fetch('/api/auth/admin-logout', {
+      method: 'POST',
+      credentials: 'same-origin',
+    }).catch(() => undefined);
     sessionStorage.removeItem(SESSION_KEY);
     window.location.reload();
   };
@@ -1017,11 +1022,28 @@ function AdminPanel() {
 // ─── Root export ───────────────────────────────────────────────────────────────
 
 export default function Admin() {
+  const { t } = useLanguage();
   const [authenticated, setAuthenticated] = useState(() => sessionStorage.getItem(SESSION_KEY) === '1');
+  const [checkingSession, setCheckingSession] = useState(true);
 
   useEffect(() => {
-    setAuthenticated(sessionStorage.getItem(SESSION_KEY) === '1');
+    fetch('/api/auth/admin-session', { credentials: 'same-origin' })
+      .then((response) => response.json())
+      .then((data: { authenticated?: boolean }) => {
+        const isAuthenticated = data.authenticated === true;
+        setAuthenticated(isAuthenticated);
+        if (!isAuthenticated) sessionStorage.removeItem(SESSION_KEY);
+      })
+      .catch(() => {
+        setAuthenticated(false);
+        sessionStorage.removeItem(SESSION_KEY);
+      })
+      .finally(() => setCheckingSession(false));
   }, []);
+
+  if (checkingSession) {
+    return <div className="min-h-[70vh] flex items-center justify-center text-sm text-muted-foreground">{t('Checking admin session...', 'در حال بررسی نشست مدیریت...')}</div>;
+  }
 
   if (!authenticated) {
     return <AdminLogin onSuccess={() => setAuthenticated(true)} />;

@@ -1,0 +1,855 @@
+I want you to take full ownership of finishing and production-hardening this project.
+
+Repository:
+https://github.com/erfan8km/Health-Data-Hub
+
+Project name:
+Iran Epidemiology Data Repository (IEDR) / Health Data Hub
+
+IMPORTANT:
+Do not just explain what should be done. Inspect the entire repository, identify the problems, implement the fixes, test everything, and only then report the final status.
+
+The goal is to have a clean, reliable, bilingual, production-ready metadata catalogue that can be deployed through GitHub + Cloudflare using free/low-cost infrastructure where possible.
+
+==================================================
+1. CORE PURPOSE OF THE PROJECT
+==================================================
+
+This website is an EPIDEMIOLOGY AND HEALTH DATA HUB / registry catalogue.
+
+It is NOT a repository for individual-level patient data.
+
+The website must NEVER store, expose, upload, or distribute raw individual registry records.
+
+The intended user flow is:
+
+1. User opens the website.
+2. User chooses Persian or English.
+3. User sees the registry catalogue.
+4. User searches/filters registries.
+5. User opens a registry.
+6. User sees metadata about that registry.
+7. User sees available/general variable information if it has actually been provided.
+8. User sees a clear explanation that the website is metadata-only.
+9. User can click the official university/registry source link.
+10. Actual registry data download/access happens only on the official source website.
+
+Do NOT invent registry metadata.
+
+If a value is unknown, display:
+- Persian: «اطلاعات در دسترس نیست»
+- English: "Not available"
+
+Never display fake 0 values.
+
+==================================================
+2. CURRENT 21 REGISTRIES
+==================================================
+
+The catalogue must contain these 21 registries:
+
+1. Esophageal atresia children – Akbar Hospital
+2. Childhood obesity – Akbar Hospital
+3. Type 1 diabetes children – Akbar Hospital
+4. Childhood cancer – Dr Sheikh Hospital
+5. Cancer Hope Hospital – Cancer Research Center
+6. Cystic fibrosis – Akbar Hospital
+7. Congenital metabolic diseases children – Akbar Hospital
+8. Primary immunodeficiency – Akbar Hospital
+9. Mucormycosis fungal infection – Ghaem and Imam Reza Hospitals
+10. Colorectal cancer – Ghaem Hospital
+11. Sudden hearing loss – Ghaem and Imam Reza Hospitals
+12. Malignant otitis externa – Imam Reza and Ghaem Hospitals
+13. Obesity and obesity treatment – Imam Reza Clinic and collaborating centers in other cities
+14. Chronic rhinosinusitis – Imam Reza Hospital
+15. Obstructive sleep apnea – Ibn Sina Psychiatric Hospital
+16. Sleep disorders – Ibn Sina Psychiatric Hospital
+17. Trophoblastic (mole) – Ghaem Hospital
+18. Ovarian cancer – Dr Sheikh Hospital
+19. Recurrent miscarriage – Imam Reza Hospital
+20. Oral lichen planus – School of Dentistry
+21. Infertility – Imam Reza and Milad Hospitals
+
+Preserve these 21 registries.
+
+Do not remove them.
+
+Do not invent additional registries.
+
+==================================================
+3. BILINGUAL / RTL
+==================================================
+
+The website must support:
+
+- Persian
+- English
+
+Persian must be true RTL.
+
+English must be LTR.
+
+Check all of the following:
+
+- navigation
+- cards
+- buttons
+- forms
+- search
+- filters
+- registry detail pages
+- tables
+- metadata
+- variable dictionary
+- admin panel
+- empty states
+- error states
+- footer
+- modal/dialog components
+
+Persian typography should remain clean and readable.
+
+Use the existing Persian font setup if appropriate.
+
+Make sure switching language does not break layout, routing, data, or filters.
+
+==================================================
+4. REGISTRY DETAIL PAGE
+==================================================
+
+Every registry detail page should have a professional structure.
+
+Include:
+
+- Registry title
+- Short description
+- Registry category
+- Institution / hospital
+- Location
+- Study period if known
+- Number of records if known
+- Number of variables if known
+- Variable dictionary if available
+- Other available metadata
+- Metadata-only notice
+- Official source / access button
+
+If information is unavailable:
+
+Do NOT invent it.
+
+Display:
+
+Persian:
+«اطلاعات در دسترس نیست»
+
+English:
+"Not available"
+
+For record counts, never use fake values.
+
+For variable counts, never use fake values.
+
+For study periods, never invent dates.
+
+For variable dictionaries, do not invent variables.
+
+==================================================
+5. OFFICIAL SOURCE URL
+==================================================
+
+Keep the officialSourceUrl / official_source_url architecture.
+
+The official source link must be clearly visible on the registry detail page.
+
+Example button:
+
+Persian:
+«مشاهده منبع رسمی / دسترسی به داده‌ها»
+
+English:
+"View Official Source / Data Access"
+
+IMPORTANT:
+
+Do NOT invent URLs.
+
+Do NOT create fake URLs.
+
+If the official URL has not been verified, keep it empty/null and display:
+
+Persian:
+«لینک رسمی هنوز ثبت نشده است»
+
+English:
+"Official source link not yet available"
+
+Make sure invalid/empty URLs cannot create broken links.
+
+External links should safely open in a new tab where appropriate.
+
+==================================================
+6. SEARCH AND FILTERING
+==================================================
+
+Test the entire catalogue search.
+
+Users should be able to search registries by relevant:
+
+- English title
+- Persian title
+- description
+- hospital/institution
+- category
+
+Search must work correctly in both languages.
+
+Test:
+
+- Persian search
+- English search
+- empty search
+- partial search
+- no results
+- clearing search
+- category filters
+- search + category together
+
+Do not break existing routing/query parameters.
+
+==================================================
+7. ADMIN PANEL
+==================================================
+
+Review the existing admin system carefully.
+
+The current browser/sessionStorage password gate is NOT sufficient security.
+
+Implement proper server-side authentication for admin mutation endpoints.
+
+IMPORTANT:
+
+The frontend must NEVER be trusted to protect admin APIs.
+
+All mutation endpoints must verify authentication on the server.
+
+Protect at least:
+
+- create dataset
+- update dataset
+- delete dataset
+- create variable
+- update variable
+- delete variable
+- category mutations
+- any export or administrative mutation that should not be public
+
+Do not expose ADMIN_PASSWORD or other secrets to frontend JavaScript.
+
+Use environment variables for secrets.
+
+Do not hardcode passwords.
+
+Do not log secrets.
+
+If session-based authentication is used, use secure cookies where supported:
+
+- HttpOnly
+- Secure in production
+- SameSite appropriate for the architecture
+
+If the current architecture requires a different authentication mechanism because of Cloudflare compatibility, implement the safest practical server-side solution.
+
+The admin panel should still be easy to use.
+
+==================================================
+8. EXPORTS
+==================================================
+
+Review JSON / CSV / schema exports.
+
+They must never accidentally export individual-level health records because this project should not contain them.
+
+Exports should only contain:
+
+- metadata
+- registry information
+- variable dictionary / schema information
+
+Make sure export routes do not expose secrets.
+
+If an export endpoint is intended to be public, make sure that it contains metadata only.
+
+==================================================
+9. DATABASE
+==================================================
+
+Inspect the existing PostgreSQL + Drizzle architecture.
+
+Do not destroy existing data.
+
+Do not change the 21 registries unnecessarily.
+
+Check:
+
+- schema
+- relations
+- constraints
+- indexes
+- migrations/push
+- connection handling
+- error handling
+
+Add useful indexes where justified, especially for:
+
+- search
+- category filtering
+- registry relationships
+- variable relationships
+
+Do not add unnecessary complexity.
+
+There must be NO individual-level patient table or raw registry records.
+
+==================================================
+10. API
+==================================================
+
+Audit every API route.
+
+Separate clearly:
+
+PUBLIC:
+- catalogue
+- registry metadata
+- categories
+- public variable dictionary
+- public statistics that are metadata only
+- metadata exports
+
+ADMIN:
+- create
+- update
+- delete
+- administrative actions
+
+Ensure every admin mutation is protected server-side.
+
+Check:
+
+- validation
+- Zod schemas
+- error responses
+- HTTP status codes
+- CORS
+- security headers where appropriate
+- rate limiting if practical
+- input sanitization
+- URL validation
+- database error handling
+
+Do not expose stack traces or sensitive information in production responses.
+
+==================================================
+11. CLOUDFLARE DEPLOYMENT
+==================================================
+
+This is extremely important.
+
+The current project uses:
+
+- React
+- Vite
+- Express
+- PostgreSQL
+- pnpm monorepo
+
+Cloudflare Pages cannot simply run the existing Express server as a static frontend.
+
+Therefore inspect the repository and implement the SMALLEST RELIABLE architecture that allows the complete application to work on Cloudflare.
+
+Preferred goal:
+
+GitHub
+  ↓
+Cloudflare
+  ↓
+Frontend
+  ↓
+API
+  ↓
+PostgreSQL
+
+The final architecture must support:
+
+- frontend
+- /api routes
+- database
+- admin authentication
+- registry catalogue
+- registry details
+- exports
+
+If the current Express backend cannot reliably run in the intended Cloudflare environment, migrate the API to a Cloudflare-compatible Worker/Pages Functions architecture.
+
+However:
+
+DO NOT rewrite the whole application unnecessarily.
+
+Preserve the current React UI and database model as much as possible.
+
+If a Cloudflare-compatible API migration is necessary, do it carefully and test every endpoint.
+
+If PostgreSQL requires a compatible serverless connection approach, implement a production-compatible approach while preserving the existing schema/data.
+
+Do not switch databases just for convenience unless technically necessary.
+
+Do not introduce a paid service unnecessarily.
+
+Prefer free-tier-compatible infrastructure.
+
+==================================================
+12. CLOUDFLARE CONFIGURATION
+==================================================
+
+Create/fix the necessary Cloudflare configuration files.
+
+Inspect whether the project needs:
+
+- wrangler.json / wrangler.jsonc
+- Worker configuration
+- Pages Functions configuration
+- build configuration
+- environment variable configuration
+- compatibility flags
+
+Do not create obsolete or unnecessary configuration.
+
+The deployment must be reproducible from GitHub.
+
+The application should not depend on Replit-specific runtime services.
+
+Replit-specific development plugins must not be required in production.
+
+==================================================
+13. ENVIRONMENT VARIABLES
+==================================================
+
+Audit all environment variables.
+
+Document the required variables.
+
+At minimum inspect:
+
+- DATABASE_URL
+- ADMIN_PASSWORD or replacement admin authentication secrets
+- SESSION_SECRET or equivalent
+- NODE_ENV
+- Cloudflare-specific variables if required
+
+IMPORTANT:
+
+Do not commit secrets.
+
+Do not put secrets in frontend code.
+
+Do not put secrets in GitHub.
+
+Do not print secrets in logs.
+
+If an existing variable is documented but unused, either use it correctly or remove/update the documentation.
+
+==================================================
+14. REPLIT INDEPENDENCE
+==================================================
+
+The production application must NOT depend on Replit.
+
+The project should be deployable from GitHub.
+
+Remove unnecessary Replit-specific runtime assumptions.
+
+Development tooling may remain if harmless, but production must work without:
+
+- REPL_ID
+- Replit deployment services
+- Replit databases
+- Replit-only APIs
+
+==================================================
+15. BUILD SYSTEM
+==================================================
+
+Audit the pnpm monorepo.
+
+Current structure includes approximately:
+
+artifacts/iedr
+artifacts/api-server
+lib/db
+lib/api-spec
+lib/api-client-react
+lib/api-zod
+scripts
+
+Do not break workspace dependencies.
+
+Run:
+
+- install
+- typecheck
+- frontend build
+- backend/Worker build
+- full build
+
+Fix all actual errors.
+
+Warnings can remain only if genuinely harmless.
+
+Do not hide errors just to make the build pass.
+
+==================================================
+16. ROUTING
+==================================================
+
+Test all public routes.
+
+At minimum:
+
+/
+catalogue/datasets
+dataset detail
+variables
+about
+admin
+
+Make sure direct navigation to nested routes works after deployment.
+
+SPA fallback must work.
+
+Do not create broken routes.
+
+Do not rely on development-server behavior.
+
+==================================================
+17. MOBILE RESPONSIVENESS
+==================================================
+
+Review the entire UI on mobile width.
+
+Test:
+
+- homepage
+- catalogue
+- search
+- filters
+- detail page
+- metadata cards
+- variable table
+- admin panel
+- buttons
+- language switcher
+
+Fix overflow, clipped text, broken RTL layouts, horizontal scrolling, and inaccessible buttons.
+
+==================================================
+18. ACCESSIBILITY / UX
+==================================================
+
+Improve obvious accessibility problems.
+
+Check:
+
+- button labels
+- form labels
+- keyboard navigation
+- focus states
+- contrast
+- semantic headings
+- alt text
+- loading states
+- error states
+- empty states
+
+Do not radically redesign the existing visual identity.
+
+Keep the website professional and suitable for presentation to university professors/researchers.
+
+==================================================
+19. HEALTH / ERROR HANDLING
+==================================================
+
+Implement or preserve a health endpoint such as:
+
+/api/healthz
+
+It should return a proper successful response when the application/API is healthy.
+
+Do not expose database credentials or internal errors.
+
+Make sure frontend API failures result in useful user-facing messages rather than blank screens.
+
+==================================================
+20. SECURITY AUDIT
+==================================================
+
+Perform a practical security audit.
+
+Look specifically for:
+
+- unauthenticated admin mutations
+- plaintext secrets
+- frontend-exposed secrets
+- SQL injection
+- unsafe query construction
+- XSS
+- unsafe external URLs
+- CSRF risks
+- insecure cookies
+- overly permissive CORS
+- stack trace exposure
+- directory/file exposure
+- accidental raw-data exposure
+- unsafe exports
+- dependency vulnerabilities where practical
+
+Fix real vulnerabilities.
+
+Do not add unnecessary security complexity that makes the application impossible to maintain.
+
+==================================================
+21. DOCUMENTATION
+==================================================
+
+Update the README and deployment documentation.
+
+Documentation must accurately describe the FINAL architecture.
+
+Remove obsolete claims.
+
+Do not document nonexistent scripts.
+
+Do not claim a restore/import system exists unless it actually exists.
+
+Document:
+
+1. Project purpose
+2. Architecture
+3. Local development
+4. Environment variables
+5. Database setup
+6. Admin authentication
+7. Build commands
+8. Cloudflare deployment
+9. GitHub deployment
+10. How to add/edit registries
+11. How official source URLs are managed
+12. Important security rules
+13. The fact that this is metadata-only and does not host individual-level registry data
+
+==================================================
+22. DATA INTEGRITY
+==================================================
+
+Before making destructive database changes:
+
+- inspect the current schema
+- inspect current registry records
+- preserve the 21 registries
+- preserve valid metadata
+
+Do not delete the 21 registries.
+
+Do not replace real values with fake values.
+
+Do not generate fake variable dictionaries.
+
+Do not generate fake record counts.
+
+Do not invent study periods.
+
+==================================================
+23. TESTING
+==================================================
+
+After implementation, run comprehensive tests.
+
+At minimum verify:
+
+- frontend builds
+- API/Worker builds
+- typecheck passes
+- database connection works
+- /api/healthz works
+- catalogue API works
+- all 21 registries are returned
+- registry detail works
+- search works
+- category filtering works
+- Persian works
+- English works
+- RTL works
+- exports work
+- official source links work when present
+- missing official URLs are handled safely
+- admin login works
+- unauthenticated admin mutations are rejected
+- authenticated admin mutations work
+- no raw patient data exists
+- no secrets are exposed in frontend bundles
+- production build works without Replit
+- direct nested routes work
+
+If you can run automated tests, add or improve them for the critical paths.
+
+==================================================
+24. VERY IMPORTANT: DO NOT INVENT INFORMATION
+==================================================
+
+This rule overrides everything else.
+
+Never invent:
+
+- official URLs
+- record counts
+- variable counts
+- study periods
+- registry descriptions presented as official facts
+- hospital information
+- registry statistics
+- variable dictionaries
+
+If something is unknown, keep it unknown and display:
+
+"Not available"
+
+or the Persian equivalent.
+
+==================================================
+25. GITHUB
+==================================================
+
+The canonical repository is:
+
+https://github.com/erfan8km/Health-Data-Hub
+
+Keep the main branch working.
+
+After changes:
+
+- make sure the working tree is clean
+- make sure the project builds
+- commit the changes with a meaningful commit message
+- push to origin/main if repository permissions allow
+
+Do NOT force push.
+
+Do NOT rewrite Git history.
+
+==================================================
+26. FINAL DEPLOYMENT GOAL
+==================================================
+
+The final result should be:
+
+A professional bilingual epidemiology and health registry catalogue.
+
+Architecture:
+
+GitHub
+   ↓
+Cloudflare
+   ↓
+React/Vite frontend
+   ↓
+Cloudflare-compatible API
+   ↓
+PostgreSQL
+   ↓
+Metadata only
+
+No individual-level health records.
+
+The user should be able to visit the website, browse the 21 registries, search them, open their details, see available metadata, and follow the official source link.
+
+==================================================
+27. WORKING METHOD
+==================================================
+
+Do this in the following order:
+
+STEP 1:
+Inspect the entire repository and current architecture.
+
+STEP 2:
+Create a concise internal checklist of all problems found.
+
+STEP 3:
+Fix the architecture and deployment blockers first.
+
+STEP 4:
+Fix API/security problems.
+
+STEP 5:
+Fix database/schema problems.
+
+STEP 6:
+Fix bilingual/RTL/search/filter issues.
+
+STEP 7:
+Fix registry detail pages and metadata handling.
+
+STEP 8:
+Fix admin authentication.
+
+STEP 9:
+Fix Cloudflare deployment configuration.
+
+STEP 10:
+Run all builds/typechecks/tests.
+
+STEP 11:
+Test the production architecture.
+
+STEP 12:
+Review the Git diff and make sure there are no accidental changes.
+
+STEP 13:
+Commit and push to GitHub if permitted.
+
+Do not stop after identifying problems.
+
+Actually implement the fixes.
+
+==================================================
+28. FINAL REPORT
+==================================================
+
+At the end, give me a clear report with exactly these sections:
+
+1. DONE
+2. SECURITY FIXES
+3. CLOUDFLARE ARCHITECTURE
+4. DATABASE
+5. API
+6. FRONTEND / RTL
+7. 21 REGISTRIES
+8. TEST RESULTS
+9. ENVIRONMENT VARIABLES REQUIRED
+10. REMAINING MANUAL STEPS
+11. GITHUB COMMIT
+12. FINAL DEPLOYMENT INSTRUCTIONS
+
+For every remaining problem, clearly say whether it is:
+
+- code problem
+- Cloudflare dashboard configuration
+- environment variable
+- database credential
+- external official URL that still needs verification
+
+Do not say "everything is ready" unless you actually verified it.
+
+Most importantly:
+DO NOT JUST GIVE ME ADVICE.
+INSPECT → IMPLEMENT → TEST → FIX → VERIFY → REPORT.

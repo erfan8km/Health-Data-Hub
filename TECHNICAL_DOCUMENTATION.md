@@ -163,7 +163,8 @@ workspace/
 │       │       └── variables.ts
 │       └── drizzle.config.ts    # Migration config
 │
-├── scripts/                     # Utility scripts (seed, etc.)
+├── functions/                   # Cloudflare Pages Functions API adapter
+├── scripts/                     # Small workspace utilities
 ├── pnpm-workspace.yaml          # Workspace + catalog + overrides
 ├── tsconfig.base.json           # Shared strict TS defaults
 └── tsconfig.json                # Root solution file (libs only)
@@ -389,7 +390,7 @@ All export endpoints stream downloadable files. No authentication required.
 | `/datasets/:id` | `DatasetDetail.tsx` | Public | Full metadata, variable table, copy-to-clipboard citation |
 | `/variables` | `VariableDictionary.tsx` | Public | Cross-dataset variable browser with filter sidebar and detail sheet |
 | `/about` | `About.tsx` | Public | Mission, team, contact |
-| `/admin` | `Admin.tsx` | Password-gated | Full CRUD for datasets, categories, variables; export panel |
+| `/admin` | `Admin.tsx` | Server-session protected | Full CRUD for datasets, categories, variables; export panel |
 
 ---
 
@@ -447,7 +448,10 @@ Navigate to `/variables`. The page calls `GET /api/variables` with the `name` pa
 
 ## 11. Admin Panel Features
 
-The admin panel at `/admin` is protected by a server-side password check (`POST /api/auth/admin-login`). Authentication state is stored in `sessionStorage`; closing the browser tab clears it.
+The admin panel at `/admin` is protected by a server-side password check
+(`POST /api/auth/admin-login`). Successful login issues an expiring signed
+cookie. `sessionStorage` is retained only as a UI hint; it is never used as
+authorization.
 
 ### Tabs
 
@@ -461,15 +465,18 @@ The admin panel at `/admin` is protected by a server-side password check (`POST 
 ### Security model
 
 - Password is stored only as an environment variable (`ADMIN_PASSWORD`) on the server; never in the database or frontend code
-- The login endpoint returns only `{ ok: true }` on success — no token is issued
-- The frontend stores only the string `"1"` in `sessionStorage` as a session flag
-- All mutating API routes (`POST`, `PUT`, `DELETE`) are unprotected at the API level in v1 — they rely on the admin UI gate. For public deployments, add middleware-level protection (see `PROJECT_SETUP.md`)
+- The login endpoint issues an HMAC-signed, expiring `HttpOnly` cookie using `SESSION_SECRET`
+- The frontend validates the cookie with `GET /api/auth/admin-session`
+- All dataset, variable, and category mutating routes verify the session server-side
 
 ---
 
 ## 12. Export & Backup
 
-Export endpoints are registered at `/api/export/*` and require no authentication. They are intended for admin use via the Export tab.
+Export endpoints are registered at `/api/export/*` and are public metadata
+downloads. They contain registry metadata, general variable dictionary
+information, and schema descriptions only; they never contain patient or raw
+registry records.
 
 ### JSON exports
 
@@ -519,9 +526,10 @@ Both fonts are loaded from Google Fonts in `index.html`:
 | Variable | Required | Description |
 |---|---|---|
 | `DATABASE_URL` | Yes | PostgreSQL connection string (e.g. `postgresql://user:pass@host:5432/dbname`) |
-| `PORT` | Yes | Port the API server listens on (set by workflow runner) |
-| `ADMIN_PASSWORD` | Yes | Admin panel password (plain text, stored as server env var) |
-| `SESSION_SECRET` | Provisioned | Reserved; not yet used in v1 |
+| `PORT` | Express only | Port the Node API server listens on |
+| `ADMIN_PASSWORD` | Yes | Server-only admin password |
+| `SESSION_SECRET` | Yes | Server-only HMAC key, at least 32 characters |
+| `CORS_ORIGINS` | Conditional | Exact allowed origins for separate frontend/API deployments |
 | `NODE_ENV` | Optional | `development` or `production` |
 
 ### Common pnpm commands
@@ -531,7 +539,9 @@ Both fonts are loaded from Google Fonts in `index.html`:
 | `pnpm --filter @workspace/api-server run dev` | Start API server (build + run) |
 | `pnpm --filter @workspace/iedr run dev` | Start frontend dev server |
 | `pnpm run typecheck` | Full typecheck across all packages |
+| `pnpm run typecheck:cloudflare` | Typecheck the Pages Functions adapter |
 | `pnpm run build` | Build all packages |
+| `pnpm run build:pages` | Build the Cloudflare Pages frontend output |
 | `pnpm --filter @workspace/api-spec run codegen` | Regenerate hooks + Zod schemas from OpenAPI spec |
 | `pnpm --filter @workspace/db run push` | Push Drizzle schema changes to the database |
 | `pnpm --filter @workspace/api-server run typecheck` | Typecheck only the API server |
