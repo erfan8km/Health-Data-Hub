@@ -1,0 +1,49 @@
+GOAL
+Convert this project into a simple, static, bilingual (Persian/English) catalogue of medical registries. Visitors browse registries organized by country > city > institution > category > field, and clicking a registry opens its official external link in a new tab. No file uploads, no visitor accounts, no database at runtime, no server. It must deploy as a pure static site on Cloudflare Pages with a custom domain. Do all steps below in ONE pass, minimize back-and-forth, and do not stop to ask questions unless something is truly blocking.
+
+STEP 0 - PRESERVE DATA FIRST
+Before deleting anything, query the existing database and export all current registries (title, title_fa, category, any source/institution/geographic text) to /data/registries.json. Keep the 21 existing Mashhad registries and their existing categories. Do NOT invent any data: unknown values must be empty strings or null, never 0 or made-up text.
+
+STEP 1 - REMOVE
+Delete: Express API, Cloudflare Functions/Hono adapter, Drizzle/Postgres/Neon, admin panel and all auth/session code, variables dictionary, export endpoints, OpenAPI/Orval/Zod generated packages, mockup sandbox, wrangler Functions config, Replit-only plugins. Flatten the monorepo into a single Vite + React + TypeScript project if feasible; otherwise remove all unused packages. Keep Tailwind and the existing UI components that are still used.
+
+STEP 2 - DATA MODEL
+Single file /src/data/registries.json (array). Each item:
+{
+  "id": "unique-slug",
+  "title_fa": "", "title_en": "",
+  "description_fa": "", "description_en": "",
+  "category_id": "", "field_id": "",
+  "institution_id": "",
+  "official_source_url": "",
+  "status": "active" | "inactive",
+  "last_checked": ""
+}
+Plus lookup files: /src/data/countries.json, cities.json, institutions.json, categories.json, fields.json (each item has id, name_fa, name_en; cities have country_id; institutions have city_id; fields have category_id). Seed: country Iran, city Mashhad, institution Mashhad University of Medical Sciences (Persian name too), plus the existing categories. Adding a new city or country later must require ONLY adding JSON rows, with no code changes.
+
+STEP 3 - PAGES AND FEATURES
+- Home: short intro, search box, browse-by-category cards, counts computed from the data.
+- Catalogue (/registries): list of cards (Persian + English title, category, field, institution, city) with search and filters for country, city, institution, category, field. Filters are cascading (country limits cities, etc). Support URL query params so filtered views are shareable.
+- Search: client-side, works on Persian and English titles/descriptions. Normalize Persian text (unify Arabic ي/ك to ی/ک, remove diacritics and ZWNJ, case-insensitive English).
+- Registry card/detail: button "View on official site" opens official_source_url with target="_blank" rel="noopener noreferrer". If the URL is empty, show a disabled button with "Link not available yet" (Persian: «لینک هنوز ثبت نشده»). Never show 0 for unknown values.
+- About page: purpose, a note that this site only links to original sources and does not host or copy registry content, and a contact placeholder.
+- Language toggle FA/EN with proper RTL/LTR, Persian font (Vazirmatn via local/self-hosted or system fallback), default language Persian.
+- Responsive, mobile-first, fast, accessible (labels, focus states, contrast).
+- Routing: /, /registries, /registries/:id, /about, and a not-found page.
+- SEO: title/meta description per page, Open Graph tags, sitemap.xml and robots.txt generated at build time from the data.
+
+STEP 4 - DEPLOY CONFIG (Cloudflare Pages, static only)
+- Build command: npm run build (or pnpm equivalent), output dir: dist.
+- Add public/_redirects with: /* /index.html 200
+- Remove wrangler Functions config; no server code anywhere.
+- Set base path to "/".
+
+STEP 5 - DATA QUALITY
+Add a script (npm run validate) that fails the build if: ids are not unique, any foreign id (category/field/institution/city/country) does not exist, official_source_url is non-empty and not a valid https URL, or a title_fa/title_en is missing. Run it automatically before build. Add a separate optional script (npm run check-links) that HEAD-requests all non-empty URLs and prints broken ones; it must NOT run during build.
+
+STEP 6 - DOCS
+Write a short README with: how to add a registry, city, country, or institution (JSON examples); how to fill official_source_url; commands; and step-by-step deploy to Cloudflare Pages from GitHub plus connecting a custom domain. Delete outdated docs (PROJECT_STATUS.md, VPS/security text).
+
+STEP 7 - VERIFY AND REPORT
+Run typecheck, validate, and build. Preview locally and test: search in Persian and English, cascading filters, deep link /registries/<id> loads directly, RTL layout, disabled-link state, external link opening. Commit everything to git with a clear message.
+Final report (concise): what was removed, final file structure, list of the 21 registries showing which fields are still empty, exact test results, and anything I must fill manually. Do not claim anything works unless you actually ran it.
