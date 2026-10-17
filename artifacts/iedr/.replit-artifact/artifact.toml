@@ -11,15 +11,15 @@ version = "1.0.0"
 
 [[services]]
 name = "web"
-paths = [ "/" ]
+paths = ["/"]
 localPort = 19420
 
 [services.development]
 run = "pnpm --filter @workspace/iedr run dev"
 
 [services.production]
-build = [ "pnpm", "--filter", "@workspace/iedr", "run", "build" ]
-publicDir = "artifacts/iedr/dist/public"
+build = ["pnpm", "run", "build"]
+publicDir = "dist"
 serve = "static"
 
 [[services.production.rewrites]]
@@ -28,4 +28,3 @@ to = "/index.html"
 
 [services.env]
 PORT = "19420"
-BASE_PATH = "/"

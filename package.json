@@ -1,24 +1,17 @@
 {
-  "name": "workspace",
-  "version": "0.0.0",
-  "license": "MIT",
-  "scripts": {
-    "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
-    "build": "pnpm run typecheck && pnpm -r --if-present run build",
-    "build:pages": "pnpm --filter @workspace/iedr run build",
-    "typecheck:libs": "tsc --build",
-    "typecheck:cloudflare": "tsc -p functions/tsconfig.json --noEmit",
-    "typecheck": "pnpm run typecheck:libs && pnpm run typecheck:cloudflare && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
-  },
+  "name": "iedr-static-catalogue",
+  "version": "1.0.0",
   "private": true,
-  "devDependencies": {
-    "prettier": "^3.8.3",
-    "typescript": "~5.9.3"
+  "packageManager": "pnpm@10.26.1",
+  "engines": {
+    "node": ">=20.19"
   },
-  "dependencies": {
-    "@cloudflare/workers-types": "^5.20260916.1",
-    "@neondatabase/serverless": "^1.1.0",
-    "hono": "^4.13.8",
-    "wrangler": "^4.132.0"
+  "scripts": {
+    "dev": "pnpm --filter @workspace/iedr run dev",
+    "typecheck": "pnpm --filter @workspace/iedr run typecheck",
+    "validate": "pnpm --filter @workspace/iedr run validate",
+    "test": "pnpm --filter @workspace/iedr run test",
+    "build": "pnpm --filter @workspace/iedr run build",
+    "check-links": "pnpm --filter @workspace/iedr run check-links"
   }
 }

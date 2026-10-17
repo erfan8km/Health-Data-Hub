@@ -1,52 +1,24 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import path from "path";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const isReplit = process.env.REPL_ID !== undefined;
-const isProd = process.env.NODE_ENV === "production";
-
-// PORT: required for the dev server; not needed for `vite build`
-const rawPort = process.env.PORT;
-const port = rawPort ? Number(rawPort) : 3000;
-
-// BASE_PATH: the public base URL for all assets.
-// Defaults to "/" for standard deployments (nginx serves from root).
-// On Replit the workflow runner injects the correct sub-path.
-const basePath = process.env.BASE_PATH ?? "/";
+const appRoot = path.dirname(fileURLToPath(import.meta.url));
+const port = Number(process.env.PORT ?? 5173);
 
 export default defineConfig({
-  base: basePath,
-  plugins: [
-    react(),
-    tailwindcss(),
-    // Replit-specific dev plugins — only load inside Replit environment
-    ...(isReplit && !isProd
-      ? [
-          await import("@replit/vite-plugin-runtime-error-modal").then((m) =>
-            m.default()
-          ),
-          await import("@replit/vite-plugin-cartographer").then((m) =>
-            m.cartographer({
-              root: path.resolve(import.meta.dirname, ".."),
-            })
-          ),
-          await import("@replit/vite-plugin-dev-banner").then((m) =>
-            m.devBanner()
-          ),
-        ]
-      : []),
-  ],
+  base: "/",
+  plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      "@": path.resolve(import.meta.dirname, "src"),
-      "@assets": path.resolve(import.meta.dirname, "..", "..", "attached_assets"),
+      "@": path.resolve(appRoot, "src"),
     },
     dedupe: ["react", "react-dom"],
   },
-  root: path.resolve(import.meta.dirname),
+  root: appRoot,
   build: {
-    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    outDir: path.resolve(appRoot, "../..", "dist"),
     emptyOutDir: true,
   },
   server: {
@@ -54,9 +26,6 @@ export default defineConfig({
     strictPort: true,
     host: "0.0.0.0",
     allowedHosts: true,
-    fs: {
-      strict: true,
-    },
   },
   preview: {
     port,

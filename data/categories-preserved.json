@@ -1,0 +1,47 @@
+[
+  {
+    "id": 3,
+    "name": "Cancer Registry",
+    "nameFa": "ثبت سرطان",
+    "slug": "cancer-registry",
+    "description": "National and regional cancer registry data",
+    "descriptionFa": "داده‌های ثبت سرطان ملی و منطقه‌ای",
+    "datasetCount": 5
+  },
+  {
+    "id": 1,
+    "name": "Chronic Diseases",
+    "nameFa": "بیماری‌های مزمن",
+    "slug": "chronic-diseases",
+    "description": "Datasets related to chronic and non-communicable diseases",
+    "descriptionFa": "مجموعه داده‌های مرتبط با بیماری‌های مزمن و غیرواگیر",
+    "datasetCount": 5
+  },
+  {
+    "id": 2,
+    "name": "Infectious Diseases",
+    "nameFa": "بیماری‌های عفونی",
+    "slug": "infectious-diseases",
+    "description": "Datasets covering infectious and communicable disease registries",
+    "descriptionFa": "مجموعه داده‌های پوشش ثبت بیماری‌های عفونی و واگیر",
+    "datasetCount": 2
+  },
+  {
+    "id": 4,
+    "name": "Maternal & Child Health",
+    "nameFa": "بهداشت مادر و کودک",
+    "slug": "maternal-child-health",
+    "description": "Maternal mortality, child health, and reproductive health data",
+    "descriptionFa": "داده‌های مرگ و میر مادران، سلامت کودک و بهداشت باروری",
+    "datasetCount": 9
+  },
+  {
+    "id": 5,
+    "name": "Mental Health",
+    "nameFa": "بهداشت روان",
+    "slug": "mental-health",
+    "description": "Psychiatric registries and population mental health surveys",
+    "descriptionFa": "ثبت‌های روانپزشکی و پیمایش‌های سلامت روان جمعیت",
+    "datasetCount": 0
+  }
+]

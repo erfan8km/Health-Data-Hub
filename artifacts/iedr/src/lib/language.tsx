@@ -1,32 +1,43 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from "react";
 
-type Language = 'en' | 'fa';
+type Language = "en" | "fa";
 
-interface LanguageContextType {
+interface LanguageContextValue {
   language: Language;
-  setLanguage: (lang: Language) => void;
+  setLanguage: (language: Language) => void;
   isRtl: boolean;
-  t: (en: string | undefined | null, fa: string | undefined | null) => string;
+  t: (english: string | null | undefined, persian: string | null | undefined) => string;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const LanguageContext = createContext<LanguageContextValue | undefined>(undefined);
+
+function initialLanguage(): Language {
+  try {
+    return window.localStorage.getItem("iedr-language") === "en" ? "en" : "fa";
+  } catch {
+    return "fa";
+  }
+}
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguage] = useState<Language>('en');
+  const [language, setLanguage] = useState<Language>(initialLanguage);
 
   useEffect(() => {
-    const isRtl = language === 'fa';
-    document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
-    document.body.style.fontFamily = isRtl ? "'Vazirmatn', sans-serif" : "'Inter', sans-serif";
+    const isPersian = language === "fa";
+    document.documentElement.lang = language;
+    document.documentElement.dir = isPersian ? "rtl" : "ltr";
+    try {
+      window.localStorage.setItem("iedr-language", language);
+    } catch {
+      // Language switching still works when browser storage is unavailable.
+    }
   }, [language]);
 
-  const t = (en: string | undefined | null, fa: string | undefined | null) => {
-    if (language === 'fa') return fa || en || '';
-    return en || fa || '';
-  };
+  const t = (english: string | null | undefined, persian: string | null | undefined) =>
+    language === "fa" ? persian || english || "" : english || persian || "";
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, isRtl: language === 'fa', t }}>
+    <LanguageContext.Provider value={{ language, setLanguage, isRtl: language === "fa", t }}>
       {children}
     </LanguageContext.Provider>
   );
@@ -34,8 +45,6 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
 export function useLanguage() {
   const context = useContext(LanguageContext);
-  if (context === undefined) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
-  }
+  if (!context) throw new Error("useLanguage must be used within a LanguageProvider");
   return context;
 }
