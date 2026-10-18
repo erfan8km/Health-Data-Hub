@@ -138,7 +138,7 @@ export default function GlobeScene({ view, onArrival, onSelectIran }: Props) {
       viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString("#0d1b2a");
       viewer.scene.globe.enableLighting = true;
       viewer.scene.globe.showGroundAtmosphere = true;
-      viewer.scene.skyAtmosphere.show = true;
+      if (viewer.scene.skyAtmosphere) viewer.scene.skyAtmosphere.show = true;
       viewer.scene.fog.enabled = true;
       viewer.scene.globe.depthTestAgainstTerrain = false;
       viewer.scene.screenSpaceCameraController.minimumZoomDistance = 120000;
@@ -161,9 +161,11 @@ export default function GlobeScene({ view, onArrival, onSelectIran }: Props) {
         setHoverIran(overIran);
         canvas.style.cursor = overIran ? "pointer" : "grab";
         if (outlineEntity?.polygon) {
-          outlineEntity.polygon.material = overIran
-            ? Cesium.Color.fromCssColorString("#5be7d0").withAlpha(0.12)
-            : Cesium.Color.fromCssColorString("#5be7d0").withAlpha(0.045);
+          outlineEntity.polygon.material = new Cesium.ColorMaterialProperty(
+            overIran
+              ? Cesium.Color.fromCssColorString("#5be7d0").withAlpha(0.12)
+              : Cesium.Color.fromCssColorString("#5be7d0").withAlpha(0.045),
+          );
         }
       }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
       hoverHandler.setInputAction((click: Cesium.ScreenSpaceEventHandler.PositionedEvent) => {
