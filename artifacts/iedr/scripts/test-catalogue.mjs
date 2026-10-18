@@ -3,65 +3,58 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
-import { filterRegistries, normalizeSearchText } from "../src/lib/catalogue.js";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const registries = JSON.parse(await readFile(resolve(root, "src/data/registries.json"), "utf8"));
-const categories = JSON.parse(await readFile(resolve(root, "src/data/categories.json"), "utf8"));
-const originalExport = JSON.parse(await readFile(resolve(root, "../../data/registries.json"), "utf8"));
-const categoryName = (id) => categories.find((category) => category.id === id)?.name_en ?? "";
-const emptyName = () => "";
-const countryId = () => "iran";
-const cityId = () => "mashhad";
-const categoryIdByLegacyId = {
-  1: "chronic-diseases",
-  2: "infectious-diseases",
-  3: "cancer-registry",
-  4: "maternal-child-health",
-  5: "mental-health",
-};
+const read = (name) => readFile(resolve(root, "public/data", name), "utf8").then(JSON.parse);
+const [registries, categories, countries, borders] = await Promise.all([
+  read("registries.json"), read("categories.json"), read("countries.json"), read("borders.geojson"),
+]);
 
-test("preserves all 21 registry records and 5 categories", () => {
-  assert.equal(registries.length, 21);
-  assert.equal(categories.length, 5);
-  assert.equal(originalExport.length, 21);
+test("contains the 30 initial registry rows and 11 clinical categories from the brief", () => {
+  assert.equal(registries.length, 30);
+  assert.equal(categories.length, 11);
 });
 
-test("preserves every original title, category, source, and geographic value", () => {
-  for (const original of originalExport) {
-    const registry = registries.find((entry) => entry.title_en === original.title_en && entry.title_fa === original.title_fa);
-    assert.ok(registry, `Missing preserved registry: ${original.title_en}`);
-    assert.equal(registry.category_id, categoryIdByLegacyId[original.category_legacy_id]);
-    assert.equal(registry.description_en, original.description_en);
-    assert.equal(registry.description_fa, original.description_fa);
-    assert.equal(registry.source_text_en, original.source_text_en);
-    assert.equal(registry.source_text_fa, original.source_text_fa);
-    assert.equal(registry.geographic_text_en, original.geographic_text_en);
-    assert.equal(registry.geographic_text_fa, original.geographic_text_fa);
-    assert.equal(registry.official_source_url, original.official_source_url);
+test("registry slugs are unique and all records use the initial Iran/Mashhad geography", () => {
+  const slugs = registries.map((registry) => registry.slug);
+  assert.equal(new Set(slugs).size, slugs.length);
+  for (const registry of registries) {
+    assert.equal(registry.country, "IR");
+    assert.equal(registry.city, "mashhad");
+    assert.ok(registry.fa.length > 0 && registry.en.length > 0);
   }
 });
 
-test("search normalization unifies Persian/Arabic yeh and kaf and removes ZWNJ", () => {
-  assert.equal(normalizeSearchText("كيستيك‌فايبروسيس"), normalizeSearchText("کیستیکفایبروسیس"));
+test("all registry category references point to known categories, including multi-category records", () => {
+  const categoryIds = new Set(categories.map((category) => category.id));
+  for (const registry of registries) {
+    assert.ok(registry.categories.length > 0);
+    for (const id of registry.categories) assert.ok(categoryIds.has(id), `${registry.slug}: unknown ${id}`);
+  }
+  assert.deepEqual(registries.find((registry) => registry.slug === "obstructive-sleep-apnea")?.categories, ["sleep", "ent"]);
+  assert.deepEqual(registries.find((registry) => registry.slug === "endometriosis")?.categories, ["gyn"]);
 });
 
-test("English title search ignores case", () => {
-  assert.deepEqual(filterRegistries(registries, { q: "pEdIaTrIc CaNcEr" }, countryId, cityId, categoryName, emptyName, emptyName, emptyName).map((entry) => entry.id), ["pediatric-cancer"]);
+test("unknown descriptions and official URLs are left blank instead of being invented", () => {
+  for (const registry of registries) {
+    assert.equal(registry.description, "");
+    assert.equal(registry.officialUrl, "");
+  }
 });
 
-test("Persian search finds the expected registry after normalization", () => {
-  const results = filterRegistries(registries, { q: "کاهش شنوایی سادن" }, countryId, cityId, categoryName, emptyName, emptyName, emptyName);
-  assert.deepEqual(results.map((entry) => entry.id), ["sudden-hearing-loss"]);
+test("the active Iran country has a boundary and geographic coordinates", () => {
+  const iran = countries.find((country) => country.id === "IR");
+  assert.ok(iran);
+  assert.equal(iran.iso3, "IRN");
+  assert.ok(Number.isFinite(iran.coordinates.latitude));
+  assert.ok(Number.isFinite(iran.coordinates.longitude));
+  assert.ok(borders.features.some((feature) => feature.properties.iso2 === "IR"));
 });
 
-test("country, city, institution, category, and field filters combine", () => {
-  assert.equal(filterRegistries(registries, {
-    country: "iran",
-    city: "mashhad",
-    institution: "mashhad-university-of-medical-sciences",
-    category: "cancer-registry",
-    field: "",
-  }, countryId, cityId, categoryName, emptyName, emptyName, emptyName).length, 5);
-  assert.equal(filterRegistries(registries, { country: "unknown" }, countryId, cityId, categoryName, emptyName, emptyName, emptyName).length, 0);
+test("category counts match multi-category references without mutating the data", () => {
+  const count = (id) => registries.filter((registry) => registry.categories.includes(id)).length;
+  assert.ok(count("gyn") > 0);
+  assert.ok(count("onc") > 0);
+  assert.ok(count("eye") > 0);
+  assert.equal(registries.filter((registry) => registry.categories.includes("sleep")).length, 2);
 });

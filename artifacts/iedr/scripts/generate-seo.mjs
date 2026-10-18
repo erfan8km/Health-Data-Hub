@@ -1,68 +1,52 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
+import { readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const appRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const outputDir = resolve(appRoot, "../..", "dist");
-const siteUrlValue = process.env.SITE_URL;
-if (!siteUrlValue) {
-  console.error("SITE_URL is required at build time so the sitemap and canonical URLs use your real domain.");
+const rawSiteUrl = process.env.SITE_URL;
+if (!rawSiteUrl) {
+  console.error("SITE_URL is required at build time so canonical metadata and sitemap use the correct public URL.");
   process.exit(1);
 }
 
 let siteUrl;
 try {
-  siteUrl = new URL(siteUrlValue).origin;
-  if (!["http:", "https:"].includes(new URL(siteUrlValue).protocol)) throw new Error();
+  const parsed = new URL(rawSiteUrl);
+  if (!["http:", "https:"].includes(parsed.protocol)) throw new Error();
+  siteUrl = parsed.href.endsWith("/") ? parsed.href : parsed.href + "/";
 } catch {
-  console.error("SITE_URL must be a valid http(s) URL, such as https://yourdomain.example.");
+  console.error("SITE_URL must be a valid http(s) URL, e.g. https://example.com/ or https://username.github.io/repository/.");
   process.exit(1);
 }
 
-const registries = JSON.parse(await readFile(resolve(appRoot, "src/data/registries.json"), "utf8"));
-const categories = JSON.parse(await readFile(resolve(appRoot, "src/data/categories.json"), "utf8"));
-const baseHtml = await readFile(resolve(outputDir, "index.html"), "utf8");
+const htmlPath = resolve(outputDir, "index.html");
+let html = await readFile(htmlPath, "utf8");
 const escapeHtml = (value) => String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 
-function updateMeta(html, attribute, key, content) {
-  const pattern = new RegExp(`<meta ${attribute}="${key}" content="[^"]*"\\s*\\/?>`);
-  const tag = `<meta ${attribute}="${key}" content="${escapeHtml(content)}" />`;
-  return pattern.test(html) ? html.replace(pattern, tag) : html.replace("</head>", `  ${tag}\n  </head>`);
+function updateMeta(attribute, key, content) {
+  const escapedContent = escapeHtml(content);
+  const pattern = new RegExp("<meta\\s+" + attribute + "=\"" + key + "\"[^>]*>", "i");
+  const tag = "<meta " + attribute + "=\"" + key + "\" content=\"" + escapedContent + "\" />";
+  if (pattern.test(html)) html = html.replace(pattern, tag);
+  else html = html.replace("</head>", "  " + tag + "\n  </head>");
 }
 
-function routeHtml(path, title, description) {
-  const canonical = `${siteUrl}${path}`;
-  let html = baseHtml.replace(/<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(title)}</title>`);
-  html = updateMeta(html, "name", "description", description);
-  html = updateMeta(html, "property", "og:title", title);
-  html = updateMeta(html, "property", "og:description", description);
-  html = updateMeta(html, "name", "twitter:title", title);
-  html = updateMeta(html, "name", "twitter:description", description);
-  const canonicalTag = `<link rel="canonical" href="${escapeHtml(canonical)}" />`;
-  html = html.replace("</head>", `  ${canonicalTag}\n  </head>`);
-  return html;
-}
+const title = "مخزن داده‌های اپیدمیولوژی ایران | Iran Epidemiology Data Repository";
+const description = "کاتالوگ دوزبانه فراداده ریجستری‌های پزشکی ایران. Bilingual metadata catalogue of medical registries in Iran.";
+html = html.replace(/<title>[\s\S]*?<\/title>/i, "<title>" + escapeHtml(title) + "</title>");
+updateMeta("name", "description", description);
+updateMeta("property", "og:title", title);
+updateMeta("property", "og:description", description);
+updateMeta("name", "twitter:title", title);
+updateMeta("name", "twitter:description", description);
+const canonicalTag = "<link rel=\"canonical\" href=\"" + escapeHtml(siteUrl) + "\" />";
+const canonicalPattern = /<link\s+rel=["']canonical["'][^>]*>/i;
+if (canonicalPattern.test(html)) html = html.replace(canonicalPattern, canonicalTag);
+else html = html.replace("</head>", "  " + canonicalTag + "\n  </head>");
+await writeFile(htmlPath, html);
 
-const routes = [
-  { path: "/", title: "مخزن داده‌های اپیدمیولوژی ایران | Iran Epidemiology Data Repository", description: "کاتالوگ دوزبانه فراداده ثبت‌های پزشکی ایران. Bilingual metadata catalogue of medical registries in Iran." },
-  { path: "/registries", title: "فهرست ثبت‌ها | Registry Catalogue — IEDR", description: "جستجو و مرور ثبت‌های پزشکی ایران. Search and browse medical registries in Iran." },
-  { path: "/about", title: "درباره | About — IEDR", description: "درباره کاتالوگ فراداده ثبت‌های پزشکی ایران. About the Iran medical registry metadata catalogue." },
-  ...registries.map((registry) => ({
-    path: `/registries/${encodeURIComponent(registry.id)}`,
-    title: `${registry.title_fa} | ${registry.title_en} — IEDR`,
-    description: `${registry.title_fa} (${registry.title_en}) — ${categories.find((category) => category.id === registry.category_id)?.name_fa ?? "ثبت پزشکی"}.`,
-  })),
-];
-
-const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${routes.map(({ path }) => `  <url><loc>${escapeHtml(`${siteUrl}${path}`)}</loc></url>`).join("\n")}\n</urlset>\n`;
+const sitemap = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n  <url><loc>" + escapeHtml(siteUrl) + "</loc></url>\n</urlset>\n";
 await writeFile(resolve(outputDir, "sitemap.xml"), sitemap);
-await writeFile(resolve(outputDir, "robots.txt"), `User-agent: *\nAllow: /\nSitemap: ${siteUrl}/sitemap.xml\n`);
-await writeFile(resolve(outputDir, "index.html"), routeHtml(baseHtml, routes[0].title, routes[0].description));
-
-for (const route of routes.slice(1)) {
-  const routeDirectory = resolve(outputDir, route.path.replace(/^\//, ""));
-  await mkdir(routeDirectory, { recursive: true });
-  await writeFile(resolve(routeDirectory, "index.html"), routeHtml(baseHtml, route.title, route.description));
-}
-
-console.log(`SEO files generated for ${routes.length} routes at ${siteUrl}.`);
+await writeFile(resolve(outputDir, "robots.txt"), "User-agent: *\nAllow: /\nSitemap: " + siteUrl + "sitemap.xml\n");
+console.log("SEO metadata and sitemap generated for " + siteUrl + ".");
