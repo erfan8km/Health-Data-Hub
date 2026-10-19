@@ -38,7 +38,7 @@ if (!cesiumBuildDir) {
   throw new Error("Could not locate Cesium runtime (expected Cesium.js and Widgets under the cesium package).");
 }
 
-const outputDir = path.resolve(appRoot, "../..", "dist", "cesium");
+const outputDir = path.resolve(appRoot, "../../..", "dist", "cesium");
 await mkdir(outputDir, { recursive: true });
 for (const name of ["Assets", "ThirdParty", "Workers", "Widgets"]) {
   const source = path.join(cesiumBuildDir, name);
