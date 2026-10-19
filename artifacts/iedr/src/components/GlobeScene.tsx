@@ -184,25 +184,73 @@ export default function GlobeScene({ view, onArrival, onSelectIran }: Props) {
       viewer.scene.preRender.addEventListener(rotationHandler);
 
       const loadImagery = async () => {
+        // Intentionally do not load street or satellite imagery.
+        // The globe is a clean, minimal political map with country outlines and labels.
+        setImageryFallback(true);
+      };
+
+      const loadWorldCountries = async () => {
         try {
-          if (!ION_TOKEN) throw new Error("No optional ion token configured");
-          const provider = await Cesium.IonImageryProvider.fromAssetId(2);
-          if (alive && viewer && !viewer.isDestroyed()) viewer.imageryLayers.addImageryProvider(provider);
-        } catch {
-          if (!alive || !viewer || viewer.isDestroyed()) return;
-          setImageryFallback(true);
-          try {
-            // Use OpenStreetMap as the no-token fallback. Esri's World Imagery
-            // endpoint may return 403 / omit CORS headers on static hosting.
-            const provider = new Cesium.OpenStreetMapImageryProvider({
-              url: "https://tile.openstreetmap.org/",
-              credit: "© OpenStreetMap contributors",
-              maximumLevel: 19,
-            });
-            viewer.imageryLayers.addImageryProvider(provider);
-          } catch {
-            // The dark globe and catalogue remain usable if external imagery cannot load.
+          const response = await fetch("https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson");
+          if (!response.ok) throw new Error("Could not load world country boundaries");
+          const geo = await response.json();
+          if (!Array.isArray(geo?.features) || !viewer || viewer.isDestroyed()) return;
+
+          for (const feature of geo.features) {
+            const props = feature?.properties ?? {};
+            const name = props.ADMIN || props.NAME || props.name;
+            const geometry = feature?.geometry;
+            if (!name || !geometry || !viewer || viewer.isDestroyed()) continue;
+
+            const polygons = geometry.type === "Polygon"
+              ? [geometry.coordinates]
+              : geometry.type === "MultiPolygon"
+                ? geometry.coordinates
+                : [];
+            for (const polygon of polygons) {
+              const ring = polygon?.[0];
+              if (!Array.isArray(ring) || ring.length < 3) continue;
+              const positions = Cesium.Cartesian3.fromDegreesArray(ring.flatMap((pair: number[]) => [pair[0], pair[1]]));
+              viewer.entities.add({
+                name: String(name),
+                polygon: {
+                  hierarchy: new Cesium.PolygonHierarchy(positions),
+                  material: Cesium.Color.fromCssColorString("#14283a").withAlpha(0.20),
+                  outline: true,
+                  outlineColor: Cesium.Color.fromCssColorString("#6d91a8").withAlpha(0.58),
+                  height: 8000,
+                },
+              });
+            }
+
+            // Approximate a label anchor from the largest polygon's outer ring.
+            const rings = polygons.map((polygon: any[]) => polygon?.[0]).filter((ring: any) => Array.isArray(ring) && ring.length > 2);
+            rings.sort((a: any[], b: any[]) => b.length - a.length);
+            const ring = rings[0];
+            if (ring) {
+              const lon = ring.reduce((sum: number, pair: number[]) => sum + pair[0], 0) / ring.length;
+              const lat = ring.reduce((sum: number, pair: number[]) => sum + pair[1], 0) / ring.length;
+              viewer.entities.add({
+                name: String(name) + " label",
+                position: Cesium.Cartesian3.fromDegrees(lon, lat, 30000),
+                label: {
+                  text: String(name),
+                  font: "11px sans-serif",
+                  fillColor: Cesium.Color.fromCssColorString("#e6f3ff"),
+                  outlineColor: Cesium.Color.fromCssColorString("#07111d"),
+                  outlineWidth: 2,
+                  style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                  showBackground: false,
+                  disableDepthTestDistance: 0,
+                  distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 18000000),
+                  scaleByDistance: new Cesium.NearFarScalar(3000000, 1.0, 16000000, 0.45),
+                },
+              });
+            }
           }
+          viewer.scene.requestRender();
+        } catch {
+          // The globe and Iran action remain usable if the external boundary file is unavailable.
         }
       };
 
@@ -244,7 +292,7 @@ export default function GlobeScene({ view, onArrival, onSelectIran }: Props) {
       };
 
       (viewer as Cesium.Viewer & { __iedrFly?: (targetView: View) => void }).__iedrFly = beginFlight;
-      void Promise.all([loadImagery(), loadIranBoundary()]).finally(() => {
+      void Promise.all([loadImagery(), loadWorldCountries(), loadIranBoundary()]).finally(() => {
         if (!alive) return;
         setSceneReady(true);
         if (viewRef.current === "categories") beginFlight("categories");
@@ -292,7 +340,7 @@ export default function GlobeScene({ view, onArrival, onSelectIran }: Props) {
       {(!sceneReady || !webglSupported || globeError) && view === "globe" && (
         <div className="globe-fallback-notice"><span className="signal-dot" />{globeError || !webglSupported ? "نمای کره در این دستگاه در دسترس نیست" : "در حال آماده‌سازی نمای ماهواره‌ای"}</div>
       )}
-      {imageryFallback && sceneReady && view === "globe" && <div className="imagery-note">نقشه عمومی OpenStreetMap · بدون کلید Cesium ion</div>}
+      {imageryFallback && sceneReady && view === "globe" && <div className="imagery-note">نمای سیاسی مینیمال · فقط مرز و نام کشورها</div>}
       {view === "globe" && sceneReady && webglSupported && !globeError && (
         <button type="button" className={"iran-hotspot" + (hoverIran ? " iran-hotspot-hover" : "")} onClick={onSelectIran} aria-label="ورود به نقشه ایران">
           <span className="hotspot-pulse" /><span className="hotspot-label">ایران / IRAN</span>
