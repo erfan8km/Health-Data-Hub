@@ -107,7 +107,6 @@ function App() {
     const text = query.trim().toLocaleLowerCase();
     return !text || [registry.fa, registry.en, registry.slug].some((value) => value.toLocaleLowerCase().includes(text));
   }), [registries, query, route.view, route.slug]);
-  const activeCountryCount = new Set(registries.map((registry) => registry.country)).size;
   const categoryBlurb = (id: string) => (english ? englishBlurbs[id] : persianBlurbs[id]) || "";
 
   return (
