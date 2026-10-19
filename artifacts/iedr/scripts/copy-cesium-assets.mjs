@@ -5,7 +5,16 @@ import { fileURLToPath } from "node:url";
 
 const appRoot = path.dirname(fileURLToPath(import.meta.url));
 const require = createRequire(path.join(appRoot, "package.json"));
-const packageRoot = path.dirname(require.resolve("cesium/package.json"));
+let packageRoot = path.dirname(require.resolve("cesium"));
+while (packageRoot !== path.dirname(packageRoot)) {
+  if (await exists(path.join(packageRoot, "package.json"))) {
+    try {
+      const pkg = JSON.parse(await (await import("node:fs/promises")).readFile(path.join(packageRoot, "package.json"), "utf8"));
+      if (pkg.name === "cesium") break;
+    } catch {}
+  }
+  packageRoot = path.dirname(packageRoot);
+}
 
 async function exists(file) {
   try { await access(file); return true; } catch { return false; }
