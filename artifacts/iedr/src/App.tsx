@@ -132,20 +132,7 @@ function App() {
       </header>}
 
       {route.view === "globe" && <section className="landing-overlay">
-        <div className="landing-topline"><span className="live-indicator" /> {english ? "A LIVING ATLAS OF HEALTH DATA" : "اطلس زنده‌ی داده‌های سلامت"}</div>
-        <div className="landing-copy">
-          <p className="eyebrow">{english ? "FROM THE GLOBE TO THE REGISTRY" : "از کره‌ی زمین تا ریجستری‌های پزشکی"}</p>
-          <h1>{english ? <>Explore the landscape of<br /><span>health registries in Iran.</span></> : <>داده‌های سلامت را<br /><span>از زاویه‌ای تازه ببینید.</span></>}</h1>
-          <p className="landing-description">{english ? "A bilingual discovery atlas for clinical and epidemiological registry metadata." : "نقشه‌ای دوزبانه برای کشف ریجستری‌های بالینی و اپیدمیولوژیک؛ از نمای سیاره تا حوزه‌های تخصصی."}</p>
-          <button type="button" className="primary-cta" onClick={() => { setCategoriesReady(false); navigate("categories"); }}><span>{english ? "Explore Iran" : "ورود به ایران"}</span><ArrowLeft size={17} /></button>
-          <div className="landing-hint"><span className="hint-mouse" /><span>{english ? "Select the glowing country to begin" : "برای شروع، ایرانِ نورانی را روی کره انتخاب کنید"}</span></div>
-        </div>
-        <div className="landing-stats">
-          <div><strong>{dataReady && !dataError ? String(registries.length).padStart(2, "0") : "—"}</strong><span>{english ? "INITIAL REGISTRIES" : "ریجستری اولیه"}</span></div><i />
-          <div><strong>{dataReady && !dataError ? String(categories.length).padStart(2, "0") : "—"}</strong><span>{english ? "CLINICAL GROUPS" : "دسته‌ی بالینی"}</span></div><i />
-          <div><strong>{dataReady && !dataError ? String(activeCountryCount).padStart(2, "0") : "—"}</strong><span>{english ? "ACTIVE COUNTRIES" : "کشور فعال"}</span></div>
-        </div>
-        <div className="orbital-caption"><span className="caption-rule" /><span>35°41′ N · 51°25′ E</span><small>IRAN · MIDDLE EAST</small></div>
+        <div className="orbital-caption"><span className="caption-rule" /><span>35°41′ N · 51°25′ E</span></div>
         <div className="bottom-coordinates">IEDR / 01 <span>—</span> DATA LANDSCAPE, IRAN</div>
       </section>}
 
