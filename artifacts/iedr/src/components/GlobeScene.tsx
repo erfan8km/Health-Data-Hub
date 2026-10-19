@@ -180,8 +180,11 @@ export default function GlobeScene({ view, onArrival, onSelectIran }: Props) {
     async function init() {
       try {
         if (!alive || !hostRef.current) return;
-        const globeFactory = Globe as unknown as (element: HTMLElement, options?: Record<string, unknown>) => any;
-        globe = globeFactory(hostRef.current, { animateIn: true })
+        // globe.gl exports a factory: call it first, then mount the returned
+        // globe API on the host element. Calling Globe(hostElement) directly
+        // leaves the scene uninitialised at runtime even though TypeScript builds.
+        const globeFactory = Globe as unknown as (options?: Record<string, unknown>) => (element: HTMLElement) => any;
+        globe = globeFactory({ animateIn: true })(hostRef.current)
           .width(hostRef.current.clientWidth)
           .height(hostRef.current.clientHeight)
           .backgroundColor("rgba(0,0,0,0)")
