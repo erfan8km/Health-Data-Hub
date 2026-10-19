@@ -130,11 +130,6 @@ function App() {
         </nav>}
       </header>}
 
-      {route.view === "globe" && <section className="landing-overlay">
-        <div className="orbital-caption"><span className="caption-rule" /><span>35°41′ N · 51°25′ E</span></div>
-        <div className="bottom-coordinates">IEDR / 01 <span>—</span> DATA LANDSCAPE, IRAN</div>
-      </section>}
-
       {route.view === "categories" && <section className={"category-overlay" + (categoriesReady ? " category-overlay-visible" : "")} aria-label={english ? "Clinical categories" : "دسته‌های بالینی"}>
         <div className="categories-panel">
           <div className="panel-topline"><span className="panel-index">01 / 11</span><span className="panel-line" /><span className="panel-state"><span className="header-live-dot" /> {english ? "IRAN SELECTED" : "ایران انتخاب شد"}</span></div>
@@ -205,7 +200,6 @@ function App() {
             <button type="button" className="bottom-back-link" onClick={() => navigate("category/" + (selectedRegistry.categories[0] || "gyn"))}><ArrowRight size={16} /> {english ? "Back to category" : "بازگشت به دسته‌ی مربوطه"}</button>
           </>}
         </section>}
-        <footer className="paper-footer"><span>IEDR · IRAN EPIDEMIOLOGY DATA REPOSITORY</span><span>{english ? "Static metadata catalogue" : "کاتالوگ ایستای فراداده"}</span></footer>
       </div>}
     </main>
   );
