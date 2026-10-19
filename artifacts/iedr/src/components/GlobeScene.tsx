@@ -81,11 +81,11 @@ export default function GlobeScene({ view, onArrival, onSelectIran }: Props) {
           .atmosphereColor("#54b9d2")
           .atmosphereAltitude(0.18)
           .polygonsData([])
-          .polygonAltitude((feature: any) => feature.properties?.ADMIN === "Iran" ? 0.008 : 0.0015)
-          .polygonCapColor((feature: any) => feature.properties?.ADMIN === "Iran" ? "rgba(91,231,208,0.22)" : "rgba(15,38,58,0.18)")
-          .polygonSideColor(() => "rgba(35,105,130,0.08)")
-          .polygonStrokeColor((feature: any) => feature.properties?.ADMIN === "Iran" ? "#5be7d0" : "rgba(134,190,207,0.58)")
-          .polygonLabel(({ properties: p }: any) => p?.ADMIN === "Iran" ? `<div style="font-family: sans-serif; color: #eaf7ff; background: rgba(4,12,24,.9); padding: 6px 9px; border-radius: 6px">ایران / Iran</div>` : "")
+          .polygonAltitude(() => 0.012)
+          .polygonCapColor(() => "rgba(84,238,211,0.34)")
+          .polygonSideColor(() => "rgba(50,204,185,0.24)")
+          .polygonStrokeColor(() => "#74ffe6")
+          .polygonLabel(({ properties: p }: any) => p?.ADMIN === "Iran" ? `<div style="font-family: sans-serif; color: #eaf7ff; background: rgba(4,12,24,.94); border: 1px solid rgba(116,255,230,.35); padding: 7px 10px; border-radius: 7px">ایران / IRAN</div>` : "")
           .onPolygonHover((feature: any) => {
             if (!alive) return;
             const isIran = feature?.properties?.ADMIN === "Iran";
@@ -98,16 +98,16 @@ export default function GlobeScene({ view, onArrival, onSelectIran }: Props) {
           .labelsData([])
           .labelLat((d: any) => d.lat)
           .labelLng((d: any) => d.lng)
-          .labelText((d: any) => d.name)
-          .labelSize((d: any) => d.name === "Iran" ? 0.72 : 0.48)
-          .labelDotRadius((d: any) => d.name === "Iran" ? 0.16 : 0.07)
-          .labelColor((d: any) => d.name === "Iran" ? "#74ffe6" : "rgba(230,244,255,0.88)")
+          .labelText((d: any) => d.name === "Iran" ? "ایران / IRAN" : d.name)
+          .labelSize(() => 0.95)
+          .labelDotRadius(() => 0.22)
+          .labelColor(() => "#74ffe6")
           .labelResolution(2)
           .labelAltitude(0.012)
-          .pointOfView({ lat: 22, lng: 8, altitude: 2.25 }, 0);
+          .pointOfView({ lat: 32.3, lng: 53.6, altitude: 1.85 }, 0);
 
         globe.controls().autoRotate = true;
-        globe.controls().autoRotateSpeed = 0.35;
+        globe.controls().autoRotateSpeed = 0.18;
         globe.controls().enableZoom = true;
         globeRef.current = globe;
 
@@ -181,17 +181,14 @@ export default function GlobeScene({ view, onArrival, onSelectIran }: Props) {
     }
     if (view === "globe") {
       globe.controls().autoRotate = true;
-      globe.pointOfView({ lat: 22, lng: 8, altitude: 2.25 }, 1500);
+      globe.pointOfView({ lat: 32.3, lng: 53.6, altitude: 1.85 }, 1500);
     }
   }, [view, sceneReady]);
 
   return (
     <div className={"globe-stage" + ((view === "globe" || view === "categories") ? " globe-stage-visible" : "")} aria-hidden={view === "category" || view === "registry"}>
       <div className="cesium-host" ref={hostRef} />
-      <div className={"globe-vignette" + (zooming ? " globe-vignette-zooming" : "")} />
-      <div className={"cloud-layer cloud-layer-one" + (zooming ? " cloud-layer-fade" : "")} />
-      <div className={"cloud-layer cloud-layer-two" + (zooming ? " cloud-layer-fade" : "")} />
-      <div className={"atmosphere-ring" + (hoverIran ? " atmosphere-ring-active" : "")} />
+      
       {(!sceneReady || globeError) && view === "globe" && (
         <div className="globe-fallback-notice"><span className="signal-dot" />{globeError ? "نمای کره بارگذاری نشد؛ اتصال اینترنت را بررسی کنید" : "در حال آماده‌سازی کره زمین"}</div>
       )}
