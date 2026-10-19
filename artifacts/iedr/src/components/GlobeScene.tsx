@@ -37,8 +37,6 @@ export default function GlobeScene({ view, onArrival, onSelectIran }: Props) {
   const onSelectIranRef = useRef(onSelectIran);
   const [sceneReady, setSceneReady] = useState(false);
   const [globeError, setGlobeError] = useState(false);
-  const [hoverIran, setHoverIran] = useState(false);
-  const [zooming, setZooming] = useState(false);
 
   viewRef.current = view;
   onArrivalRef.current = onArrival;
@@ -89,7 +87,6 @@ export default function GlobeScene({ view, onArrival, onSelectIran }: Props) {
           .onPolygonHover((feature: any) => {
             if (!alive) return;
             const isIran = feature?.properties?.ADMIN === "Iran";
-            setHoverIran(Boolean(isIran));
             if (hostRef.current) hostRef.current.style.cursor = isIran ? "pointer" : "grab";
           })
           .onPolygonClick((feature: any) => {
@@ -134,12 +131,10 @@ export default function GlobeScene({ view, onArrival, onSelectIran }: Props) {
         onArrivalRef.current();
         return;
       }
-      setZooming(true);
       globe.pointOfView({ lat: 32.3, lng: 53.6, altitude: 1.45 }, 2300);
       if (arrivalTimer) window.clearTimeout(arrivalTimer);
       arrivalTimer = window.setTimeout(() => {
         if (!alive) return;
-        setZooming(false);
         onArrivalRef.current();
       }, 2500);
     }
@@ -170,11 +165,9 @@ export default function GlobeScene({ view, onArrival, onSelectIran }: Props) {
     const globe = globeRef.current;
     if (!globe || !sceneReady) return;
     if (view === "categories") {
-      setZooming(true);
       globe.controls().autoRotate = false;
       globe.pointOfView({ lat: 32.3, lng: 53.6, altitude: 1.45 }, 2300);
       const timer = window.setTimeout(() => {
-        setZooming(false);
         onArrivalRef.current();
       }, 2500);
       return () => window.clearTimeout(timer);
