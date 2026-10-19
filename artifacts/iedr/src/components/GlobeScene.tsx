@@ -85,7 +85,7 @@ export default function GlobeScene({ view, onArrival, onSelectIran }: Props) {
           .polygonCapColor((feature: any) => feature.properties?.ADMIN === "Iran" ? "rgba(91,231,208,0.22)" : "rgba(15,38,58,0.18)")
           .polygonSideColor(() => "rgba(35,105,130,0.08)")
           .polygonStrokeColor((feature: any) => feature.properties?.ADMIN === "Iran" ? "#5be7d0" : "rgba(134,190,207,0.58)")
-          .polygonLabel(({ properties: p }: any) => `<div style="font-family: sans-serif; color: #eaf7ff; background: rgba(4,12,24,.9); padding: 6px 9px; border-radius: 6px">${p.ADMIN || p.NAME || ""}</div>`)
+          .polygonLabel(({ properties: p }: any) => p?.ADMIN === "Iran" ? `<div style="font-family: sans-serif; color: #eaf7ff; background: rgba(4,12,24,.9); padding: 6px 9px; border-radius: 6px">ایران / Iran</div>` : "")
           .onPolygonHover((feature: any) => {
             if (!alive) return;
             const isIran = feature?.properties?.ADMIN === "Iran";
@@ -117,7 +117,7 @@ export default function GlobeScene({ view, onArrival, onSelectIran }: Props) {
         if (!alive) return;
         const features = (geo.features || []).filter((feature: any) => feature.properties?.ADMIN !== "Antarctica");
         globe.polygonsData(features);
-        globe.labelsData(features.map(countryLabelPoint).filter(Boolean));
+        globe.labelsData(features.filter((feature: any) => feature.properties?.ADMIN === "Iran").map(countryLabelPoint).filter(Boolean));
         setSceneReady(true);
         if (viewRef.current === "categories") flyToIran();
       } catch {
