@@ -192,9 +192,11 @@ export default function GlobeScene({ view, onArrival, onSelectIran }: Props) {
           if (!alive || !viewer || viewer.isDestroyed()) return;
           setImageryFallback(true);
           try {
-            const provider = new Cesium.UrlTemplateImageryProvider({
-              url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-              credit: "Imagery © Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+            // Use OpenStreetMap as the no-token fallback. Esri's World Imagery
+            // endpoint may return 403 / omit CORS headers on static hosting.
+            const provider = new Cesium.OpenStreetMapImageryProvider({
+              url: "https://tile.openstreetmap.org/",
+              credit: "© OpenStreetMap contributors",
               maximumLevel: 19,
             });
             viewer.imageryLayers.addImageryProvider(provider);
@@ -290,7 +292,7 @@ export default function GlobeScene({ view, onArrival, onSelectIran }: Props) {
       {(!sceneReady || !webglSupported || globeError) && view === "globe" && (
         <div className="globe-fallback-notice"><span className="signal-dot" />{globeError || !webglSupported ? "نمای کره در این دستگاه در دسترس نیست" : "در حال آماده‌سازی نمای ماهواره‌ای"}</div>
       )}
-      {imageryFallback && sceneReady && view === "globe" && <div className="imagery-note">تصویر ماهواره‌ای عمومی · بدون کلید Cesium ion</div>}
+      {imageryFallback && sceneReady && view === "globe" && <div className="imagery-note">نقشه عمومی OpenStreetMap · بدون کلید Cesium ion</div>}
       {view === "globe" && sceneReady && webglSupported && !globeError && (
         <button type="button" className={"iran-hotspot" + (hoverIran ? " iran-hotspot-hover" : "")} onClick={onSelectIran} aria-label="ورود به نقشه ایران">
           <span className="hotspot-pulse" /><span className="hotspot-label">ایران / IRAN</span>
