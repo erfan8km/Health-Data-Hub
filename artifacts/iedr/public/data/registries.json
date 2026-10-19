@@ -1,0 +1,375 @@
+[
+  {
+    "slug": "obstructive-sleep-apnea",
+    "fa": "آپنه انسدادی خواب",
+    "en": "Obstructive Sleep Apnea",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "sleep",
+      "ent"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "sleep-disorders",
+    "fa": "اختلالات خواب",
+    "en": "Sleep Disorders",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "sleep"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "trophoblastic-disease",
+    "fa": "بیماری تروفوبلاستیک حاملگی (مول)",
+    "en": "Trophoblastic Disease (Molar Pregnancy)",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "gyn",
+      "onc"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "ovarian-cancer",
+    "fa": "سرطان تخمدان",
+    "en": "Ovarian Cancer",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "gyn",
+      "onc"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "recurrent-miscarriage",
+    "fa": "سقط مکرر",
+    "en": "Recurrent Miscarriage",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "gyn"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "oral-lichen-planus",
+    "fa": "لیکن پلان دهانی",
+    "en": "Oral Lichen Planus",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "oral"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "infertility",
+    "fa": "ناباروری",
+    "en": "Infertility",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "gyn"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "malignant-otitis-externa",
+    "fa": "اوتیت خارجی بدخیم",
+    "en": "Malignant Otitis Externa",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "ent",
+      "immun"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "obesity",
+    "fa": "چاقی و درمان چاقی",
+    "en": "Obesity and Obesity Treatment",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "endo"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "chronic-rhinosinusitis",
+    "fa": "رینوسینوزیت مزمن",
+    "en": "Chronic Rhinosinusitis",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "ent"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "esophageal-atresia",
+    "fa": "آترزی مری کودکان",
+    "en": "Esophageal Atresia in Children",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "peds",
+      "gi"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "childhood-obesity",
+    "fa": "چاقی کودکان",
+    "en": "Childhood Obesity",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "peds",
+      "endo"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "type1-diabetes-children",
+    "fa": "دیابت نوع ۱ کودکان",
+    "en": "Type 1 Diabetes in Children",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "peds",
+      "endo"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "childhood-cancer",
+    "fa": "سرطان کودکان",
+    "en": "Childhood Cancer",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "peds",
+      "onc"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "omid-hospital-cancer",
+    "fa": "بیماران سرطانی بیمارستان امید",
+    "en": "Cancer Patients at Omid Hospital",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "onc"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "cystic-fibrosis",
+    "fa": "فیبروز کیستیک",
+    "en": "Cystic Fibrosis",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "peds"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "inborn-metabolic-disorders",
+    "fa": "اختلالات متابولیک مادرزادی کودکان",
+    "en": "Inborn Metabolic Disorders in Children",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "peds",
+      "endo"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "primary-immunodeficiency",
+    "fa": "نقص ایمنی اولیه",
+    "en": "Primary Immunodeficiency",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "immun"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "invasive-fungal-mucormycosis",
+    "fa": "عفونت‌های قارچی مهاجم (موکور)",
+    "en": "Invasive Fungal Infections (Mucormycosis)",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "immun"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "colorectal-cancer",
+    "fa": "سرطان کولورکتال",
+    "en": "Colorectal Cancer",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "onc",
+      "gi"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "ssnhl",
+    "fa": "کاهش شنوایی حسی عصبی ناگهانی (سادن)",
+    "en": "Sudden Sensorineural Hearing Loss (SSNHL)",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "ent"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "rop-screening",
+    "fa": "معاینه چشمی نوزادان زودرس (ROP)",
+    "en": "Eye Examination of Premature Infants (ROP)",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "eye",
+      "peds"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "opportunistic-pathogens",
+    "fa": "پاتوژن‌های فرصت‌طلب در بیماران نقص ایمنی",
+    "en": "Opportunistic Pathogens in Immunocompromised Patients",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "immun"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "endometriosis",
+    "fa": "اندومتریوز",
+    "en": "Endometriosis",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "gyn"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "cornea-rna-biobank",
+    "fa": "بیوبانک RNA از بافت قرنیه",
+    "en": "RNA Biobank from Corneal Tissue",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "eye"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "liver-transplantation",
+    "fa": "پیوند کبد",
+    "en": "Liver Transplantation",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "gi"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "endometrial-cancer",
+    "fa": "سرطان اندومتر",
+    "en": "Endometrial Cancer",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "gyn",
+      "onc"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "hepatic-hydatid-cyst",
+    "fa": "کیست هیداتید کبدی",
+    "en": "Hepatic Hydatid Cyst",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "gi",
+      "immun"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "granulomatous-mastitis",
+    "fa": "ماستیت گرانولوماتوز",
+    "en": "Granulomatous Mastitis",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "gyn"
+    ],
+    "description": "",
+    "officialUrl": ""
+  },
+  {
+    "slug": "brain-death",
+    "fa": "مرگ مغزی",
+    "en": "Brain Death",
+    "country": "IR",
+    "city": "mashhad",
+    "categories": [
+      "neuro-icu"
+    ],
+    "description": "",
+    "officialUrl": ""
+  }
+]

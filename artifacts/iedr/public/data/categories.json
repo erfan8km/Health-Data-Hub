@@ -1,0 +1,57 @@
+[
+  {
+    "id": "gyn",
+    "fa": "زنان، زایمان و ناباروری",
+    "en": "Women, Obstetrics & Infertility"
+  },
+  {
+    "id": "onc",
+    "fa": "سرطان‌ها",
+    "en": "Cancers"
+  },
+  {
+    "id": "peds",
+    "fa": "کودکان",
+    "en": "Children"
+  },
+  {
+    "id": "endo",
+    "fa": "غدد، متابولیسم و چاقی",
+    "en": "Endocrinology, Metabolism & Obesity"
+  },
+  {
+    "id": "ent",
+    "fa": "گوش، حلق و بینی",
+    "en": "Ear, Nose & Throat"
+  },
+  {
+    "id": "eye",
+    "fa": "چشم",
+    "en": "Eye"
+  },
+  {
+    "id": "sleep",
+    "fa": "خواب",
+    "en": "Sleep"
+  },
+  {
+    "id": "gi",
+    "fa": "گوارش و کبد",
+    "en": "Gastroenterology & Liver"
+  },
+  {
+    "id": "immun",
+    "fa": "ایمنی و عفونی",
+    "en": "Immunity & Infectious Diseases"
+  },
+  {
+    "id": "neuro-icu",
+    "fa": "اعصاب و مراقبت‌های ویژه",
+    "en": "Neurology & Intensive Care"
+  },
+  {
+    "id": "oral",
+    "fa": "دهان و دندان",
+    "en": "Oral & Dental"
+  }
+]
