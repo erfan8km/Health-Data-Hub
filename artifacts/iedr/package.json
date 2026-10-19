@@ -7,7 +7,7 @@
     "dev": "vite --config vite.config.ts --host 0.0.0.0",
     "validate": "node scripts/validate-data.mjs",
     "check-links": "node scripts/check-links.mjs",
-    "test": "node --test scripts/test-catalogue.mjs",
+    "test": "node --test scripts/test-catalogue.mjs scripts/test-globe-geo.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "build": "node scripts/validate-data.mjs && vite build --config vite.config.ts && node scripts/generate-seo.mjs && node scripts/copy-cesium-assets.mjs",
     "preview": "vite preview --config vite.config.ts --host 0.0.0.0"
