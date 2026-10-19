@@ -115,9 +115,13 @@ export default function GlobeScene({ view, onArrival, onSelectIran }: Props) {
         if (!response.ok) throw new Error("Country data unavailable");
         const geo = await response.json();
         if (!alive) return;
-        const features = (geo.features || []).filter((feature: any) => feature.properties?.ADMIN !== "Antarctica");
-        globe.polygonsData(features);
-        globe.labelsData(features.filter((feature: any) => feature.properties?.ADMIN === "Iran").map(countryLabelPoint).filter(Boolean));
+        // Keep the night-Earth texture for the whole planet, but load only Iran
+        // into the interactive country layer. Other countries remain visual land
+        // on the texture and cannot be hovered, highlighted, or selected.
+        const iranFeature = (geo.features || []).find((feature: any) => feature.properties?.ADMIN === "Iran");
+        if (!iranFeature) throw new Error("Iran country geometry unavailable");
+        globe.polygonsData([iranFeature]);
+        globe.labelsData([countryLabelPoint(iranFeature)].filter(Boolean));
         setSceneReady(true);
         if (viewRef.current === "categories") flyToIran();
       } catch {
@@ -190,11 +194,6 @@ export default function GlobeScene({ view, onArrival, onSelectIran }: Props) {
       <div className={"atmosphere-ring" + (hoverIran ? " atmosphere-ring-active" : "")} />
       {(!sceneReady || globeError) && view === "globe" && (
         <div className="globe-fallback-notice"><span className="signal-dot" />{globeError ? "نمای کره بارگذاری نشد؛ اتصال اینترنت را بررسی کنید" : "در حال آماده‌سازی کره زمین"}</div>
-      )}
-      {view === "globe" && sceneReady && (
-        <button type="button" className={"iran-hotspot" + (hoverIran ? " iran-hotspot-hover" : "")} onClick={onSelectIran} aria-label="ورود به نقشه ایران">
-          <span className="hotspot-pulse" /><span className="hotspot-label">ایران / IRAN</span>
-        </button>
       )}
     </div>
   );
