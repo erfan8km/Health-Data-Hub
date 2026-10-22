@@ -32,8 +32,8 @@ function updateMeta(attribute, key, content) {
   else html = html.replace("</head>", "  " + tag + "\n  </head>");
 }
 
-const title = "مخزن داده‌های اپیدمیولوژی ایران | Iran Epidemiology Data Repository";
-const description = "کاتالوگ دوزبانه فراداده ریجستری‌های پزشکی ایران. Bilingual metadata catalogue of medical registries in Iran.";
+const title = "RegistryHub | کاتالوگ ریجستری‌های سلامت";
+const description = "RegistryHub is a bilingual catalogue of health and medical registries. کاتالوگ دوزبانه ریجستری‌های سلامت و پزشکی.";
 html = html.replace(/<title>[\s\S]*?<\/title>/i, "<title>" + escapeHtml(title) + "</title>");
 updateMeta("name", "description", description);
 updateMeta("property", "og:title", title);

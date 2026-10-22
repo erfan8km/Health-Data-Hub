@@ -114,9 +114,9 @@ function App() {
       <GlobeScene view={route.view} onArrival={() => setCategoriesReady(true)} onSelectIran={() => { setCategoriesReady(false); navigate("categories"); }} />
 
       {(route.view === "globe" || route.view === "categories") && <header className="space-header">
-        <a href="#/" className="brand-lockup" aria-label="IEDR Home">
+        <a href="#/" className="brand-lockup" aria-label="RegistryHub Home">
           <span className="brand-symbol"><Globe2 size={19} /></span>
-          <span className="brand-words"><strong>IEDR</strong><small>IRAN EPIDEMIOLOGY DATA REPOSITORY</small></span>
+          <span className="brand-words"><strong>RegistryHub</strong><small>HEALTH REGISTRY DIRECTORY</small></span>
         </a>
         <div className="header-center"><span className="header-live-dot" /> {english ? "IRAN HEALTH REGISTRY ATLAS" : "اطلس ریجستری‌های سلامت ایران"}</div>
         <div className="header-actions">
@@ -156,7 +156,7 @@ function App() {
 
       {(route.view === "category" || route.view === "registry") && <div className="paper-shell" dir={english ? "ltr" : "rtl"}>
         <header className="paper-header">
-          <a href="#/" className="paper-brand"><span className="paper-brand-mark"><Globe2 size={19} /></span><span><strong>IEDR</strong><small>IRAN EPIDEMIOLOGY DATA REPOSITORY</small></span></a>
+          <a href="#/" className="paper-brand"><span className="paper-brand-mark"><Globe2 size={19} /></span><span><strong>RegistryHub</strong><small>HEALTH REGISTRY DIRECTORY</small></span></a>
           <div className="paper-header-actions"><button type="button" className="subtle-button" onClick={() => setEnglish((value) => !value)}>{english ? "فارسی" : "EN"}</button><button type="button" className="paper-back" onClick={() => navigate("categories")}><ArrowRight size={16} /> {english ? "Clinical categories" : "دسته‌های بالینی"}</button></div>
         </header>
         {route.view === "category" && <section className="catalogue-page">
@@ -175,7 +175,7 @@ function App() {
         {route.view === "registry" && <section className="registry-detail-page">
           <div className="breadcrumb"><button type="button" onClick={() => navigate("categories")}>{english ? "Clinical categories" : "دسته‌های بالینی"}</button><ChevronLeft size={14} /><button type="button" onClick={() => navigate("category/" + (selectedRegistry?.categories[0] || "gyn"))}>{getText(categories.find((item) => item.id === selectedRegistry?.categories[0]), english)}</button><ChevronLeft size={14} /><span>{selectedRegistry ? (english ? selectedRegistry.en : selectedRegistry.fa) : (english ? "Registry" : "ریجستری")}</span></div>
           {!selectedRegistry ? <div className="empty-state"><h1>{english ? "Registry not found" : "ریجستری پیدا نشد"}</h1><button type="button" className="text-back" onClick={() => navigate("categories")}>{english ? "Return to categories" : "بازگشت به دسته‌ها"} <ArrowLeft size={15} /></button></div> : <>
-            <div className="detail-kicker"><span className="detail-kicker-icon"><Activity size={18} /></span><span>{english ? "REGISTRY PROFILE" : "شناسنامه‌ی ریجستری"}</span><span className="detail-id">IEDR / {selectedRegistry.slug.toUpperCase()}</span></div>
+            <div className="detail-kicker"><span className="detail-kicker-icon"><Activity size={18} /></span><span>{english ? "REGISTRY PROFILE" : "شناسنامه‌ی ریجستری"}</span><span className="detail-id">RegistryHub / {selectedRegistry.slug.toUpperCase()}</span></div>
             <div className="registry-detail-heading"><p className="section-kicker">{english ? "IRAN · MASHHAD" : "ایران · مشهد"}</p><h1>{english ? selectedRegistry.en : selectedRegistry.fa}</h1><p className="detail-english-title">{english ? selectedRegistry.fa : selectedRegistry.en}</p></div>
             <div className="detail-content-grid">
               <article className="detail-main-card">
