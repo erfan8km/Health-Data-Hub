@@ -1,22 +1,39 @@
 # RegistryHub admin prototype (local-only)
 
 ## Scope
-This is an isolated UI prototype in `admin-prototype/`. It is not imported by the public Vite app and does not change the public site, Worker, domain, Cloudflare settings, or `main`.
+This isolated UI prototype lives in `admin-prototype/`. It is not imported by the public Vite app. It does not change `main`, the public site, Worker, domain, Cloudflare settings, or deployment configuration.
 
 ## Try it
-Open `index.html` locally in a browser. Load a copy of `artifacts/iedr/public/data/registries.json`, search, add/edit/delete draft records, then export the JSON. Changes remain in browser memory until exported. The UI intentionally has no network calls, authentication, GitHub write integration, or deployment functionality.
+Open `index.html` locally in a browser. Load copies of:
+- `artifacts/iedr/public/data/registries.json`
+- `artifacts/iedr/public/data/categories.json`
+- `artifacts/iedr/public/data/countries.json`
 
-## Security review and recommended production architecture
-- **Do not put a GitHub PAT or other write secret in browser JavaScript, HTML, local storage, or a public repository.** Anyone who can inspect the client can extract it.
-- The current prototype is a data-editor usability demo, not an authenticated admin tool. Do not treat hiding its URL or adding a client-side password as security.
-- Recommended future workflow: administrator signs in through a server-side OAuth flow; a small Cloudflare Worker validates the session and CSRF/origin protections, keeps GitHub credentials only in Worker secrets, and creates a branch + pull request for JSON changes. Public production remains a static catalogue served by Cloudflare.
-- Limit GitHub permissions to the minimum repository contents/pull-request permissions available; never expose the credential in responses or logs. Validate schema, unique slugs, HTTPS URLs, country/category references, and payload size on the server before opening a PR.
-- Require CI validation and human review before merging. Merge to `main` is the release gate. No PR is created by this prototype.
-- Use secure, HttpOnly, SameSite cookies for sessions; implement OAuth state/PKCE as appropriate, expiry/revocation, rate limiting, audit logging without secrets, and CSRF protection. Avoid accepting arbitrary repository paths or branch names from clients.
-- Deploy only the public catalogue to Cloudflare. GitHub Pages is not a required production target; any future GitHub Pages workflow can be reviewed separately and disabled/removed only with explicit approval.
+The prototype supports search, add/edit/delete of local drafts, basic catalogue checks, and JSON export. Country and category choices are controlled by the loaded reference files. City IDs are normalized to lowercase ASCII IDs (for example, `mashhad`). Existing slugs are locked while editing because they are used in public detail URLs. Unknown properties on an existing record are preserved when it is edited.
 
-## Known prototype limits
-- Client validation is only a convenience, not a security boundary.
-- Country and category IDs are not cross-validated against their companion JSON files yet.
-- The form covers the current registry shape documented in `App.tsx`; if the data schema changes, update this UI and server-side validation together.
-- No real authentication, GitHub write path, PR creation, or automated test suite is implemented in this phase.
+Drafts autosave in this browser's `localStorage`; a warning appears before leaving with unsaved-to-export changes. This is only local convenience, not secure storage. Avoid shared computers. No network calls, authentication, GitHub write integration, or deployment functionality is implemented.
+
+## Validation alignment
+The client mirrors the current `validate-data.mjs` rules for registry fields:
+- slug and bilingual titles are required;
+- country IDs and category IDs are checked against reference files when loaded;
+- city is required;
+- categories must contain at least one ID;
+- `description` and `officialUrl` must be strings but may be empty;
+- a non-empty `officialUrl` must parse as a valid HTTPS URL.
+
+This browser validation is a usability aid, not a security boundary. The CI validator remains authoritative. The client also warns about duplicate slugs. Keep these rules aligned when the catalogue schema changes.
+
+## Recommended production architecture
+- Put the admin hostname behind **Cloudflare Access** with an allowlist for approved administrator email addresses.
+- The Worker must independently verify the Access JWT (signature, issuer/audience and expiry) on every protected request. Access in front of the page alone is not sufficient to secure an exposed API endpoint.
+- Do not put a GitHub PAT or other write secret in browser JavaScript, HTML, local storage, or a public repository.
+- Have the client send a narrow operation (for example, add/update/delete a registry by slug), not a filename, repository path, arbitrary branch, or replacement file.
+- The Worker should read the latest catalogue from `main`, apply the operation server-side, validate the full result using a shared validator, and open a Pull Request. If the base version changes during processing, detect the race and retry safely or return a conflict instead of silently overwriting data.
+- Extract validation into a shared module used by CI and the Worker. The UI can mirror the rules for immediate feedback, but server-side validation remains mandatory.
+- Use a fine-grained GitHub credential restricted to this repository and only the permissions required to read contents, create a branch, and open a PR. Keep it in Worker secrets; never expose it in responses or logs.
+- Protect `main` with required CI checks and review where repository settings/plan permit. CI and human review are the release gate. The Worker must never write directly to `main`.
+- Deploy the public catalogue only to Cloudflare. GitHub Pages is not a required production target; its existing workflow has not been changed in this prototype.
+
+## Not implemented yet
+No real authentication, Cloudflare Access policy, JWT verification, Worker API, GitHub integration, PR creation, shared validator, automated browser tests, or production deployment is included in this prototype.
