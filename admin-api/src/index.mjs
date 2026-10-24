@@ -35,7 +35,7 @@ async function verifyAccessJwt(token, env) {
   const aud = Array.isArray(claims.aud) ? claims.aud : [claims.aud];
   if (!aud.includes(env.CF_ACCESS_AUD)) throw new Error("invalid audience");
   const now = Math.floor(Date.now() / 1000);
-  if (!Number.isFinite(claims.exp) || claims.exp <= now || (claims.nbf && claims.nbf > now)) throw new Error("expired access token");
+  if (!Number.isFinite(claims.exp) || claims.exp <= now || (claims.nbf !== undefined && (!Number.isFinite(claims.nbf) || claims.nbf > now))) throw new Error("invalid token time claims");
   if (typeof claims.email !== "string" || claims.email.toLowerCase() !== String(env.ADMIN_EMAIL || "").toLowerCase()) {
     throw new Error("administrator not allowed");
   }
