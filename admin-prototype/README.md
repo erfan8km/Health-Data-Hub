@@ -29,11 +29,13 @@ This browser validation is a usability aid, not a security boundary. The CI vali
 - The Worker must independently verify the Access JWT (signature, issuer/audience and expiry) on every protected request. Access in front of the page alone is not sufficient to secure an exposed API endpoint.
 - Do not put a GitHub PAT or other write secret in browser JavaScript, HTML, local storage, or a public repository.
 - Have the client send a narrow operation (for example, add/update/delete a registry by slug), not a filename, repository path, arbitrary branch, or replacement file.
-- The Worker should read the latest catalogue from `main`, apply the operation server-side, validate the full result using a shared validator, and open a Pull Request. If the base version changes during processing, detect the race and retry safely or return a conflict instead of silently overwriting data.
-- Extract validation into a shared module used by CI and the Worker. The UI can mirror the rules for immediate feedback, but server-side validation remains mandatory.
+- The current isolated Worker scaffold accepts a complete `registries` array, reads current registry/category/country JSON from `main`, validates the payload, creates a separate branch, and opens a Pull Request. It never merges or writes to `main`. Before production, prefer per-record operations and add explicit stale-base conflict handling.
+- The Worker imports the server-side validator in `admin-api/src/validate.mjs`; CI runs unit tests for both the validator and request guards. Keep this schema aligned with `artifacts/iedr/scripts/validate-data.mjs`.
 - Use a fine-grained GitHub credential restricted to this repository and only the permissions required to read contents, create a branch, and open a PR. Keep it in Worker secrets; never expose it in responses or logs.
 - Protect `main` with required CI checks and review where repository settings/plan permit. CI and human review are the release gate. The Worker must never write directly to `main`.
-- Deploy the public catalogue only to Cloudflare. GitHub Pages is not a required production target; its existing workflow has not been changed in this prototype.
+- This PR proposes removing the GitHub Pages deployment workflow. The change is only on the review branch and has no effect until the PR is merged. The live default branch and hosting settings have not been changed.
 
-## Not implemented yet
-No real authentication, Cloudflare Access policy, JWT verification, Worker API, GitHub integration, PR creation, shared validator, automated browser tests, or production deployment is included in this prototype.
+## Admin API scaffold status
+A separate Worker implementation now exists under `admin-api/`. It verifies the Cloudflare Access JWT signature, issuer, audience, expiry and allowlisted email; checks the request origin and payload size; validates the full registry array; and opens a branch + PR using a server-side GitHub token. Automated tests cover basic request guards.
+
+**Not production-ready / not deployed:** no Cloudflare Access application/policy or Worker secrets have been configured; the admin UI is not yet wired to the API; no deployment workflow exists for this separate Worker; the full-array update flow needs a stronger stale-base conflict strategy; and end-to-end tests against a staging repository are still needed. Do not deploy until the Access app, allowed admin email, exact admin origin, and a least-privilege GitHub token are configured and reviewed.
