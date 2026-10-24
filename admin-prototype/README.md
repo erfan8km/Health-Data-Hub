@@ -1,13 +1,13 @@
 # RegistryHub admin prototype
 
 ## Scope
-The UI in `admin-prototype/` is an isolated, local-only editor. It is not imported by the public Vite app and does not change the public site, Worker, domain, Cloudflare settings, or `main`.
+The UI in `admin-prototype/` is an isolated admin editor served by the separate `registryhub-admin-api` Worker configuration. It is not imported by the public Vite app and does not change the public site, domain, Cloudflare settings, or `main`.
 
 ## Try the UI prototype
-Open `index.html` locally in a browser. Load a copy of `artifacts/iedr/public/data/registries.json`, search, add/edit/delete draft entries, then export the JSON. Changes remain in browser memory until exported. The UI intentionally has no network calls, authentication, or repository-write integration.
+For a local draft, open `index.html` in a browser and load copies of `registries.json`, `categories.json`, and `countries.json`. Drafts autosave to this browser's local storage; export JSON for a portable copy. The submit button requires the admin Worker to be deployed and protected by Cloudflare Access.
 
 ## API status
-A separate Cloudflare Worker API already exists in `admin-api/`. It validates proposed registry data, checks Cloudflare Access JWTs, and creates a branch + pull request in GitHub. However, the UI prototype is **not connected to that API**, and the API has not been configured or deployed as part of this PR. Do not submit secrets in the browser or assume the endpoint is ready for use.
+A separate Cloudflare Worker API already exists in `admin-api/`. It validates proposed registry data, checks Cloudflare Access JWTs, and creates a branch + pull request in GitHub. The UI now submits to the same-origin `/api/proposals` endpoint. The API and UI have **not** been configured or deployed as part of this PR. Until the Worker is deployed behind Cloudflare Access and its secrets are set, submission is not expected to work. Do not submit secrets in the browser.
 
 See [admin API deployment and security notes](../admin-api/README.md) before configuring anything.
 
@@ -22,5 +22,5 @@ See [admin API deployment and security notes](../admin-api/README.md) before con
 
 ## Known UI prototype limits
 - Country/category references are not cross-validated by the UI itself.
-- No authentication, API calls, or GitHub writes are implemented in this HTML prototype.
+- The UI does not implement its own login; authentication must be enforced by Cloudflare Access at the Worker boundary.
 - The form covers the current registry shape documented in `artifacts/iedr/src/App.tsx`.
