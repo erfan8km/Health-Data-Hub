@@ -4,6 +4,11 @@
   "main": "src/index.mjs",
   "compatibility_date": "2026-10-24",
   "workers_dev": true,
+  "assets": {
+    "directory": "../admin-prototype",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*", "/health"]
+  },
   "vars": {
     "GITHUB_REPOSITORY": "erfan8km/Health-Data-Hub"
   }
