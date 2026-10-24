@@ -8,7 +8,9 @@ This folder is an isolated experiment on branch `feat/sveltia-cms-poc`. It is no
 - GitHub backend targeting this repository and the experiment branch only.
 - Editorial workflow for proposed changes rather than direct commits to `main`.
 - A single-file collection mapped to the existing `artifacts/iedr/public/data/registries.json` array.
+- Reference selectors for countries and categories backed by the existing `countries.json` and `categories.json` files.
 - Existing field names and shapes: `slug`, `fa`, `en`, `country`, `city`, `categories[]`, `description`, `officialUrl`.
+- Basic CMS-level patterns for city IDs and HTTPS official URLs.
 
 ## Not ready to authenticate or publish
 
@@ -25,6 +27,8 @@ Do not enable this admin path on the public production site yet. Before producti
 ## Local review
 
 Open `index.html` with a local static server to inspect the CMS shell. The GitHub backend requires valid OAuth configuration and repository permissions before sign-in or content editing can work. The current config is deliberately not production-authenticatable because the OAuth URL is a placeholder.
+
+The CMS configuration and editor UI still need an authenticated browser end-to-end test. The repository's standard CI validates the app code and catalogue, but does not currently exercise this separate CMS configuration.
 
 ## Deployment boundary
 
