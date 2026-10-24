@@ -28,7 +28,7 @@
 <div class="field wide"><label for="description">Description (optional)</label><textarea id="description"></textarea></div>
 <div class="field wide"><label for="url">Official HTTPS URL (optional)</label><input id="url" type="url" placeholder="https://..."></div>
 </div><p class="muted">Matches validate-data.mjs: description and officialUrl must be strings but may be empty; non-empty URLs must be valid HTTPS. Slug is locked during editing because it forms the public detail URL. Load categories.json and countries.json for controlled choices.</p><div class="toolbar"><button type="submit">Save in this tab</button><button type="button" id="cancel" class="secondary">Cancel</button></div></form></section>
-<section class="panel"><h2>Registry records</h2><p class="muted">Load your current <code>registries.json</code> to inspect or edit a copy. This prototype does not fetch repository data automatically.</p><div id="list" class="list"><p class="muted">No data loaded yet.</p></div><p id="message" class="status" role="status"></p></section>
+<section class="panel"><h2>Registry records</h2><p class="muted">Load your current <code>registries.json</code> to inspect or edit a copy. This prototype does not fetch repository data automatically. Existing blank descriptions and official URLs are permitted by the current repository validator.</p><div id="list" class="list"><p class="muted">No data loaded yet.</p></div><p id="message" class="status" role="status"></p></section>
 </main>
 <script>const $=id=>document.getElementById(id);
 let records=[],editIndex=-1,categoriesData=[],countriesData=[],dirty=false;
