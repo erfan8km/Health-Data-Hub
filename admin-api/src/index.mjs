@@ -131,7 +131,14 @@ async function createProposal(env, registries, email) {
 
 export async function handleRequest(request, env) {
   const url = new URL(request.url);
-  if (url.pathname === "/health" && request.method === "GET") return json({ ok: true, service: "registryhub-admin-api" });
+  if (url.pathname === "/health") {
+    if (request.method === "GET") return json({ ok: true, service: "registryhub-admin-api" });
+    return json({ error: "method not allowed" }, 405);
+  }
+  if (!url.pathname.startsWith("/api/")) {
+    if (env.ASSETS && typeof env.ASSETS.fetch === "function") return env.ASSETS.fetch(request);
+    return json({ error: "not found" }, 404);
+  }
   if (url.pathname !== "/api/proposals") return json({ error: "not found" }, 404);
 
   const expectedOrigin = String(env.ADMIN_ORIGIN || "").replace(/\/$/, "");
