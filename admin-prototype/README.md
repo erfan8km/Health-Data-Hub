@@ -18,7 +18,7 @@ See [admin API deployment and security notes](../admin-api/README.md) before con
 - Store the GitHub credential only as a Worker secret. Restrict it to the minimum repository permissions needed for reading catalogue files, creating a branch, writing the registry file on that branch, and opening a pull request.
 - Keep server-side validation for schema, unique slugs, HTTPS URLs, country/category references, and request size. Client validation is not a security boundary.
 - Require CI validation and human review before merging. The API must never merge a PR or deploy the public catalogue.
-- Production public hosting is Cloudflare Workers only. GitHub Pages is not required. The existing GitHub Pages workflow still needs to be disabled or removed by an account with permission to edit workflow files; this PR does not change Cloudflare or hosting settings.
+- Production public hosting is intended to be Cloudflare Workers only. This branch removes the GitHub Pages deployment workflow, but `main` still has it until this PR is reviewed and merged. No deployment or Cloudflare setting has been changed.
 
 ## Known UI prototype limits
 - Country/category references are not cross-validated by the UI itself.
