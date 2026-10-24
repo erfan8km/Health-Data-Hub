@@ -24,12 +24,54 @@ collections:
       - { name: slug, label: Slug, widget: string, required: true }
       - { name: en, label: English name, widget: string, required: true }
       - { name: fa, label: Persian name, widget: string, required: true }
-      - { name: country, label: Country ID, widget: string, required: true }
-      - { name: city, label: City ID, widget: string, required: true }
+      - name: country
+        label: Country
+        widget: relation
+        collection: reference_data
+        file: countries
+        value_field: id
+        display_fields: ['{{en}} ({{fa}})']
+        search_fields: [en, fa, id]
+        required: true
+      - { name: city, label: City ID, widget: string, required: true, pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$' }
       - name: categories
         label: Categories
-        widget: list
+        widget: relation
+        collection: reference_data
+        file: categories
+        value_field: id
+        display_fields: ['{{en}} ({{fa}})']
+        search_fields: [en, fa, id]
+        multiple: true
+        min: 1
         required: true
-        field: { name: category, label: Category ID, widget: string }
       - { name: description, label: Description, widget: text, required: false }
-      - { name: officialUrl, label: Official HTTPS URL, widget: string, required: false }
+      - { name: officialUrl, label: Official HTTPS URL, widget: string, required: false, pattern: '^https://.+' }
+
+  - name: reference_data
+    label: Reference data
+    files:
+      - name: categories
+        label: Categories
+        file: /public/data/categories.json
+        identifier_field: id
+        fields:
+          - { name: id, label: ID, widget: string, required: true }
+          - { name: fa, label: Persian name, widget: string, required: true }
+          - { name: en, label: English name, widget: string, required: true }
+      - name: countries
+        label: Countries
+        file: /public/data/countries.json
+        identifier_field: id
+        fields:
+          - { name: id, label: ID, widget: string, required: true }
+          - { name: iso3, label: ISO 3166-1 alpha-3, widget: string, required: true }
+          - { name: fa, label: Persian name, widget: string, required: true }
+          - { name: en, label: English name, widget: string, required: true }
+          - name: coordinates
+            label: Globe coordinates
+            widget: object
+            fields:
+              - { name: longitude, label: Longitude, widget: number, required: true }
+              - { name: latitude, label: Latitude, widget: number, required: true }
+              - { name: height, label: Height, widget: number, required: true }
