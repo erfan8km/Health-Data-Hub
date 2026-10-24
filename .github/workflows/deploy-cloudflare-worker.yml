@@ -38,6 +38,6 @@ jobs:
           if [[ -z "$CLOUDFLARE_API_TOKEN" || -z "$CLOUDFLARE_ACCOUNT_ID" ]]; then
             echo "::warning::Skipping Cloudflare deployment because CLOUDFLARE_API_TOKEN and/or CLOUDFLARE_ACCOUNT_ID GitHub Actions secrets are missing."
             echo "::error::Cloudflare deployment was not performed because required GitHub Actions secrets are missing."
-            exit 0
+            exit 1
           fi
           npx --yes wrangler@4 deploy
