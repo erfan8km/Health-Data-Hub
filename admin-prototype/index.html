@@ -9,24 +9,24 @@
 <body>
 <header><div><strong>RegistryHub</strong><div><small>Registry catalogue · Admin prototype</small></div></div><small>Local-only preview · v0.1</small></header>
 <main class="wrap">
-<div class="notice"><strong>Prototype safety notice</strong><br>This page does not sign in to GitHub, does not save to the repository, and does not publish changes. Data remains in this browser tab until exported. Never paste a GitHub token or password here.</div>
+<div class="notice"><strong>Prototype safety notice</strong><br>This local-only editor does not sign in to GitHub or publish changes. Drafts autosave in this browser storage; do not use a shared computer and never paste a GitHub token here.</div>
 <section class="toolbar">
 <label class="filebtn">Load registries.json<input id="file" type="file" accept=".json,application/json"></label><label class="filebtn secondary">Load categories.json<input id="categories-file" type="file" accept=".json,application/json"></label><label class="filebtn secondary">Load countries.json<input id="countries-file" type="file" accept=".json,application/json"></label>
 <input id="search" type="search" placeholder="Search by English/Persian name or slug" aria-label="Search registries">
 <button id="new">+ New registry</button>
 <button id="export" class="secondary">Export JSON</button>
-<button id="download-template" class="secondary">Download empty template</button>
+<button id="download-template" class="secondary">Download sample template</button>
 </section>
 <div class="stats"><div class="stat"><strong id="count">0</strong><span class="muted">Loaded registries</span></div><div class="stat"><strong id="valid">—</strong><span class="muted">Validation</span></div></div>
 <section class="panel hidden" id="editor"><h2 id="editor-title">Registry</h2><form id="form"><div class="grid">
 <div class="field"><label for="slug">Slug (unique)</label><input id="slug" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*"></div>
-<div class="field"><label for="country">Country ID</label><input id="country" required placeholder="e.g. IRN"></div>
+<div class="field"><label for="country">Country ID</label><select id="country" required></select></div>
 <div class="field"><label for="en">English name</label><input id="en" required></div>
 <div class="field"><label for="fa">Persian name</label><input id="fa" required dir="rtl"></div>
 <div class="field"><label for="city">City ID</label><select id="city" required></select><input id="new-city" class="hidden" placeholder="New city ID, e.g. tehran" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" style="margin-top:8px"></div>
-<div class="field"><label for="categories">Category IDs (comma-separated)</label><input id="categories" required placeholder="e.g. cancer,cardiology"></div>
-<div class="field wide"><label for="description">Description</label><textarea id="description" required></textarea></div>
-<div class="field wide"><label for="url">Official HTTPS URL</label><input id="url" type="url" required placeholder="https://..."></div>
+<div class="field wide"><label>Categories (select one or more)</label><div id="category-options" class="grid"></div></div>
+<div class="field wide"><label for="description">Description (optional)</label><textarea id="description"></textarea></div>
+<div class="field wide"><label for="url">Official HTTPS URL (optional)</label><input id="url" type="url" placeholder="https://..."></div>
 </div><p class="muted">Matches validate-data.mjs: description and officialUrl must be strings but may be empty; non-empty URLs must be valid HTTPS. Slug is locked during editing because it forms the public detail URL. Load categories.json and countries.json for controlled choices.</p><div class="toolbar"><button type="submit">Save in this tab</button><button type="button" id="cancel" class="secondary">Cancel</button></div></form></section>
 <section class="panel"><h2>Registry records</h2><p class="muted">Load your current <code>registries.json</code> to inspect or edit a copy. This prototype does not fetch repository data automatically.</p><div id="list" class="list"><p class="muted">No data loaded yet.</p></div><p id="message" class="status" role="status"></p></section>
 </main>
