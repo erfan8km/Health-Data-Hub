@@ -25,6 +25,7 @@ jobs:
       - run: pnpm validate
       - run: pnpm typecheck
       - run: pnpm test
+      - run: pnpm test:admin-api
       - run: pnpm run build
         env:
           SITE_URL: https://example.invalid/
