@@ -13,6 +13,6 @@
     "test": "pnpm --filter @workspace/iedr run test",
     "build": "pnpm --filter @workspace/iedr run build",
     "check-links": "pnpm --filter @workspace/iedr run check-links",
-    "test:admin-api": "node --test admin-api/src/validate.test.mjs"
+    "test:admin-api": "node --test admin-api/src/validate.test.mjs admin-api/src/index.test.mjs"
   }
 }
