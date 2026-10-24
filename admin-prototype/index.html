@@ -9,13 +9,14 @@
 <body>
 <header><div><strong>RegistryHub</strong><div><small>Registry catalogue · Admin prototype</small></div></div><small>Local-only preview · v0.2</small></header>
 <main class="wrap">
-<div class="notice"><strong>Prototype safety notice</strong><br>This local-only editor does not sign in to GitHub or publish changes. Drafts autosave in this browser storage; do not use a shared computer and never paste a GitHub token here.</div>
+<div class="notice"><strong>Admin safety notice</strong><br>Drafts autosave in this browser. The “Submit proposal” action works only when this UI and API are served from the same Worker origin behind Cloudflare Access. It creates a GitHub Pull Request for review; it does not merge or deploy. Never paste a GitHub token here.</div>
 <section class="toolbar">
 <label class="filebtn">Load registries.json<input id="file" type="file" accept=".json,application/json"></label><label class="filebtn secondary">Load categories.json<input id="categories-file" type="file" accept=".json,application/json"></label><label class="filebtn secondary">Load countries.json<input id="countries-file" type="file" accept=".json,application/json"></label>
 <input id="search" type="search" placeholder="Search by English/Persian name or slug" aria-label="Search registries">
 <button id="new">+ New registry</button>
 <button id="export" class="secondary">Export JSON</button>
 <button id="download-template" class="secondary">Download sample template</button>
+<button id="submit-proposal">Submit proposal (creates PR)</button>
 </section>
 <div class="stats"><div class="stat"><strong id="count">0</strong><span class="muted">Loaded registries</span></div><div class="stat"><strong id="valid">—</strong><span class="muted">Validation</span></div></div>
 <section class="panel hidden" id="editor"><h2 id="editor-title">Registry</h2><form id="form"><div class="grid">
@@ -55,5 +56,22 @@ $('form').addEventListener('submit',e=>{e.preventDefault();const city=$('city').
 $('list').addEventListener('click',e=>{const ed=e.target.closest('[data-edit]'),del=e.target.closest('[data-delete]');if(ed)showEditor(Number(ed.dataset.edit));if(del){const i=Number(del.dataset.delete);if(confirm('Delete '+(records[i]?.en||records[i]?.slug)+' from this local draft?')){records.splice(i,1);markDirty();render();}}});
 $('export').onclick=()=>{const errs=validate();if(errs.length&&!confirm('Validation found issues. Export anyway?\n'+errs.slice(0,8).join('\n')))return;const blob=new Blob([JSON.stringify(records,null,2)+'\n'],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='registries.json';a.click();URL.revokeObjectURL(a.href);dirty=false;persistDraft();$('message').textContent='Exported registries.json.';};
 $('download-template').onclick=()=>{const sample=[{slug:'example-registry',fa:'نام نمونه',en:'Example Registry',country:'IR',city:'mashhad',categories:['gyn'],description:'',officialUrl:''}],blob=new Blob([JSON.stringify(sample,null,2)+'\n'],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='registries-template.json';a.click();URL.revokeObjectURL(a.href);};
+$('submit-proposal').onclick=async()=>{
+ const errors=validate();
+ if(errors.length){$('message').textContent='Fix validation issues before submitting:\\n'+errors.slice(0,10).join('\\n');$('message').className='status error';return;}
+ if(!records.length){$('message').textContent='Load or add at least one registry first.';return;}
+ if(location.protocol==='file:'){ $('message').textContent='Submission is unavailable in a local file preview. Deploy the admin UI and API together behind Cloudflare Access first.'; $('message').className='status error';return; }
+ if(!confirm('Submit this catalogue draft to GitHub as a Pull Request? It will not publish until a human reviews and merges it.'))return;
+ const button=$('submit-proposal');button.disabled=true;$('message').textContent='Submitting proposal…';$('message').className='status';
+ try{
+  const response=await fetch('/api/proposals',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({registries:records})});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok){const detail=Array.isArray(data.details)?'\\n'+data.details.join('\\n'):'';throw new Error((data.error||('Request failed ('+response.status+')'))+detail);}
+  dirty=false;persistDraft();
+  const pr=data.pullRequest||{};$('message').textContent='Pull Request created'+(pr.number?' #'+pr.number:'')+(pr.url?'\\n'+pr.url:'')+'\\nNo public deployment has occurred.';
+  $('message').className='status';
+ }catch(error){$('message').textContent='Submission failed: '+error.message+'\\nConfirm the admin Worker is deployed behind Cloudflare Access and its secrets/settings are configured.';$('message').className='status error';}
+ finally{button.disabled=false;}
+};
 try{const d=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');if(d&&Array.isArray(d.records)){records=d.records;categoriesData=Array.isArray(d.categoriesData)?d.categoriesData:[];countriesData=Array.isArray(d.countriesData)?d.countriesData:[];dirty=!!d.dirty;}}catch{}
 loadSelect('country',countriesData,'IR');renderCategories();renderCities();render();</script></body></html>
