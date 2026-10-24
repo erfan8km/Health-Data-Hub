@@ -1,0 +1,16 @@
+name: GitHub Pages deployment disabled (Cloudflare only)
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  disabled:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain deployment target
+        run: echo "GitHub Pages deployment is intentionally disabled. Production hosting is Cloudflare only."
