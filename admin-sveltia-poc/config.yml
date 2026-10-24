@@ -1,0 +1,80 @@
+# Proof of concept only. See README.md before enabling authentication.
+backend:
+  name: github
+  repo: erfan8km/Health-Data-Hub
+  # CMS edits go to an isolated staging branch, never directly to main.
+  branch: cms-staging
+  root_dir: artifacts/iedr
+  auth_methods: [oauth]
+  # Replace with the URL of a separately deployed Sveltia CMS Authenticator.
+  base_url: REPLACE_WITH_AUTHENTICATOR_WORKER_URL
+
+# Sveltia's built-in Editorial Workflow is not implemented yet.
+# Simple workflow commits directly to the configured cms-staging branch.
+publish_mode: simple
+
+media_folder: /public/media
+public_folder: /media
+
+collections:
+  - name: registries
+    label: Registries
+    label_singular: Registry
+    file: /public/data/registries.json
+    identifier_field: slug
+    summary: '{{en}} · {{fa}} ({{slug}})'
+    fields:
+      - { name: slug, label: Slug, widget: string, required: true }
+      - { name: en, label: English name, widget: string, required: true }
+      - { name: fa, label: Persian name, widget: string, required: true }
+      - name: country
+        label: Country
+        widget: relation
+        collection: countries
+        value_field: id
+        display_fields: ['{{en}} ({{fa}})']
+        search_fields: [en, fa, id]
+        required: true
+      - { name: city, label: City ID, widget: string, required: true, pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$' }
+      - name: categories
+        label: Categories
+        widget: relation
+        collection: categories
+        value_field: id
+        display_fields: ['{{en}} ({{fa}})']
+        search_fields: [en, fa, id]
+        multiple: true
+        min: 1
+        required: true
+      - { name: description, label: Description, widget: text, required: false }
+      - { name: officialUrl, label: Official HTTPS URL, widget: string, required: false, pattern: '^https://.+' }
+
+  # These are single-file entry collections because each existing JSON file
+  # contains an array of records. Relations refer to these collection names.
+  - name: categories
+    label: Categories
+    label_singular: Category
+    file: /public/data/categories.json
+    identifier_field: id
+    fields:
+      - { name: id, label: ID, widget: string, required: true }
+      - { name: fa, label: Persian name, widget: string, required: true }
+      - { name: en, label: English name, widget: string, required: true }
+
+  - name: countries
+    label: Countries
+    label_singular: Country
+    file: /public/data/countries.json
+    identifier_field: id
+    fields:
+      - { name: id, label: ID, widget: string, required: true }
+      - { name: iso3, label: ISO 3166-1 alpha-3, widget: string, required: true }
+      - { name: fa, label: Persian name, widget: string, required: true }
+      - { name: en, label: English name, widget: string, required: true }
+      - name: coordinates
+        label: Globe coordinates
+        widget: object
+        fields:
+          - { name: longitude, label: Longitude, widget: number, required: true }
+          - { name: latitude, label: Latitude, widget: number, required: true }
+          - { name: height, label: Height, widget: number, required: true }
