@@ -38,4 +38,11 @@ This browser validation is a usability aid, not a security boundary. The CI vali
 ## Admin API scaffold status
 A separate Worker implementation now exists under `admin-api/`. It verifies the Cloudflare Access JWT signature, issuer, audience, expiry and allowlisted email; checks the request origin and payload size; validates the full registry array; and opens a branch + PR using a server-side GitHub token. Automated tests cover basic request guards.
 
-**Not production-ready / not deployed:** no Cloudflare Access application/policy or Worker secrets have been configured; the admin UI is not yet wired to the API; no deployment workflow exists for this separate Worker; the full-array update flow needs a stronger stale-base conflict strategy; and end-to-end tests against a staging repository are still needed. Do not deploy until the Access app, allowed admin email, exact admin origin, and a least-privilege GitHub token are configured and reviewed.
+**Not production-ready / not deployed:** no Cloudflare Access application/policy or Worker secrets have been configured; the admin UI is not yet wired to the API; no deployment workflow exists for this separate Worker; the full-array update flow needs a stronger stale-base conflict strategy; and end-to-end tests against a staging repository are still needed.
+
+Required Worker configuration before a future deployment:
+- Non-secret variables: `CF_ACCESS_TEAM_DOMAIN` (team domain, e.g. `team.cloudflareaccess.com`), `CF_ACCESS_AUD` (the Access application's AUD tag), `ADMIN_EMAIL` (the one allowlisted administrator email), and `ADMIN_ORIGIN` (exact HTTPS origin of the admin UI).
+- Secret: `GITHUB_TOKEN`, a fine-grained token limited to this repository with Contents read/write and Pull requests read/write permissions as required by the API calls.
+- The Worker also has a fixed `GITHUB_REPOSITORY` variable in its separate Wrangler config. Do not reuse the public site's deployment workflow to deploy this admin API without a separate review.
+
+Do not deploy until the Access app, allowed admin email, exact admin origin, and least-privilege GitHub token are configured and reviewed.
