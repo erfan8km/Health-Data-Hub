@@ -1,39 +1,37 @@
-# Admin API: validation and security boundary
+# RegistryHub Admin API
 
-This folder is an isolated, non-deployed preparation step. It is not imported by the public catalogue and is not wired into `wrangler.jsonc` or the existing deployment workflow.
+This folder contains an isolated Cloudflare Worker API and tests. It is not the public catalogue Worker, and it must not be deployed with write credentials until the access boundary is configured and verified.
 
-## What this step adds
-- A pure server-side-friendly validator for the registry payload shape.
-- Node tests for valid payloads and common malformed inputs.
-- An API/security design contract for a future Cloudflare Worker.
+## What the API does
+- `GET /health`: returns a minimal health response without configuration details.
+- `POST /api/proposals`: requires a valid Cloudflare Access JWT, checks the exact configured admin origin, validates a bounded registry payload against the trusted `categories.json` and `countries.json` files on `main`, creates a branch, writes `registries.json` on that branch, and opens a pull request to `main`.
+- It does not merge pull requests or deploy the public catalogue.
 
-## Validation contract
-The server must treat all client input as untrusted. Validate:
-- payload is a bounded JSON array of registry objects;
-- required fields have the expected types; `description` and `officialUrl` may be empty strings because the current catalogue uses empty values for unknown metadata;
-- slugs follow a lowercase kebab-case format and are unique;
-- `country` references an existing country ID;
-- every category reference exists and each registry has at least one category;
-- a non-empty `officialUrl` parses as HTTPS;
-- unexpected fields are rejected so only the supported schema is written.
+## Required Worker configuration
+Non-secret settings:
+- `GITHUB_REPOSITORY` — repository name; currently set in `wrangler.jsonc`.
+- `ADMIN_ORIGIN` — exact origin of the admin UI, including scheme and port if present, without a trailing slash.
+- `ADMIN_EMAIL` — the single administrator email allowed by the API.
+- `CF_ACCESS_TEAM_DOMAIN` — Cloudflare Access team hostname used as the JWT issuer, e.g. `your-team.cloudflareaccess.com` (hostname only).
+- `CF_ACCESS_AUD` — audience tag for the Cloudflare Access application protecting the API.
 
-The existing catalogue's reference files are `artifacts/iedr/public/data/categories.json` and `countries.json`. The production Worker should receive trusted category/country IDs from server-side configuration or load them from the repository, not accept the reference lists from the browser as authoritative.
+Secret:
+- `GITHUB_TOKEN` — set as a Worker secret with `wrangler secret put GITHUB_TOKEN`. Never commit the token, put it in a plaintext variable, or expose it to the browser.
 
-## Intended future API (not implemented here)
-- `GET /auth/login` and `GET /auth/callback`: server-side GitHub OAuth flow with state validation and PKCE where supported.
-- `GET /api/session`: return only safe session metadata, never credentials.
-- `POST /api/registries/validate`: validate bounded JSON without writing.
-- `POST /api/registries/pull-request`: require an authenticated administrator, CSRF/origin protections, rate limits, strict validation, then create a branch and pull request using a server-side GitHub credential.
-- Unknown routes and methods fail closed.
+## Required before deployment
+1. Choose a dedicated admin hostname and restrict its Cloudflare Access application to the intended administrator.
+2. Protect the API hostname with an Access application or another verified boundary. Do not assume that the default public `workers.dev` URL is protected; verify it cannot bypass Access.
+3. Set `ADMIN_ORIGIN` to the exact admin UI origin. CORS is an additional browser control, not authentication.
+4. Create a narrowly scoped GitHub credential limited to this repository, with only the permissions needed to read contents, create a branch, write the catalogue file on that branch, and open a pull request. Confirm endpoint-specific permissions against GitHub's current API documentation.
+5. Store the credential only as a Worker secret. Never send it to the browser, return it in responses, or log it.
+6. Test unauthenticated, invalid-token, wrong-origin, oversized, malformed, and invalid-data requests. Run `pnpm test:admin-api`, `pnpm validate`, `pnpm typecheck`, `pnpm test`, and `pnpm build`.
+7. Confirm that a valid submission creates a branch and reviewable PR only. Human review and merge remain required; production deployment is a separate step.
+8. Add appropriate rate limiting/abuse controls and a token rotation/revocation procedure.
 
-## Security requirements before deployment
-- Keep OAuth client secret and GitHub credential in Cloudflare Worker secrets only; never put them in Vite environment variables, client code, JSON responses, URLs, or logs.
-- Use a server-side session with a random identifier in a Secure, HttpOnly, SameSite cookie. Store session/token state server-side (e.g. a Cloudflare storage binding) and implement expiry/revocation.
-- Validate OAuth state and callback URLs; protect write endpoints against CSRF; restrict CORS to the exact admin origin; add rate limits and audit events without sensitive values.
-- Restrict write capability to the target repository and minimum required permissions. Never accept arbitrary repository, file path, branch, or target branch from the browser.
-- Keep public catalogue hosting static on Cloudflare. A PR is not a deployment; merge and the existing CI/release gates remain separate.
-- Do not deploy this code until OAuth, storage bindings, secrets, integration tests, and threat review are complete.
-
-## Run tests
-From the repository root, run:
-`node --test admin-api/src/validate.test.mjs`
+## Current limitations and boundaries
+- The HTML editor in `admin-prototype/` is not connected to this API yet.
+- No API deployment workflow or live Access application is configured by this PR.
+- The current Worker configuration has `workers_dev: true`. Do not deploy with a GitHub write secret until the `workers.dev` route is confirmed protected or disabled for admin traffic.
+- The API currently reads trusted country/category metadata and the base ref from `main`; it does not accept these from the browser.
+- `/health` is intentionally unauthenticated and exposes only a static status.
+- A PR is not a deployment. Never merge or deploy the admin API just to preview the local HTML editor.
