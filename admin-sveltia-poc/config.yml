@@ -1,0 +1,35 @@
+# Proof of concept only. See README.md before enabling authentication.
+backend:
+  name: github
+  repo: erfan8km/Health-Data-Hub
+  branch: feat/sveltia-cms-poc
+  root_dir: artifacts/iedr
+  auth_methods: [oauth]
+  # Replace with the URL of a separately deployed Sveltia CMS Authenticator.
+  base_url: REPLACE_WITH_AUTHENTICATOR_WORKER_URL
+
+publish_mode: editorial_workflow
+
+media_folder: /public/media
+public_folder: /media
+
+collections:
+  - name: registries
+    label: Registries
+    label_singular: Registry
+    file: /public/data/registries.json
+    identifier_field: slug
+    summary: '{{en}} · {{fa}} ({{slug}})'
+    fields:
+      - { name: slug, label: Slug, widget: string, required: true }
+      - { name: en, label: English name, widget: string, required: true }
+      - { name: fa, label: Persian name, widget: string, required: true }
+      - { name: country, label: Country ID, widget: string, required: true }
+      - { name: city, label: City ID, widget: string, required: true }
+      - name: categories
+        label: Categories
+        widget: list
+        required: true
+        field: { name: category, label: Category ID, widget: string }
+      - { name: description, label: Description, widget: text, required: false }
+      - { name: officialUrl, label: Official HTTPS URL, widget: string, required: false }
