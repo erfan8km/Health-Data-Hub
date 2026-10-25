@@ -85,6 +85,14 @@ function App() {
     };
   }, []);
   useEffect(() => {
+    if (!dataReady) return;
+    if (["categories", "category", "registry"].includes(route.view)) {
+      const province = provinces.find((item) => item.id === (route.provinceId || ACTIVE_PROVINCE_ID));
+      if (!province?.active) navigate("provinces");
+    }
+  }, [dataReady, route.view, route.provinceId, provinces]);
+
+  useEffect(() => {
     let active = true;
     Promise.all([
       fetch(BASE + "data/categories.json").then((r) => { if (!r.ok) throw new Error("categories"); return r.json(); }),
@@ -164,7 +172,7 @@ function App() {
 
       {route.view === "categories" && <section className={"category-overlay" + (categoriesReady ? " category-overlay-visible" : "")} aria-label={english ? "Clinical categories" : "دسته‌های بالینی"}>
         <div className="categories-panel">
-          <div className="panel-topline"><span className="panel-index">01 / 11</span><span className="panel-line" /><span className="panel-state"><span className="header-live-dot" /> {english ? "IRAN SELECTED" : "ایران انتخاب شد"}</span></div>
+          <div className="panel-topline"><span className="panel-index">01 / 11</span><span className="panel-line" /><span className="panel-state"><span className="header-live-dot" /> {english ? "PROVINCE SELECTED" : "استان انتخاب شد"}</span></div>
           <div className="panel-heading">
             <div><p className="eyebrow">{english ? "CLINICAL LANDSCAPE" : "حوزه‌های تخصصی"}</p><h1>{english ? "Explore by clinical field" : "یک حوزه‌ی بالینی انتخاب کنید"}</h1><p>{english ? `Browse registries in ${selectedProvince?.en || "the selected province"}.` : `ریجستری‌های استان ${selectedProvince?.fa || "انتخاب‌شده"} را بر اساس حوزه‌ی تخصصی مرور کنید.`}</p></div>
             <button type="button" className="back-to-globe" onClick={() => { setCategoriesReady(false); navigate("provinces"); }}><MapPin size={16} /> {english ? "Back to provinces" : "بازگشت به استان‌ها"}</button>
@@ -208,7 +216,7 @@ function App() {
           <div className="breadcrumb"><button type="button" onClick={() => navigate("categories/" + (route.provinceId || ACTIVE_PROVINCE_ID))}>{english ? "Clinical categories" : "دسته‌های بالینی"}</button><ChevronLeft size={14} /><button type="button" onClick={() => navigate("category/" + (selectedRegistry?.categories[0] || "gyn") + "/" + (route.provinceId || ACTIVE_PROVINCE_ID))}>{getText(categories.find((item) => item.id === selectedRegistry?.categories[0]), english)}</button><ChevronLeft size={14} /><span>{selectedRegistry ? (english ? selectedRegistry.en : selectedRegistry.fa) : (english ? "Registry" : "ریجستری")}</span></div>
           {!selectedRegistry ? <div className="empty-state"><h1>{english ? "Registry not found" : "ریجستری پیدا نشد"}</h1><button type="button" className="text-back" onClick={() => navigate("categories/" + (route.provinceId || ACTIVE_PROVINCE_ID))}>{english ? "Return to categories" : "بازگشت به دسته‌ها"} <ArrowLeft size={15} /></button></div> : <>
             <div className="detail-kicker"><span className="detail-kicker-icon"><Activity size={18} /></span><span>{english ? "REGISTRY PROFILE" : "شناسنامه‌ی ریجستری"}</span><span className="detail-id">RegistryHub / {selectedRegistry.slug.toUpperCase()}</span></div>
-            <div className="registry-detail-heading"><p className="section-kicker">{english ? "IRAN · MASHHAD" : "ایران · مشهد"}</p><h1>{english ? selectedRegistry.en : selectedRegistry.fa}</h1><p className="detail-english-title">{english ? selectedRegistry.fa : selectedRegistry.en}</p></div>
+            <div className="registry-detail-heading"><p className="section-kicker">{english ? "IRAN · RAZAVI KHORASAN · MASHHAD" : "ایران · خراسان رضوی · مشهد"}</p><h1>{english ? selectedRegistry.en : selectedRegistry.fa}</h1><p className="detail-english-title">{english ? selectedRegistry.fa : selectedRegistry.en}</p></div>
             <div className="detail-content-grid">
               <article className="detail-main-card">
                 <h2>{english ? "Registry overview" : "معرفی ریجستری"}</h2>
