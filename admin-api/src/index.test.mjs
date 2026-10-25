@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { handleRequest, readBodyLimited } from "./index.mjs";
+import { handleRequest, isAllowedGithubWrite, readBodyLimited } from "./index.mjs";
 import { handleAuthRequest } from "./auth.mjs";
 
 const ORIGIN = "https://admin.example.test";
@@ -207,4 +207,80 @@ test("proposal API fails closed when rate limiting binding is missing", async ()
   } finally {
     globalThis.fetch = originalFetch;
   }
+});
+
+
+const SHA = "a".repeat(40);
+const ADMIN_BRANCH = "admin/registry-update-a1b2c3d4";
+const REPO = "erfan8km/Health-Data-Hub";
+const REGISTRY_PATH = "/repos/" + REPO + "/contents/artifacts/iedr/public/data/registries.json";
+
+test("GitHub write allowlist permits only the canonical data file, proposal branch, and PR", () => {
+  const contentWrite = JSON.stringify({
+    message: "Propose registry catalogue update via RegistryHub admin",
+    content: "W10=",
+    sha: SHA,
+    branch: ADMIN_BRANCH,
+  });
+  assert.equal(isAllowedGithubWrite(REPO, REGISTRY_PATH, "PUT", contentWrite), true);
+
+  const branchCreate = JSON.stringify({ ref: "refs/heads/" + ADMIN_BRANCH, sha: SHA });
+  assert.equal(isAllowedGithubWrite(REPO, "/repos/" + REPO + "/git/refs", "POST", branchCreate), true);
+
+  const prCreate = JSON.stringify({
+    title: "Registry catalogue update",
+    head: ADMIN_BRANCH,
+    base: "main",
+    body: "This PR must be reviewed and merged manually; the API never merges or deploys.",
+  });
+  assert.equal(isAllowedGithubWrite(REPO, "/repos/" + REPO + "/pulls", "POST", prCreate), true);
+});
+
+test("GitHub write allowlist rejects direct main writes and unapproved repository paths", () => {
+  const directMain = JSON.stringify({
+    message: "Propose registry catalogue update via RegistryHub admin",
+    content: "W10=",
+    sha: SHA,
+    branch: "main",
+  });
+  assert.equal(isAllowedGithubWrite(REPO, REGISTRY_PATH, "PUT", directMain), false);
+
+  const codeFile = "/repos/" + REPO + "/contents/admin-api/src/index.mjs";
+  const codeWrite = JSON.stringify({
+    message: "Propose registry catalogue update via RegistryHub admin",
+    content: "Y29kZQ==",
+    sha: SHA,
+    branch: ADMIN_BRANCH,
+  });
+  assert.equal(isAllowedGithubWrite(REPO, codeFile, "PUT", codeWrite), false);
+
+  const workflowFile = "/repos/" + REPO + "/contents/.github/workflows/deploy-cloudflare-worker.yml";
+  assert.equal(isAllowedGithubWrite(REPO, workflowFile, "PUT", codeWrite), false);
+
+  const arbitraryEndpoint = "/repos/" + REPO + "/git/blobs";
+  assert.equal(isAllowedGithubWrite(REPO, arbitraryEndpoint, "POST", JSON.stringify({ content: "x", encoding: "utf-8" })), false);
+});
+
+test("GitHub write allowlist rejects unrelated branches, changed filenames, and PRs not based on main", () => {
+  const wrongBranch = JSON.stringify({
+    ref: "refs/heads/main",
+    sha: SHA,
+  });
+  assert.equal(isAllowedGithubWrite(REPO, "/repos/" + REPO + "/git/refs", "POST", wrongBranch), false);
+
+  const wrongFile = JSON.stringify({
+    message: "Propose registry catalogue update via RegistryHub admin",
+    content: "W10=",
+    sha: SHA,
+    branch: ADMIN_BRANCH,
+  });
+  assert.equal(isAllowedGithubWrite(REPO, "/repos/" + REPO + "/contents/artifacts/iedr/public/data/categories.json", "PUT", wrongFile), false);
+
+  const wrongBase = JSON.stringify({
+    title: "Registry catalogue update",
+    head: ADMIN_BRANCH,
+    base: "feat/admin-independent-auth",
+    body: "This PR must be reviewed and merged manually.",
+  });
+  assert.equal(isAllowedGithubWrite(REPO, "/repos/" + REPO + "/pulls", "POST", wrongBase), false);
 });
