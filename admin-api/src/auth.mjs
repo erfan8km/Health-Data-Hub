@@ -60,7 +60,7 @@ async function rateLimitStatus(env, bindingName, key) {
   }
 }
 
-export async function checkRateLimit(request, env, bindingName, key) {
+export async function checkRateLimit(env, bindingName, key) {
   const status = await rateLimitStatus(env, bindingName, key);
   if (status === "ok") return null;
   if (status === "limited") {
@@ -202,7 +202,7 @@ export async function readAdminSession(request, env) {
 
 async function beginLogin(request, env) {
   if (!configReady(env)) return textError("Admin authentication is not configured.", 503);
-  const limited = await checkRateLimit(request, env, "AUTH_RATE_LIMITER", clientKey(request) + ":login");
+  const limited = await checkRateLimit(env, "AUTH_RATE_LIMITER", clientKey(request) + ":login");
   if (limited) return limited;
   const origin = originFromEnv(env);
   const state = randomToken(32);
@@ -229,11 +229,13 @@ async function completeLogin(request, env) {
   const clearState = expiredCookie(STATE_COOKIE);
   if (!configReady(env)) return textError("Admin authentication is not configured.", 503, [clearState]);
   const url = new URL(request.url);
-  const limited = await checkRateLimit(request, env, "AUTH_RATE_LIMITER", clientKey(request) + ":callback");
-  if (limited) return response(await limited.text(), limited.status, {
-    "content-type": "text/plain; charset=utf-8",
-    "retry-after": limited.headers.get("retry-after") || "60",
-  }, [clearState]);
+  const limited = await checkRateLimit(env, "AUTH_RATE_LIMITER", clientKey(request) + ":callback");
+  if (limited) {
+    const headers = { "content-type": "text/plain; charset=utf-8" };
+    const retryAfter = limited.headers.get("retry-after");
+    if (retryAfter) headers["retry-after"] = retryAfter;
+    return response(await limited.text(), limited.status, headers, [clearState]);
+  }
   if (url.searchParams.has("error")) {
     return textError("GitHub sign-in was not completed.", 401, [clearState]);
   }
