@@ -168,7 +168,7 @@ export async function handleRequest(request, env) {
       !env.GITHUB_REPOSITORY || !env.ADMIN_ORIGIN) {
     return json({ error: "admin API is not configured" }, 503, expectedOrigin);
   }
-  const limited = await checkRateLimit(request, env, "PROPOSAL_RATE_LIMITER", "admin:" + session.id);
+  const limited = await checkRateLimit(env, "PROPOSAL_RATE_LIMITER", "admin:" + session.id);
   if (limited) return limited;
   let payload;
   try {
