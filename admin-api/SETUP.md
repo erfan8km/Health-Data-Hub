@@ -65,7 +65,13 @@ Copy the output directly into Cloudflare's secret-value field. Never send it thr
 Cloudflare's official guidance says secrets should be set as Worker secrets rather than plaintext `vars`, and local `.dev.vars` files should be excluded from Git. See:
 https://developers.cloudflare.com/workers/configuration/secrets/
 
-## 5. Rate limits in this branch
+## 5. OAuth state replay protection
+
+OAuth login state is reserved and consumed through the `OAUTH_STATE_STORE` SQLite-backed Durable Object. A callback can consume a state only once, including concurrent callback attempts; missing or unavailable state storage fails closed. The binding and initial migration are declared in `wrangler.jsonc`. The namespace is provisioned only when this experimental Worker is first deployed; this code change has not created a live Cloudflare resource.
+
+Do not deploy merely to provision the Durable Object. Keep the existing no-deploy gate in place until the authentication flow and review checklist pass.
+
+## 6. Rate limits in this branch
 
 The configuration uses Cloudflare Rate Limiting bindings:
 
@@ -75,7 +81,7 @@ The configuration uses Cloudflare Rate Limiting bindings:
 Cloudflare documents these bindings as approximate per-location limits, not strict global ceilings. They help with ordinary abuse but are not a substitute for monitoring or a strict globally consistent limiter:
 https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/
 
-## 6. Secret handling and deployment gate
+## 7. Secret handling and deployment gate
 
 - `admin-api/.dev.vars.example` is a placeholder template only. For local development, copy it to `admin-api/.dev.vars` and replace every placeholder with test-only values. The actual `.dev.vars` is ignored by Git.
 - Do not paste secrets into GitHub issues, PR text, commits, browser code, or chat.
