@@ -79,7 +79,7 @@ test("login starts GitHub OAuth with state, PKCE S256, fixed callback and secure
   assert.match(stateCookie, /; Secure/);
   assert.match(stateCookie, /; HttpOnly/);
   assert.match(stateCookie, /; SameSite=Lax/);
-  assert.match(stateCookie, /; Path=//);
+  assert.ok(stateCookie.includes("; Path=/"));
   assert.equal(location.searchParams.get("scope"), null);
   assert.equal(location.searchParams.get("allow_signup"), "false");
 });
@@ -105,7 +105,7 @@ test("callback exchanges code with PKCE and creates a signed HttpOnly session on
   assert.match(sessionHeader, /; Secure/);
   assert.match(sessionHeader, /; HttpOnly/);
   assert.match(sessionHeader, /; SameSite=Lax/);
-  assert.match(sessionHeader, /; Path=//);
+  assert.ok(sessionHeader.includes("; Path=/"));
   assert.doesNotMatch(sessionHeader, /temporary-test-oauth-token/);
   assert.ok(setCookieFor(response, "__Host-rh_oauth").includes("Max-Age=0"));
 
