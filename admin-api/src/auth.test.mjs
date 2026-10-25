@@ -7,8 +7,10 @@ const env = {
   ADMIN_ORIGIN: ORIGIN,
   ADMIN_GITHUB_USER_ID: "123456",
   GITHUB_OAUTH_CLIENT_ID: "oauth-client-id",
-  GITHUB_OAUTH_CLIENT_SECRET: "oauth-client-secret",
+  GITHUB_OAUTH_CLIENT_SECRET: "oauth-client-secret-long-enough",
   SESSION_SIGNING_SECRET: "s".repeat(64),
+  AUTH_RATE_LIMITER: { limit: async () => ({ success: true }) },
+  PROPOSAL_RATE_LIMITER: { limit: async () => ({ success: true }) },
 };
 
 function setCookies(response) {
