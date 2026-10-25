@@ -246,3 +246,42 @@ test("placeholder session signing secret fails closed", async () => {
   });
   assert.equal(response.status, 503);
 });
+
+
+test("callback rejects expired OAuth state before exchanging the authorization code", async () => {
+  const started = await beginLogin();
+  const callbackUrl = new URL(ORIGIN + "/auth/callback");
+  callbackUrl.searchParams.set("code", "test-code");
+  callbackUrl.searchParams.set("state", started.location.searchParams.get("state"));
+  const oldNow = Date.now;
+  const originalFetch = globalThis.fetch;
+  let called = false;
+  Date.now = () => oldNow() + 11 * 60 * 1000;
+  globalThis.fetch = async () => { called = true; throw new Error("must not fetch"); };
+  try {
+    const response = await handleAuthRequest(new Request(callbackUrl, {
+      headers: { cookie: cookiePair(started.stateCookie) },
+    }), env);
+    assert.equal(response.status, 400);
+    assert.match(await response.text(), /expired/);
+    assert.equal(called, false);
+  } finally {
+    Date.now = oldNow;
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("signed session expires after its configured lifetime", async () => {
+  const { response } = await completeLogin();
+  const sessionHeader = setCookieFor(response, "__Host-rh_session");
+  const oldNow = Date.now;
+  Date.now = () => oldNow() + 9 * 60 * 60 * 1000;
+  try {
+    const session = await readAdminSession(new Request(ORIGIN + "/", {
+      headers: { cookie: cookiePair(sessionHeader) },
+    }), env);
+    assert.equal(session, null);
+  } finally {
+    Date.now = oldNow;
+  }
+});
