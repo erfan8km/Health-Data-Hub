@@ -151,3 +151,60 @@ test("bounded body reader stops oversized streamed requests without content-leng
   await assert.rejects(() => readBodyLimited(request, 100), (error) =>
     error.status === 413 && /request too large/.test(error.message));
 });
+
+
+test("proposal rate limit blocks repeat submissions for the authenticated administrator", async () => {
+  const session = await createSessionCookie();
+  const originalFetch = globalThis.fetch;
+  let githubCalled = false;
+  globalThis.fetch = async () => {
+    githubCalled = true;
+    throw new Error("GitHub must not be called after the limiter rejects the request");
+  };
+  try {
+    const response = await handleRequest(new Request(ORIGIN + "/api/proposals", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        origin: ORIGIN,
+        cookie: session,
+      },
+      body: JSON.stringify({ registries: [] }),
+    }), {
+      ...env,
+      PROPOSAL_RATE_LIMITER: { limit: async ({ key }) => {
+        assert.equal(key, "admin:123456");
+        return { success: false };
+      } },
+    });
+    assert.equal(response.status, 429);
+    assert.equal(response.headers.get("retry-after"), "60");
+    assert.equal(githubCalled, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("proposal API fails closed when rate limiting binding is missing", async () => {
+  const session = await createSessionCookie();
+  const { PROPOSAL_RATE_LIMITER, ...withoutLimiter } = env;
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => {
+    throw new Error("GitHub must not be called when rate limiting is unavailable");
+  };
+  try {
+    const response = await handleRequest(new Request(ORIGIN + "/api/proposals", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        origin: ORIGIN,
+        cookie: session,
+      },
+      body: JSON.stringify({ registries: [] }),
+    }), withoutLimiter);
+    assert.equal(response.status, 503);
+    assert.match((await response.json()).error, /protection is unavailable/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
