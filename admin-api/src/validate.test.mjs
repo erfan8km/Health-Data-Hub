@@ -26,6 +26,14 @@ test("rejects duplicate and malformed slugs", () => {
   assert.ok(result.errors.some((e) => e.includes("duplicate slug")));
 });
 
+test("rejects slugs that attempt path traversal or contain path separators", () => {
+  for (const slug of ["../secret", "a/../b", "a\\b", "%2e%2e", "."]) {
+    const result = validateRegistryPayload([{ ...registry, slug }], categories, countries);
+    assert.equal(result.ok, false, "should reject slug: " + slug);
+    assert.ok(result.errors.some((error) => error.includes("lowercase kebab-case")));
+  }
+});
+
 test("rejects unknown country and category references", () => {
   const result = validateRegistryPayload([{ ...registry, country: "XX", categories: ["missing"] }], categories, countries);
   assert.ok(result.errors.some((e) => e.includes("unknown country")));
