@@ -35,7 +35,7 @@ GitHub's official instructions: https://docs.github.com/en/repositories/configur
 - Limit it to **only** erfan8km/Health-Data-Hub.
 - Grant only **Contents: Read and write** and **Pull requests: Read and write**, plus GitHub's required Metadata read-only. The server-side API write allowlist narrows operations further to: create an admin/registry-update-xxxxxxxx branch from main, update the single registry JSON file on that branch, and open a PR back to main.
 - Set an explicit 90-day expiry when creating the token. Record the actual creation and expiration dates privately.
-- A reminder is scheduled separately as a 90-day checkpoint from this preparation date. If token creation occurs later, move the reminder to before the actual expiry date; do not create a token just because a reminder fires.
+- A reminder is scheduled separately for 2027-01-08, 75 days after this preparation date, to leave time before a 90-day token expires. If token creation occurs later, move the reminder to before the actual expiry date; do not create a token just because a reminder fires.
 - When rotating: create a replacement with the same minimal scope, replace the Worker secret only when deployment/configuration is authorized, verify proposal creation, and revoke the old token. In future, consider a GitHub App installation token with a short lifetime.
 
 ## Limits of these controls
