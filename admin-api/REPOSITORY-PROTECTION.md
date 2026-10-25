@@ -16,8 +16,9 @@ On 2026-10-25, GitHub's repository rulesets endpoint returned an empty list for 
 5. Leave the **Bypass list empty**. Do not add repository administrators, the admin Worker, a token, or any role as a bypass actor. This is important: the intention is to force the Worker and the repository owner through the normal PR route.
 6. Enable **Require a pull request before merging**. This is the essential rule that prevents direct updates to main.
 7. Enable **Block force pushes** and **Restrict deletions**.
-8. Save the ruleset and confirm its status is **Active**, the target includes main, the bypass list is empty, and the rule is visible in the repository's Rulesets list.
-9. Open the ruleset from the Rulesets list and verify that it is still Active. A test push directly to main should be rejected, while a branch push and PR should be allowed. Do not test by attempting to change production files; use a harmless test branch or rely on GitHub's ruleset status and audit details.
+8. Under required status checks, require the GitHub Actions check named **validate-and-build** (verified on the current main branch's check runs). This ensures the catalogue validation/typecheck/tests/build workflow completes before a PR can merge.
+9. Save the ruleset and confirm its status is **Active**, the target includes main, the bypass list is empty, and the rule is visible in the repository's Rulesets list.
+10. Open the ruleset from the Rulesets list and verify that it is still Active. A test push directly to main should be rejected, while a branch push and PR should be allowed. Do not test by attempting to change production files; use a harmless test branch or rely on GitHub's ruleset status and audit details.
 
 GitHub's official instructions: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository
 
