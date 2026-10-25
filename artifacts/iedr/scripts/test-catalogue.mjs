@@ -6,8 +6,8 @@ import { dirname, resolve } from "node:path";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (name) => readFile(resolve(root, "public/data", name), "utf8").then(JSON.parse);
-const [registries, categories, countries, borders] = await Promise.all([
-  read("registries.json"), read("categories.json"), read("countries.json"), read("borders.geojson"),
+const [registries, categories, countries, borders, provinces] = await Promise.all([
+  read("registries.json"), read("categories.json"), read("countries.json"), read("borders.geojson"), read("provinces.json"),
 ]);
 
 test("contains the 30 initial registry rows and 11 clinical categories from the brief", () => {
@@ -15,12 +15,13 @@ test("contains the 30 initial registry rows and 11 clinical categories from the 
   assert.equal(categories.length, 11);
 });
 
-test("registry slugs are unique and all records use the initial Iran/Mashhad geography", () => {
+test("registry slugs are unique and all records use the initial Iran/Mashhad/Razavi Khorasan geography", () => {
   const slugs = registries.map((registry) => registry.slug);
   assert.equal(new Set(slugs).size, slugs.length);
   for (const registry of registries) {
     assert.equal(registry.country, "IR");
     assert.equal(registry.city, "mashhad");
+    assert.equal(registry.province, "razavi-khorasan");
     assert.ok(registry.fa.length > 0 && registry.en.length > 0);
   }
 });
@@ -49,6 +50,14 @@ test("the active Iran country has a boundary and geographic coordinates", () => 
   assert.ok(Number.isFinite(iran.coordinates.latitude));
   assert.ok(Number.isFinite(iran.coordinates.longitude));
   assert.ok(borders.features.some((feature) => feature.properties.iso2 === "IR"));
+});
+
+test("province directory includes all 31 provinces but enables only Razavi Khorasan", () => {
+  assert.equal(provinces.length, 31);
+  assert.equal(provinces.filter((province) => province.active).length, 1);
+  assert.equal(provinces.find((province) => province.active)?.id, "razavi-khorasan");
+  const provinceIds = new Set(provinces.map((province) => province.id));
+  for (const registry of registries) assert.ok(provinceIds.has(registry.province));
 });
 
 test("category counts match multi-category references without mutating the data", () => {
