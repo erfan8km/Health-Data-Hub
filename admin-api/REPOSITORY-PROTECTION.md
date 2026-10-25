@@ -9,7 +9,7 @@ Checked through the GitHub rulesets API on 2026-10-25:
 - Ruleset **Protect main — require PR**, ID `25821290`, is `active` and targets only `refs/heads/main`.
 - The bypass list is empty and the connected account cannot bypass the ruleset.
 - Pull requests, stale-approval dismissal, conversation resolution, force-push blocking, deletion restriction, and strict `validate-and-build` status checking are enabled.
-- **Important unresolved gap:** `required_approving_review_count` is still `0`. The ruleset currently requires a PR but does not require a separate human approval. This must be changed to `1` manually in GitHub Settings before configuring a GitHub write token.
+- **Approval requirement verified:** a fresh API readback on 2026-10-25 shows `required_approving_review_count: 1`, with the ruleset active and the bypass list empty. Re-open the [ruleset settings](https://github.com/erfan8km/Health-Data-Hub/rules/25821290) and verify the saved value before any credential setup. Do not configure the GitHub write token or deploy the Worker without explicit authorization and a separate trusted reviewer.
 - The connected GitHub integration can read the ruleset but does not expose a ruleset-write action. Verify the saved value by reopening [the ruleset](https://github.com/erfan8km/Health-Data-Hub/rules/25821290) after saving.
 
 If there is no second trusted reviewer, do not work around this by adding a bypass actor. Arrange a separate reviewer first; otherwise a one-approval requirement will prevent the sole PR author from merging their own PR.
