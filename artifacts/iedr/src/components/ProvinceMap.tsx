@@ -35,6 +35,11 @@ function featureNames(feature: Feature): string[] {
 
 function matchProvince(feature: Feature, provinces: Province[]): Province | undefined {
   const names = featureNames(feature).map(normalized);
+  const activeProvince = provinces.find((province) => province.active);
+  const activeAliases = new Set(["razavikhorasan", "khorasanrazavi", "khorasanerazavi", "khorasaneerazavi"]);
+  if (activeProvince && names.some((name) =>
+    activeAliases.has(name) || name.includes("خراسانرضوی")
+  )) return activeProvince;
   return provinces.find((province) =>
     names.includes(normalized(province.fa)) || names.includes(normalized(province.en))
   );
@@ -119,6 +124,7 @@ export default function ProvinceMap({ provinces, english, onSelectProvince }: {
   const [fallbackImageFailed, setFallbackImageFailed] = useState(false);
 
   useEffect(() => {
+    let current = true;
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 10000);
     fetch(GEOJSON_URL, { signal: controller.signal, mode: "cors" })
@@ -130,12 +136,13 @@ export default function ProvinceMap({ provinces, english, onSelectProvince }: {
         if (!Array.isArray(data.features) || data.features.length < 25) throw new Error("Unexpected province geometry");
         setFeatures(data.features);
       })
-      .catch(() => setMapFailed(true))
+      .catch(() => { if (current) setMapFailed(true); })
       .finally(() => {
         window.clearTimeout(timeout);
-        setLoading(false);
+        if (current) setLoading(false);
       });
     return () => {
+      current = false;
       window.clearTimeout(timeout);
       controller.abort();
     };
