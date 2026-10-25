@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { handleRequest } from "./index.mjs";
+import { handleRequest, readBodyLimited } from "./index.mjs";
 
 const env = { ADMIN_ORIGIN: "https://admin.example.test" };
 
@@ -146,4 +146,17 @@ test("returns 404 for unknown API routes and 405 for non-GET health requests", a
   assert.equal(unknown.status, 404);
   const health = await handleRequest(new Request("https://admin.example.test/health", { method: "POST" }), env);
   assert.equal(health.status, 405);
+});
+
+
+test("bounded body reader stops oversized streamed requests without content-length", async () => {
+  const body = new ReadableStream({
+    start(controller) {
+      controller.enqueue(new TextEncoder().encode("x".repeat(64)));
+      controller.enqueue(new TextEncoder().encode("y".repeat(64)));
+      controller.close();
+    },
+  });
+  const request = new Request("https://api.example.test/api/proposals", { method: "POST", body, duplex: "half" });
+  await assert.rejects(() => readBodyLimited(request, 100), (error) => error.status === 413 && /request too large/.test(error.message));
 });
