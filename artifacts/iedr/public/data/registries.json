@@ -4,6 +4,7 @@
     "fa": "آپنه انسدادی خواب",
     "en": "Obstructive Sleep Apnea",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "sleep",
@@ -17,6 +18,7 @@
     "fa": "اختلالات خواب",
     "en": "Sleep Disorders",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "sleep"
@@ -29,6 +31,7 @@
     "fa": "بیماری تروفوبلاستیک حاملگی (مول)",
     "en": "Trophoblastic Disease (Molar Pregnancy)",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "gyn",
@@ -42,6 +45,7 @@
     "fa": "سرطان تخمدان",
     "en": "Ovarian Cancer",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "gyn",
@@ -55,6 +59,7 @@
     "fa": "سقط مکرر",
     "en": "Recurrent Miscarriage",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "gyn"
@@ -67,6 +72,7 @@
     "fa": "لیکن پلان دهانی",
     "en": "Oral Lichen Planus",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "oral"
@@ -79,6 +85,7 @@
     "fa": "ناباروری",
     "en": "Infertility",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "gyn"
@@ -91,6 +98,7 @@
     "fa": "اوتیت خارجی بدخیم",
     "en": "Malignant Otitis Externa",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "ent",
@@ -104,6 +112,7 @@
     "fa": "چاقی و درمان چاقی",
     "en": "Obesity and Obesity Treatment",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "endo"
@@ -116,6 +125,7 @@
     "fa": "رینوسینوزیت مزمن",
     "en": "Chronic Rhinosinusitis",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "ent"
@@ -128,6 +138,7 @@
     "fa": "آترزی مری کودکان",
     "en": "Esophageal Atresia in Children",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "peds",
@@ -141,6 +152,7 @@
     "fa": "چاقی کودکان",
     "en": "Childhood Obesity",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "peds",
@@ -154,6 +166,7 @@
     "fa": "دیابت نوع ۱ کودکان",
     "en": "Type 1 Diabetes in Children",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "peds",
@@ -167,6 +180,7 @@
     "fa": "سرطان کودکان",
     "en": "Childhood Cancer",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "peds",
@@ -180,6 +194,7 @@
     "fa": "بیماران سرطانی بیمارستان امید",
     "en": "Cancer Patients at Omid Hospital",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "onc"
@@ -192,6 +207,7 @@
     "fa": "فیبروز کیستیک",
     "en": "Cystic Fibrosis",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "peds"
@@ -204,6 +220,7 @@
     "fa": "اختلالات متابولیک مادرزادی کودکان",
     "en": "Inborn Metabolic Disorders in Children",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "peds",
@@ -217,6 +234,7 @@
     "fa": "نقص ایمنی اولیه",
     "en": "Primary Immunodeficiency",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "immun"
@@ -229,6 +247,7 @@
     "fa": "عفونت‌های قارچی مهاجم (موکور)",
     "en": "Invasive Fungal Infections (Mucormycosis)",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "immun"
@@ -241,6 +260,7 @@
     "fa": "سرطان کولورکتال",
     "en": "Colorectal Cancer",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "onc",
@@ -254,6 +274,7 @@
     "fa": "کاهش شنوایی حسی عصبی ناگهانی (سادن)",
     "en": "Sudden Sensorineural Hearing Loss (SSNHL)",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "ent"
@@ -266,6 +287,7 @@
     "fa": "معاینه چشمی نوزادان زودرس (ROP)",
     "en": "Eye Examination of Premature Infants (ROP)",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "eye",
@@ -279,6 +301,7 @@
     "fa": "پاتوژن‌های فرصت‌طلب در بیماران نقص ایمنی",
     "en": "Opportunistic Pathogens in Immunocompromised Patients",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "immun"
@@ -291,6 +314,7 @@
     "fa": "اندومتریوز",
     "en": "Endometriosis",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "gyn"
@@ -303,6 +327,7 @@
     "fa": "بیوبانک RNA از بافت قرنیه",
     "en": "RNA Biobank from Corneal Tissue",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "eye"
@@ -315,6 +340,7 @@
     "fa": "پیوند کبد",
     "en": "Liver Transplantation",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "gi"
@@ -327,6 +353,7 @@
     "fa": "سرطان اندومتر",
     "en": "Endometrial Cancer",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "gyn",
@@ -340,6 +367,7 @@
     "fa": "کیست هیداتید کبدی",
     "en": "Hepatic Hydatid Cyst",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "gi",
@@ -353,6 +381,7 @@
     "fa": "ماستیت گرانولوماتوز",
     "en": "Granulomatous Mastitis",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "gyn"
@@ -365,6 +394,7 @@
     "fa": "مرگ مغزی",
     "en": "Brain Death",
     "country": "IR",
+    "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
       "neuro-icu"
