@@ -120,6 +120,14 @@ test("callback exchanges code with PKCE and creates a signed HttpOnly session on
   assert.equal(session.login, "erfan8km");
 });
 
+test("login fails closed when the one-time OAuth state store binding is missing", async () => {
+  const { OAUTH_STATE_STORE, ...withoutStateStore } = env;
+  const response = await handleAuthRequest(new Request(ORIGIN + "/auth/login"), withoutStateStore);
+  assert.equal(response.status, 503);
+  assert.match(await response.text(), /replay protection is unavailable/);
+  assert.equal(response.headers.get("location"), null);
+});
+
 test("callback rejects a state mismatch without making a network request", async () => {
   const started = await beginLogin();
   const callbackUrl = new URL(ORIGIN + "/auth/callback");
