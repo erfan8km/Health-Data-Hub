@@ -1,6 +1,6 @@
 # RegistryHub Admin API
 
-This folder contains an experimental, separate Cloudflare Worker for the admin UI and proposal API. It is isolated from the public catalogue Worker. It must not be deployed with a GitHub write credential until the authentication implementation is reviewed and the runtime configuration is tested. See [SETUP.md](./SETUP.md) for the planned callback URL, configuration checklist, rate limits, and deployment gate.
+This folder contains an experimental, separate Cloudflare Worker for the admin UI and proposal API. It is isolated from the public catalogue Worker. It must not be deployed with a GitHub write credential until the authentication implementation is reviewed and the runtime configuration is tested. See [SETUP.md](./SETUP.md) for the planned callback URL, configuration checklist, rate limits, and deployment gate. Before creating a write token, the repository administrator must apply and verify the active [main branch ruleset](./REPOSITORY-PROTECTION.md).
 
 ## Authentication design
 
@@ -12,7 +12,7 @@ The experimental branch replaces the Cloudflare Access dependency with GitHub OA
 - `POST /auth/logout` clears the session cookie and requires the exact configured Origin.
 - `POST /api/proposals` requires a valid signed session, the exact configured Origin, JSON, a bounded request body, and server-side catalogue validation.
 
-The OAuth token is used only to read the GitHub identity during sign-in. It is not stored or returned to the browser, and the login flow requests no repository permissions. Catalogue writes use a separate server-side `GITHUB_TOKEN` secret. The API creates a branch and a reviewable Pull Request only; it never merges or deploys.
+The OAuth token is used only to read the GitHub identity during sign-in. It is not stored or returned to the browser, and the login flow requests no repository permissions. Catalogue writes use a separate server-side `GITHUB_TOKEN` secret. The API's write allowlist permits exactly three write operations: create an `admin/registry-update-xxxxxxxx` branch from `main`, write only `artifacts/iedr/public/data/registries.json` to that branch, and open a PR from that branch to `main`. All other write methods/paths are rejected before any GitHub API request. The API never merges or deploys.
 
 ## Required configuration
 
@@ -45,7 +45,7 @@ The application requests no OAuth scopes; the OAuth token is used only to retrie
 - Keep the admin Worker separate from the public catalogue Worker. Do not alter the public Worker, main branch, domain, or active Cloudflare configuration as part of this prototype.
 - Verify `ADMIN_ORIGIN` and the OAuth callback URI match exactly and use HTTPS.
 - Use a strong, independently generated `SESSION_SIGNING_SECRET`; never use the OAuth client secret for session signing.
-- Configure a separate least-privilege `GITHUB_TOKEN` secret. Confirm current GitHub endpoint permissions before granting any write access.
+- Configure a separate least-privilege `GITHUB_TOKEN` secret only after the active `main` ruleset is in place; see [REPOSITORY-PROTECTION.md](./REPOSITORY-PROTECTION.md). Confirm current GitHub endpoint permissions before granting any write access.
 - Test OAuth state mismatch/expiry, PKCE, token-exchange errors, unauthorized user IDs, session signature tampering/expiry, logout, origin mismatch, oversized bodies, malformed payloads, and proposal creation behavior.
 - Run `pnpm test:admin-api`, `pnpm validate`, `pnpm typecheck`, `pnpm test`, and `pnpm build`.
 - Verify the configured rate-limiting bindings and add monitoring/abuse-response and token rotation/revocation procedures before deployment.
