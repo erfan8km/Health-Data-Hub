@@ -185,6 +185,40 @@ export async function handleRequest(request, env) {
     if (env.ASSETS && typeof env.ASSETS.fetch === "function") return serveAdminAssets(request, env);
     return json({ error: "not found" }, 404);
   }
+  if (url.pathname === "/api/catalogue") {
+    if (request.method !== "GET") return json({ error: "method not allowed" }, 405);
+    const session = await readAdminSession(request, env);
+    if (!session) return json({ error: "authentication required" }, 401);
+    const configuredRepo = String(env.GITHUB_REPOSITORY || "erfan8km/Health-Data-Hub");
+    if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(configuredRepo) ||
+        typeof env.GITHUB_TOKEN !== "string" || !env.GITHUB_TOKEN ||
+        /^replace[_ -]?/i.test(env.GITHUB_TOKEN) || !env.ADMIN_ORIGIN) {
+      return json({ error: "admin API is not configured" }, 503);
+    }
+    const origin = request.headers.get("origin") || "";
+    const expectedOrigin = String(env.ADMIN_ORIGIN || "").replace(/\/$/, "");
+    if (origin && origin !== expectedOrigin) return json({ error: "origin not allowed" }, 403);
+    const limited = await checkRateLimit(env, "PROPOSAL_RATE_LIMITER", "catalogue:" + session.id);
+    if (limited) return limited;
+    try {
+      const [registries, categories, countries] = await Promise.all([
+        readDataFile(env, configuredRepo, "registries.json"),
+        readDataFile(env, configuredRepo, "categories.json"),
+        readDataFile(env, configuredRepo, "countries.json"),
+      ]);
+      return json({
+        ok: true,
+        source: "main",
+        loadedAt: new Date().toISOString(),
+        registries: registries.data,
+        categories: categories.data,
+        countries: countries.data,
+      });
+    } catch {
+      return json({ error: "could not load current catalogue; check admin API configuration and GitHub read permissions" }, 502);
+    }
+  }
+
   if (url.pathname !== "/api/proposals") return json({ error: "not found" }, 404);
 
   const expectedOrigin = String(env.ADMIN_ORIGIN || "").replace(/\/$/, "");
