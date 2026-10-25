@@ -1,4 +1,4 @@
-name: Deploy GitHub Pages
+name: GitHub Pages deployment disabled (Cloudflare only)
 
 on:
   push:
@@ -7,40 +7,10 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: github-pages
-  cancel-in-progress: true
 
 jobs:
-  build:
+  disabled:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.26.1
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: pnpm
-      - uses: actions/configure-pages@v5
-      - run: pnpm install --no-frozen-lockfile
-      - run: pnpm run build
-        env:
-          SITE_URL: https://erfan8km.github.io/Health-Data-Hub/
-          VITE_CESIUM_ION_TOKEN: ${{ secrets.CESIUM_ION_TOKEN }}
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Explain deployment target
+        run: echo "GitHub Pages deployment is intentionally disabled. Production hosting is Cloudflare only."

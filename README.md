@@ -1,6 +1,6 @@
-# Iran Epidemiology Data Repository (IEDR)
+# RegistryHub
 
-IEDR is a static, bilingual Persian/English catalogue of Iranian medical and clinical registry metadata. The prototype introduces an interactive CesiumJS globe, an Iran-focused fly-in, clinical categories, registry lists, and individual registry profiles. It does not host individual-level health data and has no API server or database.
+RegistryHub is a static, bilingual Persian/English catalogue of medical and clinical registry metadata. It does not host individual-level health data.
 
 ## Run locally
 
@@ -11,54 +11,47 @@ pnpm install --no-frozen-lockfile
 pnpm dev
 ```
 
-Check data and build the static site:
+Check data, tests, and build:
 
 ```sh
 pnpm validate
 pnpm typecheck
 pnpm test
+pnpm test:admin-api
 SITE_URL=https://example.com/ pnpm run build
 ```
 
-The production output is written to the repository-root `dist/` directory. The `SITE_URL` build variable is used only for canonical metadata and the sitemap; it is not a secret.
+The production output is written to the repository-root `dist/` directory. `SITE_URL` is a build variable used for canonical metadata and the sitemap; it is not a secret.
 
 ## Data files
 
-All prototype data is in `artifacts/iedr/public/data/`:
+All catalogue data is in `artifacts/iedr/public/data/`:
 
-- `categories.json` — the 11 clinical categories in the prototype.
-- `registries.json` — the 30 initial registries, including their category IDs, country and city.
+- `categories.json` — clinical categories.
+- `registries.json` — registry metadata.
 - `countries.json` — active countries and camera coordinates.
-- `borders.geojson` — the initial Iran boundary subset, used for the glowing interactive outline.
+- `borders.geojson` — country boundary geometry used by the globe.
 
-Adding a registry or category means adding a JSON row and using existing category IDs. A registry may belong to multiple categories. Unknown descriptions and official URLs are intentionally empty; the UI hides the official university-link button until an HTTPS URL is supplied. The initial boundary file contains Iran only; adding another active country later also requires adding its boundary geometry.
+Registry rows use the current schema in `artifacts/iedr/src/App.tsx`. Keep category and country IDs consistent with their companion JSON files. Empty descriptions and official URLs are allowed where information is not verified; supplied official URLs must use HTTPS.
 
 ## Satellite imagery / Cesium ion
 
-The Cesium ion token is optional. When configured, the viewer requests ion imagery asset 2. Without a token, the viewer attempts public Esri World Imagery tiles. Public tile services may be blocked, rate-limited, or unavailable in some networks; the rest of the catalogue is designed to remain accessible if imagery fails.
+The Cesium ion token is optional. If used, `VITE_CESIUM_ION_TOKEN` is included in browser code and is **not a secret**. Restrict it to the intended website domains and do not commit a personal token. Public imagery services may be unavailable or rate-limited in some networks.
 
-For a local token, copy `artifacts/iedr/.env.example` to `artifacts/iedr/.env.local` and set `VITE_CESIUM_ION_TOKEN`. The `VITE_` prefix means the token is delivered to the browser: it is not a secret. Create/restrict it in Cesium ion to the exact website domains that should use it. Do not commit a personal token.
+## Production hosting: Cloudflare only
 
-## Deploy
+The production catalogue is deployed to Cloudflare Workers using the root `wrangler.jsonc`, which serves the root `dist/` folder as static assets.
 
-### Cloudflare Workers (current project configuration)
+- Build: `pnpm install --no-frozen-lockfile && pnpm run build`
+- Deploy: `npx wrangler deploy`
+- Build variable `SITE_URL`: set it to the actual production origin, currently `https://health-data-hub.erfan8km.workers.dev/`.
+- Optional build variable `VITE_CESIUM_ION_TOKEN`: public in the browser; domain-restrict it in Cesium ion.
 
-The repository has a root `wrangler.jsonc` that serves the root `dist/` folder as static assets.
+GitHub is used for source control, CI, and reviewed changes; **GitHub Pages is not a production hosting target**. The GitHub Pages deployment workflow has been removed in this proposal. The Cloudflare deployment workflow runs on pushes to `main`; review and merge remain the release gate.
 
-- Build command: `pnpm install --no-frozen-lockfile && pnpm run build`
-- Deploy command: `npx wrangler deploy`
-- Set `SITE_URL` in the **build** variables to the actual production origin, for example `https://health-data-hub.erfan8km.workers.dev/`.
-- Optionally set `VITE_CESIUM_ION_TOKEN` as a build variable (public in the browser; domain-restrict it in ion).
+## Admin prototype and API
 
-### Cloudflare Pages
+The local editor is in `admin-prototype/`; the separate Cloudflare Worker API scaffold is in `admin-api/`. The API validates submissions and opens a pull request against `main`; it does not merge or deploy.
 
-- Project root: `/` (repository root).
-- Build command: `pnpm install --no-frozen-lockfile && pnpm run build`.
-- Output directory: `dist`.
-- Set `SITE_URL` to the actual Pages/custom domain URL in the build environment.
+**Do not deploy the admin API until Cloudflare Access is configured and tested** for the entire admin Worker, the single administrator identity is configured, and `GITHUB_TOKEN` is stored as a Worker secret with minimal repository permissions. See `admin-api/README.md`. No Cloudflare resources or secrets are configured by this source change.
 
-### GitHub Pages
-
-The workflow at `.github/workflows/deploy-github-pages.yml` publishes the `dist/` folder on pushes to `main`. Enable GitHub Pages for the repository with **GitHub Actions** as the publishing source. The workflow sets the site base to `https://erfan8km.github.io/Health-Data-Hub/`; adjust it if the repository owner or name changes. Optionally add the `CESIUM_ION_TOKEN` repository secret. The no-token Esri fallback is attempted when that secret is not provided.
-
-Hash routes (`#/categories`, `#/category/gyn`, `#/registry/endometriosis`) are used so category and registry navigation works on static hosting and beneath a GitHub Pages repository path.
