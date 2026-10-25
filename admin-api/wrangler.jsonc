@@ -13,6 +13,20 @@
       "/health"
     ]
   },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "OAUTH_STATE_STORE",
+        "class_name": "OAuthStateStore"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["OAuthStateStore"]
+    }
+  ],
   "vars": {
     "GITHUB_REPOSITORY": "erfan8km/Health-Data-Hub",
     "ADMIN_ORIGIN": "https://registryhub-admin-api.erfan8km.workers.dev",
