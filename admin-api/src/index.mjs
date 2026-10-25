@@ -51,7 +51,49 @@ async function serveAdminAssets(request, env) {
   return new Response(asset.body, { status: asset.status, statusText: asset.statusText, headers });
 }
 
+export function isAllowedGithubWrite(repo, path, method, bodyText) {
+  const verb = String(method || "GET").toUpperCase();
+  if (verb === "GET" || verb === "HEAD") return true;
+  let body;
+  try {
+    body = JSON.parse(bodyText || "");
+  } catch {
+    return false;
+  }
+  if (!body || typeof body !== "object" || Array.isArray(body)) return false;
+
+  const branchPattern = /^admin\/registry-update-[0-9a-f]{8}$/;
+  const objectShaPattern = /^[0-9a-f]{40}$/;
+
+  if (verb === "POST" && path === "/repos/" + repo + "/git/refs") {
+    return typeof body.ref === "string" &&
+      /^refs\/heads\/admin\/registry-update-[0-9a-f]{8}$/.test(body.ref) &&
+      typeof body.sha === "string" && objectShaPattern.test(body.sha);
+  }
+
+  if (verb === "PUT" && path === "/repos/" + repo + "/contents/" + DATA_PATH + "/registries.json") {
+    return typeof body.branch === "string" && branchPattern.test(body.branch) &&
+      typeof body.sha === "string" && objectShaPattern.test(body.sha) &&
+      body.message === "Propose registry catalogue update via RegistryHub admin" &&
+      typeof body.content === "string" && body.content.length > 0;
+  }
+
+  if (verb === "POST" && path === "/repos/" + repo + "/pulls") {
+    return typeof body.head === "string" && branchPattern.test(body.head) &&
+      body.base === "main" &&
+      body.title === "Registry catalogue update" &&
+      typeof body.body === "string" && body.body.includes("must be reviewed and merged manually");
+  }
+
+  return false;
+}
+
 async function githubRequest(env, path, options = {}) {
+  const method = String(options.method || "GET").toUpperCase();
+  const repo = String(env.GITHUB_REPOSITORY || "erfan8km/Health-Data-Hub");
+  if (!isAllowedGithubWrite(repo, path, method, options.body || "")) {
+    throw new Error("GitHub write blocked by RegistryHub path and branch allowlist");
+  }
   const response = await fetch("https://api.github.com" + path, {
     ...options,
     headers: {
