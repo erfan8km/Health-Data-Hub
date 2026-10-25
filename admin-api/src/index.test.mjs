@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { handleRequest, isAllowedGithubWrite, readBodyLimited } from "./index.mjs";
 import { handleAuthRequest } from "./auth.mjs";
+import { createOAuthStateStoreBinding } from "./test-support.mjs";
 
 const ORIGIN = "https://admin.example.test";
 const env = {
@@ -10,6 +11,7 @@ const env = {
   GITHUB_OAUTH_CLIENT_ID: "oauth-client-id",
   GITHUB_OAUTH_CLIENT_SECRET: "oauth-client-secret-long-enough",
   SESSION_SIGNING_SECRET: "s".repeat(64),
+  OAUTH_STATE_STORE: createOAuthStateStoreBinding(),
   AUTH_RATE_LIMITER: { limit: async () => ({ success: true }) },
   PROPOSAL_RATE_LIMITER: { limit: async () => ({ success: true }) },
   GITHUB_TOKEN: "fake-test-only-token",
@@ -98,6 +100,15 @@ test("health endpoint reports service status without exposing configuration", as
   const response = await handleRequest(new Request(ORIGIN + "/health"), env);
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), { ok: true, service: "registryhub-admin-api" });
+});
+
+test("proposal endpoint rejects a missing Origin header", async () => {
+  const response = await handleRequest(new Request(ORIGIN + "/api/proposals", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ registries: [] }),
+  }), env);
+  assert.equal(response.status, 403);
 });
 
 test("proposal endpoint rejects requests without the exact configured origin", async () => {
