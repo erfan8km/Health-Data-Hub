@@ -60,7 +60,7 @@ async function rateLimitStatus(env, bindingName, key) {
   }
 }
 
-async function checkRateLimit(request, env, bindingName, key) {
+export async function checkRateLimit(request, env, bindingName, key) {
   const status = await rateLimitStatus(env, bindingName, key);
   if (status === "ok") return null;
   if (status === "limited") {
@@ -162,8 +162,10 @@ function originFromEnv(env) {
 function configReady(env) {
   return Boolean(
     originFromEnv(env) &&
-    typeof env.GITHUB_OAUTH_CLIENT_ID === "string" && env.GITHUB_OAUTH_CLIENT_ID.length > 0 &&
-    typeof env.GITHUB_OAUTH_CLIENT_SECRET === "string" && env.GITHUB_OAUTH_CLIENT_SECRET.length > 0 &&
+    typeof env.GITHUB_OAUTH_CLIENT_ID === "string" && env.GITHUB_OAUTH_CLIENT_ID.length >= 10 &&
+    !/^replace[_ -]?/i.test(env.GITHUB_OAUTH_CLIENT_ID) &&
+    typeof env.GITHUB_OAUTH_CLIENT_SECRET === "string" && env.GITHUB_OAUTH_CLIENT_SECRET.length >= 20 &&
+    !/^replace[_ -]?/i.test(env.GITHUB_OAUTH_CLIENT_SECRET) &&
     validSecret(env.SESSION_SIGNING_SECRET) &&
     typeof env.ADMIN_GITHUB_USER_ID === "string" && /^\d{1,20}$/.test(env.ADMIN_GITHUB_USER_ID),
   );
