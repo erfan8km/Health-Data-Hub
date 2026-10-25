@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import Globe from "globe.gl";
 import { buildBorderPaths, isIran, labelPoint } from "../lib/globe-geo.js";
 
-type View = "globe" | "categories" | "category" | "registry";
+type View = "globe" | "provinces" | "categories" | "category" | "registry";
 type Props = { view: View; onArrival: () => void; onSelectIran: () => void };
 
 const BASE = import.meta.env.BASE_URL || "./";
@@ -250,7 +250,7 @@ export default function GlobeScene({ view, onArrival, onSelectIran }: Props) {
         const point = labelPoint(iran);
         if (point) globe.htmlElementsData([point]);
         setSceneReady(true);
-        if (viewRef.current === "categories") flyToIran();
+        if (viewRef.current === "categories" || viewRef.current === "provinces") flyToIran();
       } catch {
         if (alive) setGlobeError(true);
       }
@@ -293,7 +293,7 @@ export default function GlobeScene({ view, onArrival, onSelectIran }: Props) {
   useEffect(() => {
     const globe = globeRef.current;
     if (!globe || !sceneReady) return;
-    if (view === "categories") {
+    if (view === "provinces" || view === "categories") {
       globe.controls().autoRotate = false;
       globe.pointOfView({ ...IRAN_VIEW, altitude: 1.45 }, 2300);
       const timer = window.setTimeout(() => {
@@ -308,7 +308,7 @@ export default function GlobeScene({ view, onArrival, onSelectIran }: Props) {
   }, [view, sceneReady]);
 
   return (
-    <div className={"globe-stage" + ((view === "globe" || view === "categories") ? " globe-stage-visible" : "")} aria-hidden={view === "category" || view === "registry"}>
+    <div className={"globe-stage" + ((view === "globe" || view === "provinces" || view === "categories") ? " globe-stage-visible" : "")} aria-hidden={view === "category" || view === "registry"}>
       <div className="cesium-host" ref={hostRef} />
 
       {(!sceneReady || globeError) && view === "globe" && (
