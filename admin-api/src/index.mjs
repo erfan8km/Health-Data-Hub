@@ -1,5 +1,5 @@
 import { validateRegistryPayload } from "./validate.mjs";
-import { handleAuthRequest, readAdminSession } from "./auth.mjs";
+import { checkRateLimit, handleAuthRequest, readAdminSession } from "./auth.mjs";
 
 const API_VERSION = "2022-11-28";
 const DATA_PATH = "artifacts/iedr/public/data";
@@ -163,9 +163,13 @@ export async function handleRequest(request, env) {
 
   const session = await readAdminSession(request, env);
   if (!session) return json({ error: "authentication required" }, 401, expectedOrigin);
-  if (!env.GITHUB_TOKEN || !env.GITHUB_REPOSITORY || !env.ADMIN_ORIGIN) {
+  if (typeof env.GITHUB_TOKEN !== "string" || !env.GITHUB_TOKEN ||
+      /^replace[_ -]?/i.test(env.GITHUB_TOKEN) ||
+      !env.GITHUB_REPOSITORY || !env.ADMIN_ORIGIN) {
     return json({ error: "admin API is not configured" }, 503, expectedOrigin);
   }
+  const limited = await checkRateLimit(request, env, "PROPOSAL_RATE_LIMITER", "admin:" + session.id);
+  if (limited) return limited;
   let payload;
   try {
     payload = JSON.parse(await readBodyLimited(request, MAX_BODY_BYTES));
