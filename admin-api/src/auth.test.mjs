@@ -215,3 +215,34 @@ test("placeholder OAuth configuration fails closed", async () => {
   });
   assert.equal(response.status, 503);
 });
+
+
+test("callback rate limit clears the temporary state cookie without exchanging the code", async () => {
+  const started = await beginLogin();
+  const callbackUrl = new URL(ORIGIN + "/auth/callback");
+  callbackUrl.searchParams.set("code", "test-code");
+  callbackUrl.searchParams.set("state", started.location.searchParams.get("state"));
+  const limitedEnv = { ...env, AUTH_RATE_LIMITER: { limit: async () => ({ success: false }) } };
+  const originalFetch = globalThis.fetch;
+  let called = false;
+  globalThis.fetch = async () => { called = true; throw new Error("must not fetch"); };
+  try {
+    const response = await handleAuthRequest(new Request(callbackUrl, {
+      headers: { cookie: cookiePair(started.stateCookie), "cf-connecting-ip": "192.0.2.10" },
+    }), limitedEnv);
+    assert.equal(response.status, 429);
+    assert.equal(response.headers.get("retry-after"), "60");
+    assert.match(setCookieFor(response, "__Host-rh_oauth"), /Max-Age=0/);
+    assert.equal(called, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("placeholder session signing secret fails closed", async () => {
+  const response = await handleAuthRequest(new Request(ORIGIN + "/auth/login"), {
+    ...env,
+    SESSION_SIGNING_SECRET: "REPLACE_WITH_A_REAL_RANDOM_VALUE_THAT_IS_LONG_ENOUGH",
+  });
+  assert.equal(response.status, 503);
+});
