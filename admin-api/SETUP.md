@@ -37,7 +37,7 @@ The configured numeric GitHub user ID is `323634447`, corresponding to the repos
 
 ## 4. Required runtime values
 
-**Gate:** do not create the fine-grained `GITHUB_TOKEN` until the active `main` ruleset is configured and verified. The repository rulesets endpoint was empty when checked on 2026-10-25, and the connected integration cannot inspect legacy branch protection.
+**Gate:** do not create the fine-grained `GITHUB_TOKEN` yet. The active `main` ruleset (`25821290`) is verified, but its saved `required_approving_review_count` is `0`. Manually change **Required approvals** to `1` in [the ruleset settings](https://github.com/erfan8km/Health-Data-Hub/rules/25821290), save, and verify the value again. A separate trusted reviewer is needed; do not add a bypass actor to get around the rule. The connected integration cannot write ruleset settings.
 
 These non-secret values are in `admin-api/wrangler.jsonc`:
 
