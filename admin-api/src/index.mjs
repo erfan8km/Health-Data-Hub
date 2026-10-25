@@ -1,4 +1,5 @@
 import { validateRegistryPayload } from "./validate.mjs";
+import { handleAuthRequest, readAdminSession } from "./auth.mjs";
 
 const API_VERSION = "2022-11-28";
 const DATA_PATH = "artifacts/iedr/public/data";
@@ -37,43 +38,6 @@ function json(data, status = 200, origin = "") {
     headers["vary"] = "Origin";
   }
   return new Response(JSON.stringify(data), { status, headers });
-}
-
-function b64urlToBytes(value) {
-  const padded = value.replace(/-/g, "+").replace(/_/g, "/") + "=".repeat((4 - value.length % 4) % 4);
-  return Uint8Array.from(atob(padded), (c) => c.charCodeAt(0));
-}
-
-function decodePart(value) {
-  return JSON.parse(new TextDecoder().decode(b64urlToBytes(value)));
-}
-
-async function verifyAccessJwt(token, env) {
-  const parts = token.split(".");
-  if (parts.length !== 3) throw new Error("invalid access token");
-  const header = decodePart(parts[0]);
-  const claims = decodePart(parts[1]);
-  if (header.alg !== "RS256" || typeof header.kid !== "string") throw new Error("invalid access token algorithm");
-  const team = String(env.CF_ACCESS_TEAM_DOMAIN || "").replace(/^https?:\/\//, "").replace(/\/$/, "");
-  if (!team || !env.CF_ACCESS_AUD) throw new Error("Access configuration missing");
-  const issuer = "https://" + team;
-  if (claims.iss !== issuer) throw new Error("invalid issuer");
-  const aud = Array.isArray(claims.aud) ? claims.aud : [claims.aud];
-  if (!aud.includes(env.CF_ACCESS_AUD)) throw new Error("invalid audience");
-  const now = Math.floor(Date.now() / 1000);
-  if (!Number.isFinite(claims.exp) || claims.exp <= now || (claims.nbf !== undefined && (!Number.isFinite(claims.nbf) || claims.nbf > now))) throw new Error("invalid token time claims");
-  if (typeof claims.email !== "string" || claims.email.toLowerCase() !== String(env.ADMIN_EMAIL || "").toLowerCase()) {
-    throw new Error("administrator not allowed");
-  }
-  const jwksResponse = await fetch(issuer + "/cdn-cgi/access/certs", { headers: { accept: "application/json" } });
-  if (!jwksResponse.ok) throw new Error("could not verify access token");
-  const jwks = await jwksResponse.json();
-  const jwk = jwks.keys?.find((key) => key.kid === header.kid && key.kty === "RSA");
-  if (!jwk) throw new Error("unknown access signing key");
-  const publicKey = await crypto.subtle.importKey("jwk", jwk, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["verify"]);
-  const valid = await crypto.subtle.verify("RSASSA-PKCS1-v1_5", publicKey, b64urlToBytes(parts[2]), new TextEncoder().encode(parts[0] + "." + parts[1]));
-  if (!valid) throw new Error("invalid access signature");
-  return claims;
 }
 
 async function githubRequest(env, path, options = {}) {
@@ -156,6 +120,8 @@ async function createProposal(env, registries, email) {
 }
 
 export async function handleRequest(request, env) {
+  const authResponse = await handleAuthRequest(request, env);
+  if (authResponse) return authResponse;
   const url = new URL(request.url);
   if (url.pathname === "/health") {
     if (request.method === "GET") return json({ ok: true, service: "registryhub-admin-api" });
@@ -184,15 +150,9 @@ export async function handleRequest(request, env) {
   const length = Number(request.headers.get("content-length") || 0);
   if (length > MAX_BODY_BYTES) return json({ error: "request too large" }, 413, expectedOrigin);
 
-  const token = request.headers.get("cf-access-jwt-assertion");
-  if (!token) return json({ error: "authentication required through Cloudflare Access" }, 401, expectedOrigin);
-  let claims;
-  try {
-    claims = await verifyAccessJwt(token, env);
-  } catch {
-    return json({ error: "authentication failed" }, 401, expectedOrigin);
-  }
-  if (!env.GITHUB_TOKEN || !env.CF_ACCESS_TEAM_DOMAIN || !env.CF_ACCESS_AUD || !env.ADMIN_EMAIL || !env.ADMIN_ORIGIN) {
+  const session = await readAdminSession(request, env);
+  if (!session) return json({ error: "authentication required" }, 401, expectedOrigin);
+  if (!env.GITHUB_TOKEN || !env.GITHUB_REPOSITORY || !env.ADMIN_ORIGIN) {
     return json({ error: "admin API is not configured" }, 503, expectedOrigin);
   }
   let payload;
@@ -204,7 +164,7 @@ export async function handleRequest(request, env) {
   }
   if (!payload || !Array.isArray(payload.registries)) return json({ error: "body must contain a registries array" }, 400, expectedOrigin);
   try {
-    const result = await createProposal(env, payload.registries, claims.email);
+    const result = await createProposal(env, payload.registries, session.login);
     if (result.validation) return json({ error: "validation failed", details: result.validation.errors }, 422, expectedOrigin);
     return json({ ok: true, ...result }, 201, expectedOrigin);
   } catch {
