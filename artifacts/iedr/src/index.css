@@ -22,3 +22,38 @@
 .iran-globe-name strong{font-size:12px;font-weight:700}
 .iran-globe-name small{font-family:Arial,sans-serif;font-size:9px;letter-spacing:.12em;color:#a4d7d7}
 @media(max-width:640px){.iran-globe-anchor{gap:6px;padding:6px 8px}.iran-globe-name strong{font-size:11px}.iran-globe-name small{font-size:8px}}
+
+
+/* Province selection layer */
+.province-overlay{position:fixed;inset:85px clamp(16px,3vw,42px) 20px;z-index:8;display:flex;justify-content:flex-start;align-items:stretch;visibility:hidden;opacity:0;pointer-events:none;transition:opacity .65s ease,visibility .65s ease}
+.province-overlay-visible{visibility:visible;opacity:1;pointer-events:auto}
+.provinces-panel{width:min(785px,60vw);max-height:100%;overflow:auto;padding:clamp(19px,2vw,29px);border:1px solid rgb(190 220 239 / 15%);border-radius:16px;color:#f1f7fd;background:linear-gradient(140deg,rgb(6 16 30 / 94%),rgb(6 14 26 / 90%));box-shadow:0 24px 110px rgb(0 0 0 / 34%);backdrop-filter:blur(24px);scrollbar-width:thin;scrollbar-color:#344b5b transparent}
+.province-map-content{display:grid;gap:12px}
+.province-map-frame{position:relative;display:grid;place-items:center;min-height:260px;overflow:hidden;border:1px solid rgb(196 222 241 / 13%);border-radius:12px;background:radial-gradient(ellipse at 50% 44%,rgb(43 105 122 / 18%),rgb(4 13 25 / 32%) 72%)}
+.province-map-svg{display:block;width:100%;height:auto;max-height:410px;min-height:260px}
+.province-map-shape{vector-effect:non-scaling-stroke;transition:fill .2s ease,stroke .2s ease,fill-opacity .2s ease}
+.province-map-shape-active{stroke-width:2.4px;filter:drop-shadow(0 0 7px rgb(81 217 195 / 30%));outline:none}
+.province-map-shape-active:hover,.province-map-shape-active:focus{fill:#8df8e5;stroke:#e0fff8;stroke-width:3.2px;outline:none}
+.province-map-raster-wrap{position:relative;display:grid;place-items:center;width:100%;min-height:260px;background:#132431}
+.province-map-raster{display:block;width:100%;height:auto;max-height:410px;object-fit:contain}
+.province-map-loading,.province-map-error{display:flex;align-items:center;justify-content:center;gap:10px;min-height:250px;padding:22px;color:#9eb5c7;font-size:12px;text-align:center}
+.province-map-fallback-note{position:absolute;right:8px;bottom:7px;margin:0;padding:5px 8px;border:1px solid #e8eaf0;border-radius:6px;color:#526779;background:rgb(255 255 255 / 90%);font-size:9px}
+.province-map-key{display:flex;flex-wrap:wrap;align-items:center;gap:12px;color:#8da8b9;font-size:10px}
+.province-map-key span{display:inline-flex;align-items:center;gap:7px}
+.province-key-active,.province-key-inactive{display:inline-block;width:9px;height:9px;border-radius:3px}
+.province-key-active{background:#51d9c3;box-shadow:0 0 12px rgb(81 217 195 / 40%)}
+.province-key-inactive{border:1px solid #557282;background:#17394a}
+.province-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.province-choice{display:flex;align-items:center;gap:9px;min-width:0;padding:10px 11px;border:1px solid rgb(196 222 241 / 13%);border-radius:9px;color:#cbdbe5;background:rgb(255 255 255 / 3%);font-size:11px;text-align:right;transition:border-color .2s,background .2s}
+.province-choice span:nth-child(2){flex:1;min-width:0}
+.province-choice:disabled{cursor:not-allowed;opacity:.62}
+.province-choice-active{border-color:rgb(110 240 213 / 60%);color:#e8fff9;background:rgb(110 240 213 / 8%)}
+.province-choice-active:hover{border-color:#9dfff0;background:rgb(110 240 213 / 14%)}
+.province-choice-dot{flex:0 0 auto;width:7px;height:7px;border-radius:50%;background:#4a6270}
+.province-choice-active .province-choice-dot{background:#6ef0d5;box-shadow:0 0 11px rgb(110 240 213 / 70%)}
+.province-choice strong{padding:3px 6px;border:1px solid rgb(110 240 213 / 24%);border-radius:5px;color:#6ef0d5;font:700 8px Inter,system-ui,sans-serif;letter-spacing:.05em}
+.province-choice small{color:#738c9b;font-size:9px}
+.province-map-attribution{margin:0;color:#6c8799;font-size:9px;line-height:1.7}
+.province-map-attribution a{color:#9db8c8;text-decoration:underline;text-underline-offset:2px}
+@media(max-width:850px){.province-overlay{inset:78px 12px 12px}.provinces-panel{width:100%;padding:16px}.province-map-svg{max-height:340px}.province-map-raster{max-height:340px}.province-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.province-overlay{inset:74px 8px 8px}.provinces-panel{padding:12px;border-radius:12px}.province-map-frame,.province-map-raster-wrap{min-height:210px}.province-map-svg{min-height:210px;max-height:280px}.province-map-raster{max-height:280px}.province-choice{padding:9px 8px;font-size:10px}.province-map-key{font-size:9px}.province-map-attribution{font-size:8px}}
