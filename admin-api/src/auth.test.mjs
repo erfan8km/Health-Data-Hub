@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { handleAuthRequest, readAdminSession } from "./auth.mjs";
+import { createOAuthStateStoreBinding } from "./test-support.mjs";
 
 const ORIGIN = "https://admin.example.test";
 const env = {
@@ -9,6 +10,7 @@ const env = {
   GITHUB_OAUTH_CLIENT_ID: "oauth-client-id",
   GITHUB_OAUTH_CLIENT_SECRET: "oauth-client-secret-long-enough",
   SESSION_SIGNING_SECRET: "s".repeat(64),
+  OAUTH_STATE_STORE: createOAuthStateStoreBinding(),
   AUTH_RATE_LIMITER: { limit: async () => ({ success: true }) },
   PROPOSAL_RATE_LIMITER: { limit: async () => ({ success: true }) },
 };
@@ -132,6 +134,59 @@ test("callback rejects a state mismatch without making a network request", async
     }), env);
     assert.equal(response.status, 400);
     assert.equal(called, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("callback rejects reuse of a previously consumed OAuth state even when the state cookie is replayed", async () => {
+  const { response, started } = await completeLogin();
+  assert.equal(response.status, 303);
+
+  const replayUrl = new URL(ORIGIN + "/auth/callback");
+  replayUrl.searchParams.set("code", "second-test-code");
+  replayUrl.searchParams.set("state", started.location.searchParams.get("state"));
+  const originalFetch = globalThis.fetch;
+  let called = false;
+  globalThis.fetch = async () => {
+    called = true;
+    throw new Error("GitHub token exchange must not run for a consumed state");
+  };
+  try {
+    const replay = await handleAuthRequest(new Request(replayUrl, {
+      headers: { cookie: cookiePair(started.stateCookie) },
+    }), env);
+    assert.equal(replay.status, 400);
+    assert.match(await replay.text(), /already been used/);
+    assert.equal(called, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("callback fails closed if GitHub rejects the PKCE verifier during token exchange", async () => {
+  const started = await beginLogin();
+  const callbackUrl = new URL(ORIGIN + "/auth/callback");
+  callbackUrl.searchParams.set("code", "test-code");
+  callbackUrl.searchParams.set("state", started.location.searchParams.get("state"));
+  const originalFetch = globalThis.fetch;
+  let userEndpointCalled = false;
+  globalThis.fetch = async (input) => {
+    if (String(input) === "https://github.com/login/oauth/access_token") {
+      return new Response(JSON.stringify({ error: "incorrect_verification_code" }), {
+        status: 400,
+        headers: { "content-type": "application/json" },
+      });
+    }
+    if (String(input) === "https://api.github.com/user") userEndpointCalled = true;
+    throw new Error("Unexpected request");
+  };
+  try {
+    const response = await handleAuthRequest(new Request(callbackUrl, {
+      headers: { cookie: cookiePair(started.stateCookie) },
+    }), env);
+    assert.equal(response.status, 502);
+    assert.equal(userEndpointCalled, false);
   } finally {
     globalThis.fetch = originalFetch;
   }
