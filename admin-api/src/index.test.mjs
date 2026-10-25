@@ -1,65 +1,78 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { handleRequest, readBodyLimited } from "./index.mjs";
+import { handleRequest, isAllowedGithubWrite, readBodyLimited } from "./index.mjs";
+import { handleAuthRequest } from "./auth.mjs";
 
-const env = { ADMIN_ORIGIN: "https://admin.example.test" };
+const ORIGIN = "https://admin.example.test";
+const env = {
+  ADMIN_ORIGIN: ORIGIN,
+  ADMIN_GITHUB_USER_ID: "123456",
+  GITHUB_OAUTH_CLIENT_ID: "oauth-client-id",
+  GITHUB_OAUTH_CLIENT_SECRET: "oauth-client-secret-long-enough",
+  SESSION_SIGNING_SECRET: "s".repeat(64),
+  AUTH_RATE_LIMITER: { limit: async () => ({ success: true }) },
+  PROPOSAL_RATE_LIMITER: { limit: async () => ({ success: true }) },
+  GITHUB_TOKEN: "fake-test-only-token",
+  GITHUB_REPOSITORY: "example/repository",
+};
 
-function jwtWithClaims(claims) {
-  const encode = (value) => Buffer.from(JSON.stringify(value)).toString("base64url");
-  return [encode({ alg: "RS256", kid: "test-key" }), encode(claims), "invalid-signature"].join(".");
+function setCookies(response) {
+  if (typeof response.headers.getSetCookie === "function") return response.headers.getSetCookie();
+  const value = response.headers.get("set-cookie");
+  return value ? value.split(/, (?=__Host-rh_)/) : [];
 }
 
-test("proposal endpoint accepts a valid signed Access JWT and proceeds to the GitHub API", async () => {
-  const keyPair = await crypto.subtle.generateKey(
-    { name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" },
-    true,
-    ["sign", "verify"],
-  );
-  const publicJwk = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
-  publicJwk.kid = "valid-test-key";
-  const encode = (value) => Buffer.from(JSON.stringify(value)).toString("base64url");
-  const encodedHeader = encode({ alg: "RS256", kid: "valid-test-key" });
-  const encodedClaims = encode({
-    iss: "https://team.example.cloudflareaccess.com",
-    aud: ["test-audience"],
-    exp: Math.floor(Date.now() / 1000) + 300,
-    nbf: Math.floor(Date.now() / 1000) - 5,
-    email: "admin@example.test",
-  });
-  const signingInput = encodedHeader + "." + encodedClaims;
-  const signature = await crypto.subtle.sign(
-    "RSASSA-PKCS1-v1_5",
-    keyPair.privateKey,
-    new TextEncoder().encode(signingInput),
-  );
-  const token = signingInput + "." + Buffer.from(signature).toString("base64url");
+function setCookieFor(response, name) {
+  return setCookies(response).find((value) => value.startsWith(name + "=")) || "";
+}
+
+function cookiePair(header) {
+  return header.split(";")[0];
+}
+
+async function createSessionCookie() {
+  const login = await handleAuthRequest(new Request(ORIGIN + "/auth/login"), env);
+  const stateCookie = setCookieFor(login, "__Host-rh_oauth");
+  const state = new URL(login.headers.get("location")).searchParams.get("state");
+  const callbackUrl = new URL(ORIGIN + "/auth/callback");
+  callbackUrl.searchParams.set("code", "test-code");
+  callbackUrl.searchParams.set("state", state);
   const originalFetch = globalThis.fetch;
-  globalThis.fetch = async (url) => {
-    if (String(url).endsWith("/cdn-cgi/access/certs")) {
-      return new Response(JSON.stringify({ keys: [publicJwk] }), {
-        status: 200,
-        headers: { "content-type": "application/json" },
-      });
+  globalThis.fetch = async (input) => {
+    const url = String(input);
+    if (url === "https://github.com/login/oauth/access_token") {
+      return new Response(JSON.stringify({ access_token: "temporary-test-token", token_type: "bearer" }), { status: 200 });
     }
-    return new Response(JSON.stringify({ message: "deliberate test denial" }), { status: 403 });
+    if (url === "https://api.github.com/user") {
+      return new Response(JSON.stringify({ id: 123456, login: "erfan8km" }), { status: 200 });
+    }
+    throw new Error("Unexpected URL: " + url);
   };
   try {
-    const response = await handleRequest(new Request("https://api.example.test/api/proposals", {
+    const callback = await handleAuthRequest(new Request(callbackUrl, {
+      headers: { cookie: cookiePair(stateCookie) },
+    }), env);
+    assert.equal(callback.status, 303);
+    return cookiePair(setCookieFor(callback, "__Host-rh_session"));
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+}
+
+test("valid signed admin session reaches the GitHub proposal operation without Cloudflare Access", async () => {
+  const session = await createSessionCookie();
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({ message: "deliberate test denial" }), { status: 403 });
+  try {
+    const response = await handleRequest(new Request(ORIGIN + "/api/proposals", {
       method: "POST",
       headers: {
         "content-type": "application/json",
-        origin: "https://admin.example.test",
-        "cf-access-jwt-assertion": token,
+        origin: ORIGIN,
+        cookie: session,
       },
       body: JSON.stringify({ registries: [] }),
-    }), {
-      ...env,
-      ADMIN_EMAIL: "admin@example.test",
-      CF_ACCESS_TEAM_DOMAIN: "team.example.cloudflareaccess.com",
-      CF_ACCESS_AUD: "test-audience",
-      GITHUB_TOKEN: "test-only-not-a-real-token",
-      GITHUB_REPOSITORY: "example/repository",
-    });
+    }), env);
     assert.equal(response.status, 502);
     assert.match((await response.json()).error, /could not create proposal/);
   } finally {
@@ -67,40 +80,28 @@ test("proposal endpoint accepts a valid signed Access JWT and proceeds to the Gi
   }
 });
 
-test("proposal endpoint rejects malformed nbf time claims before fetching signing keys", async () => {
-  const token = jwtWithClaims({
-    iss: "https://team.example.cloudflareaccess.com",
-    aud: ["test-audience"],
-    exp: Math.floor(Date.now() / 1000) + 300,
-    nbf: "not-a-number",
-    email: "admin@example.test",
-  });
-  const response = await handleRequest(new Request("https://api.example.test/api/proposals", {
+test("proposal endpoint rejects missing sessions even if an Access-looking header is supplied", async () => {
+  const response = await handleRequest(new Request(ORIGIN + "/api/proposals", {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      origin: "https://admin.example.test",
-      "cf-access-jwt-assertion": token,
+      origin: ORIGIN,
+      "cf-access-jwt-assertion": "not-used",
     },
     body: JSON.stringify({ registries: [] }),
-  }), {
-    ...env,
-    ADMIN_EMAIL: "admin@example.test",
-    CF_ACCESS_TEAM_DOMAIN: "team.example.cloudflareaccess.com",
-    CF_ACCESS_AUD: "test-audience",
-  });
+  }), env);
   assert.equal(response.status, 401);
-  assert.match((await response.json()).error, /authentication failed/);
+  assert.match((await response.json()).error, /authentication required/);
 });
 
 test("health endpoint reports service status without exposing configuration", async () => {
-  const response = await handleRequest(new Request("https://api.example.test/health"), env);
+  const response = await handleRequest(new Request(ORIGIN + "/health"), env);
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), { ok: true, service: "registryhub-admin-api" });
 });
 
-test("proposal endpoint rejects requests without an allowed origin", async () => {
-  const response = await handleRequest(new Request("https://api.example.test/api/proposals", {
+test("proposal endpoint rejects requests without the exact configured origin", async () => {
+  const response = await handleRequest(new Request(ORIGIN + "/api/proposals", {
     method: "POST",
     headers: { "content-type": "application/json", origin: "https://attacker.example" },
     body: JSON.stringify({ registries: [] }),
@@ -108,20 +109,10 @@ test("proposal endpoint rejects requests without an allowed origin", async () =>
   assert.equal(response.status, 403);
 });
 
-test("proposal endpoint requires Cloudflare Access authentication", async () => {
-  const response = await handleRequest(new Request("https://api.example.test/api/proposals", {
-    method: "POST",
-    headers: { "content-type": "application/json", origin: "https://admin.example.test" },
-    body: JSON.stringify({ registries: [] }),
-  }), env);
-  assert.equal(response.status, 401);
-  assert.match((await response.json()).error, /authentication required/);
-});
-
 test("proposal endpoint rejects unsupported methods", async () => {
-  const response = await handleRequest(new Request("https://api.example.test/api/proposals", {
+  const response = await handleRequest(new Request(ORIGIN + "/api/proposals", {
     method: "GET",
-    headers: { origin: "https://admin.example.test" },
+    headers: { origin: ORIGIN },
   }), env);
   assert.equal(response.status, 405);
 });
@@ -136,18 +127,17 @@ test("serves the admin UI through the same-origin static assets binding", async 
       }),
     },
   };
-  const response = await handleRequest(new Request("https://admin.example.test/"), envWithAssets);
+  const response = await handleRequest(new Request(ORIGIN + "/"), envWithAssets);
   assert.equal(response.status, 200);
   assert.equal(await response.text(), "admin-ui");
 });
 
 test("returns 404 for unknown API routes and 405 for non-GET health requests", async () => {
-  const unknown = await handleRequest(new Request("https://admin.example.test/api/unknown"), env);
+  const unknown = await handleRequest(new Request(ORIGIN + "/api/unknown"), env);
   assert.equal(unknown.status, 404);
-  const health = await handleRequest(new Request("https://admin.example.test/health", { method: "POST" }), env);
+  const health = await handleRequest(new Request(ORIGIN + "/health", { method: "POST" }), env);
   assert.equal(health.status, 405);
 });
-
 
 test("bounded body reader stops oversized streamed requests without content-length", async () => {
   const body = new ReadableStream({
@@ -158,5 +148,139 @@ test("bounded body reader stops oversized streamed requests without content-leng
     },
   });
   const request = new Request("https://api.example.test/api/proposals", { method: "POST", body, duplex: "half" });
-  await assert.rejects(() => readBodyLimited(request, 100), (error) => error.status === 413 && /request too large/.test(error.message));
+  await assert.rejects(() => readBodyLimited(request, 100), (error) =>
+    error.status === 413 && /request too large/.test(error.message));
+});
+
+
+test("proposal rate limit blocks repeat submissions for the authenticated administrator", async () => {
+  const session = await createSessionCookie();
+  const originalFetch = globalThis.fetch;
+  let githubCalled = false;
+  globalThis.fetch = async () => {
+    githubCalled = true;
+    throw new Error("GitHub must not be called after the limiter rejects the request");
+  };
+  try {
+    const response = await handleRequest(new Request(ORIGIN + "/api/proposals", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        origin: ORIGIN,
+        cookie: session,
+      },
+      body: JSON.stringify({ registries: [] }),
+    }), {
+      ...env,
+      PROPOSAL_RATE_LIMITER: { limit: async ({ key }) => {
+        assert.equal(key, "admin:123456");
+        return { success: false };
+      } },
+    });
+    assert.equal(response.status, 429);
+    assert.equal(response.headers.get("retry-after"), "60");
+    assert.equal(githubCalled, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("proposal API fails closed when rate limiting binding is missing", async () => {
+  const session = await createSessionCookie();
+  const { PROPOSAL_RATE_LIMITER, ...withoutLimiter } = env;
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => {
+    throw new Error("GitHub must not be called when rate limiting is unavailable");
+  };
+  try {
+    const response = await handleRequest(new Request(ORIGIN + "/api/proposals", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        origin: ORIGIN,
+        cookie: session,
+      },
+      body: JSON.stringify({ registries: [] }),
+    }), withoutLimiter);
+    assert.equal(response.status, 503);
+    assert.match(await response.text(), /protection is unavailable/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+
+const SHA = "a".repeat(40);
+const ADMIN_BRANCH = "admin/registry-update-a1b2c3d4";
+const REPO = "erfan8km/Health-Data-Hub";
+const REGISTRY_PATH = "/repos/" + REPO + "/contents/artifacts/iedr/public/data/registries.json";
+
+test("GitHub write allowlist permits only the canonical data file, proposal branch, and PR", () => {
+  const contentWrite = JSON.stringify({
+    message: "Propose registry catalogue update via RegistryHub admin",
+    content: "W10=",
+    sha: SHA,
+    branch: ADMIN_BRANCH,
+  });
+  assert.equal(isAllowedGithubWrite(REPO, REGISTRY_PATH, "PUT", contentWrite), true);
+
+  const branchCreate = JSON.stringify({ ref: "refs/heads/" + ADMIN_BRANCH, sha: SHA });
+  assert.equal(isAllowedGithubWrite(REPO, "/repos/" + REPO + "/git/refs", "POST", branchCreate), true);
+
+  const prCreate = JSON.stringify({
+    title: "Registry catalogue update",
+    head: ADMIN_BRANCH,
+    base: "main",
+    body: "This PR must be reviewed and merged manually; the API never merges or deploys.",
+  });
+  assert.equal(isAllowedGithubWrite(REPO, "/repos/" + REPO + "/pulls", "POST", prCreate), true);
+});
+
+test("GitHub write allowlist rejects direct main writes and unapproved repository paths", () => {
+  const directMain = JSON.stringify({
+    message: "Propose registry catalogue update via RegistryHub admin",
+    content: "W10=",
+    sha: SHA,
+    branch: "main",
+  });
+  assert.equal(isAllowedGithubWrite(REPO, REGISTRY_PATH, "PUT", directMain), false);
+
+  const codeFile = "/repos/" + REPO + "/contents/admin-api/src/index.mjs";
+  const codeWrite = JSON.stringify({
+    message: "Propose registry catalogue update via RegistryHub admin",
+    content: "Y29kZQ==",
+    sha: SHA,
+    branch: ADMIN_BRANCH,
+  });
+  assert.equal(isAllowedGithubWrite(REPO, codeFile, "PUT", codeWrite), false);
+
+  const workflowFile = "/repos/" + REPO + "/contents/.github/workflows/deploy-cloudflare-worker.yml";
+  assert.equal(isAllowedGithubWrite(REPO, workflowFile, "PUT", codeWrite), false);
+
+  const arbitraryEndpoint = "/repos/" + REPO + "/git/blobs";
+  assert.equal(isAllowedGithubWrite(REPO, arbitraryEndpoint, "POST", JSON.stringify({ content: "x", encoding: "utf-8" })), false);
+});
+
+test("GitHub write allowlist rejects unrelated branches, changed filenames, and PRs not based on main", () => {
+  const wrongBranch = JSON.stringify({
+    ref: "refs/heads/main",
+    sha: SHA,
+  });
+  assert.equal(isAllowedGithubWrite(REPO, "/repos/" + REPO + "/git/refs", "POST", wrongBranch), false);
+
+  const wrongFile = JSON.stringify({
+    message: "Propose registry catalogue update via RegistryHub admin",
+    content: "W10=",
+    sha: SHA,
+    branch: ADMIN_BRANCH,
+  });
+  assert.equal(isAllowedGithubWrite(REPO, "/repos/" + REPO + "/contents/artifacts/iedr/public/data/categories.json", "PUT", wrongFile), false);
+
+  const wrongBase = JSON.stringify({
+    title: "Registry catalogue update",
+    head: ADMIN_BRANCH,
+    base: "feat/admin-independent-auth",
+    body: "This PR must be reviewed and merged manually.",
+  });
+  assert.equal(isAllowedGithubWrite(REPO, "/repos/" + REPO + "/pulls", "POST", wrongBase), false);
 });

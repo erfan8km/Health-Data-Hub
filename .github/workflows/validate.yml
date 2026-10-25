@@ -26,6 +26,8 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm test:admin-api
+      - name: Validate admin Worker config and bundle (dry run)
+        run: npx --yes wrangler@4 deploy --config admin-api/wrangler.jsonc --dry-run
       - run: pnpm run build
         env:
           SITE_URL: https://example.invalid/
