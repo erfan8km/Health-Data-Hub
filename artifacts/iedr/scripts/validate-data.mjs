@@ -7,6 +7,7 @@ const read = (name) => JSON.parse(readFileSync(resolve(root, "public/data", name
 const registries = read("registries.json");
 const categories = read("categories.json");
 const countries = read("countries.json");
+const provinces = read("provinces.json");
 const borders = read("borders.geojson");
 const errors = [];
 
@@ -22,11 +23,21 @@ function uniqueIds(rows, key, label) {
 
 const categoryIds = uniqueIds(categories, "id", "categories");
 const countryIds = uniqueIds(countries, "id", "countries");
+const provinceIds = uniqueIds(provinces, "id", "provinces");
 uniqueIds(registries, "slug", "registries");
 
 for (const category of categories) {
   if (!category.fa?.trim() || !category.en?.trim()) errors.push(`category "${category.id}": fa and en titles are required`);
 }
+for (const province of provinces) {
+  if (!province.fa?.trim() || !province.en?.trim()) errors.push(`province "${province.id}": fa and en are required`);
+  if (typeof province.active !== "boolean") errors.push(`province "${province.id}": active must be boolean`);
+}
+if (provinces.length !== 31) errors.push(`provinces: expected 31 provinces, found ${provinces.length}`);
+if (provinces.filter((province) => province.active).length !== 1 || !provinces.some((province) => province.id === "razavi-khorasan" && province.active)) {
+  errors.push("provinces: Razavi Khorasan must be the only active province for this release");
+}
+
 for (const country of countries) {
   if (!country.iso3?.trim() || !country.fa?.trim() || !country.en?.trim()) errors.push(`country "${country.id}": iso3, fa and en are required`);
   const coordinates = country.coordinates;
@@ -37,6 +48,7 @@ for (const country of countries) {
 for (const registry of registries) {
   if (!registry.fa?.trim() || !registry.en?.trim()) errors.push(`registry "${registry.slug}": fa and en titles are required`);
   if (!countryIds.has(registry.country)) errors.push(`registry "${registry.slug}": unknown country "${registry.country}"`);
+  if (!provinceIds.has(registry.province)) errors.push(`registry "${registry.slug}": unknown province "${registry.province}"`);
   if (typeof registry.city !== "string" || !registry.city.trim()) errors.push(`registry "${registry.slug}": city must be provided`);
   if (!Array.isArray(registry.categories) || registry.categories.length === 0) {
     errors.push(`registry "${registry.slug}": at least one category is required`);
@@ -64,6 +76,7 @@ for (const country of countries) {
 }
 if (registries.length === 0) errors.push("registries: at least one entry is required");
 if (categories.length === 0) errors.push("categories: at least one entry is required");
+if (provinces.length === 0) errors.push("provinces: at least one entry is required");
 
 if (errors.length) {
   console.error(`Catalogue validation failed (${errors.length} issue${errors.length === 1 ? "" : "s"}):`);
