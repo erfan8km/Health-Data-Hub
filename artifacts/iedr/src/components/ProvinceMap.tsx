@@ -87,12 +87,20 @@ function pathForGeometry(geometry: Geometry | undefined, project: (point: Positi
 function projectFeatures(features: Feature[]) {
   const positions = features.flatMap(featurePositions);
   if (!positions.length) return [];
-  const lngs = positions.map((point) => point[0]);
-  const lats = positions.map((point) => point[1]);
-  const minLng = Math.min(...lngs);
-  const maxLng = Math.max(...lngs);
-  const minLat = Math.min(...lats);
-  const maxLat = Math.max(...lats);
+  // Avoid spreading a large GeoJSON coordinate array into Math.min/Math.max.
+  // Detailed province boundaries can contain many tens of thousands of points,
+  // which can exceed the JavaScript engine's maximum function-argument count
+  // and crash the entire React view with a blank screen.
+  let minLng = Infinity;
+  let maxLng = -Infinity;
+  let minLat = Infinity;
+  let maxLat = -Infinity;
+  for (const [lng, lat] of positions) {
+    if (lng < minLng) minLng = lng;
+    if (lng > maxLng) maxLng = lng;
+    if (lat < minLat) minLat = lat;
+    if (lat > maxLat) maxLat = lat;
+  }
   const scale = Math.min(
     (MAP_WIDTH - MAP_PADDING * 2) / Math.max(maxLng - minLng, 0.001),
     (MAP_HEIGHT - MAP_PADDING * 2) / Math.max(maxLat - minLat, 0.001),
