@@ -1,6 +1,6 @@
 # RegistryHub Admin API
 
-This folder contains an experimental, separate Cloudflare Worker for the admin UI and proposal API. It is isolated from the public catalogue Worker. It must not be deployed with a GitHub write credential until the authentication implementation is reviewed and the runtime configuration is tested.
+This folder contains an experimental, separate Cloudflare Worker for the admin UI and proposal API. It is isolated from the public catalogue Worker. It must not be deployed with a GitHub write credential until the authentication implementation is reviewed and the runtime configuration is tested. See [SETUP.md](./SETUP.md) for the planned callback URL, configuration checklist, rate limits, and deployment gate.
 
 ## Authentication design
 
@@ -48,7 +48,7 @@ The application requests no OAuth scopes; the OAuth token is used only to retrie
 - Configure a separate least-privilege `GITHUB_TOKEN` secret. Confirm current GitHub endpoint permissions before granting any write access.
 - Test OAuth state mismatch/expiry, PKCE, token-exchange errors, unauthorized user IDs, session signature tampering/expiry, logout, origin mismatch, oversized bodies, malformed payloads, and proposal creation behavior.
 - Run `pnpm test:admin-api`, `pnpm validate`, `pnpm typecheck`, `pnpm test`, and `pnpm build`.
-- Add rate limiting/abuse controls and document the token rotation/revocation procedure before deployment.
+- Verify the configured rate-limiting bindings and add monitoring/abuse-response and token rotation/revocation procedures before deployment.
 - Confirm security headers, runtime compatibility, and successful tests in CI.
 - A Pull Request is not a deployment. The API must not be deployed until the user explicitly approves after review and has configured all required variables and secrets.
 
@@ -57,6 +57,6 @@ The application requests no OAuth scopes; the OAuth token is used only to retrie
 - Authentication code is an experimental implementation in a feature branch; it has not been live-tested against a registered OAuth App.
 - No OAuth App has been registered by this change, no secrets have been created or stored, and no Worker has been deployed.
 - The admin UI files may be delivered as static assets, but all write operations remain server-side protected by session validation. UI hiding is only a user-experience measure, not a security boundary.
-- The current Worker configuration uses `workers_dev: true`; the hostname may be accessible publicly, so session validation is mandatory and production hardening is still required.
+- The current Worker configuration uses `workers_dev: true` so the dedicated admin hostname can be served, but explicitly sets `preview_urls: false`. The ordinary workers.dev hostname may be public; session validation and exact-origin checks remain mandatory.
 - Session cookies are `Secure`, `HttpOnly`, `SameSite=Lax`, root-path `__Host-` cookies, expire after eight hours, and are signed with HMAC. Sessions are not stored server-side; rotating `SESSION_SIGNING_SECRET` invalidates them.
 - A PR is not a deployment. The API never merges the proposal or deploys the public catalogue.
