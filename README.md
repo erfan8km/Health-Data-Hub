@@ -27,11 +27,14 @@ The production output is written to the repository-root `dist/` directory. The `
 All prototype data is in `artifacts/iedr/public/data/`:
 
 - `categories.json` — the 11 clinical categories in the prototype.
-- `registries.json` — the 30 initial registries, including their category IDs, country and city.
+- `registries.json` — registry metadata, including country, province, city, and category IDs.
 - `countries.json` — active countries and camera coordinates.
+- `provinces.json` — bilingual province directory; only Razavi Khorasan is currently active.
 - `borders.geojson` — the initial Iran boundary subset, used for the glowing interactive outline.
 
-Adding a registry or category means adding a JSON row and using existing category IDs. A registry may belong to multiple categories. Unknown descriptions and official URLs are intentionally empty; the UI hides the official university-link button until an HTTPS URL is supplied. The initial boundary file contains Iran only; adding another active country later also requires adding its boundary geometry.
+After Iran is selected, the interface shows an Iran province map before clinical categories. Only active provinces can be selected. Province boundaries are loaded from an OpenStreetMap-derived GeoJSON dataset; an attributed Wikimedia Commons map is used as a visual fallback if the GeoJSON cannot be fetched. Credits and license links are displayed in the province selector.
+
+Adding a registry means assigning an existing country ID, province ID, and one or more existing category IDs. A registry may belong to multiple categories. To enable a province, update its `active` flag in `provinces.json` and ensure the catalogue data is valid. Unknown descriptions and official URLs are intentionally empty; the UI hides the official university-link button until an HTTPS URL is supplied. The initial boundary file contains Iran only; adding another active country later also requires adding its boundary geometry.
 
 ## Satellite imagery / Cesium ion
 
