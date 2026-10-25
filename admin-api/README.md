@@ -14,6 +14,10 @@ The experimental branch replaces the Cloudflare Access dependency with GitHub OA
 
 The OAuth token is used only to read the GitHub identity during sign-in. It is not stored or returned to the browser, and the login flow requests no repository permissions. Catalogue writes use a separate server-side `GITHUB_TOKEN` secret. The API's write allowlist permits exactly three write operations: create an `admin/registry-update-xxxxxxxx` branch from `main`, write only `artifacts/iedr/public/data/registries.json` to that branch, and open a PR from that branch to `main`. All other write methods/paths are rejected before any GitHub API request. The API never merges or deploys.
 
+## OAuth state replay protection
+
+The OAuth state is reserved and consumed by a SQLite-backed Durable Object so the same state cannot be consumed twice, including concurrent callbacks. The Durable Object is declared in `wrangler.jsonc`; its namespace will be provisioned only when the experimental Worker is deployed. Missing state-store binding fails closed. This code change does not deploy the Worker or create live Cloudflare resources.
+
 ## Required configuration
 
 Non-secret Worker variables:
