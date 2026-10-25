@@ -40,6 +40,17 @@ function json(data, status = 200, origin = "") {
   return new Response(JSON.stringify(data), { status, headers });
 }
 
+async function serveAdminAssets(request, env) {
+  const asset = await env.ASSETS.fetch(request);
+  const headers = new Headers(asset.headers);
+  headers.set("x-content-type-options", "nosniff");
+  headers.set("x-frame-options", "DENY");
+  headers.set("referrer-policy", "no-referrer");
+  headers.set("permissions-policy", "camera=(), microphone=(), geolocation=()");
+  headers.set("content-security-policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; object-src 'none'");
+  return new Response(asset.body, { status: asset.status, statusText: asset.statusText, headers });
+}
+
 async function githubRequest(env, path, options = {}) {
   const response = await fetch("https://api.github.com" + path, {
     ...options,
@@ -128,7 +139,7 @@ export async function handleRequest(request, env) {
     return json({ error: "method not allowed" }, 405);
   }
   if (!url.pathname.startsWith("/api/")) {
-    if (env.ASSETS && typeof env.ASSETS.fetch === "function") return env.ASSETS.fetch(request);
+    if (env.ASSETS && typeof env.ASSETS.fetch === "function") return serveAdminAssets(request, env);
     return json({ error: "not found" }, 404);
   }
   if (url.pathname !== "/api/proposals") return json({ error: "not found" }, 404);
