@@ -96,6 +96,60 @@ test("proposal endpoint rejects missing sessions even if an Access-looking heade
   assert.match((await response.json()).error, /authentication required/);
 });
 
+test("catalogue endpoint returns current main data to an authenticated administrator", async () => {
+  const session = await createSessionCookie();
+  const files = {
+    "registries.json": [{ slug: "example-registry", fa: "Example", en: "Example", country: "IR", city: "tehran", categories: ["gyn"], description: "", officialUrl: "" }],
+    "categories.json": [{ id: "gyn", en: "Gynaecology" }],
+    "countries.json": [{ id: "IR", en: "Iran" }],
+  };
+  const urls = [];
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (input) => {
+    const url = new URL(String(input));
+    urls.push(url.toString());
+    assert.equal(url.origin, "https://api.github.com");
+    assert.equal(url.searchParams.get("ref"), "main");
+    const filename = url.pathname.split("/").at(-1);
+    assert.ok(Object.hasOwn(files, filename), "only the three catalogue data files may be read");
+    return new Response(JSON.stringify({
+      sha: "a".repeat(40),
+      content: Buffer.from(JSON.stringify(files[filename]), "utf8").toString("base64"),
+    }), { status: 200 });
+  };
+  try {
+    const response = await handleRequest(new Request(ORIGIN + "/api/catalogue", {
+      headers: { cookie: session },
+    }), env);
+    assert.equal(response.status, 200);
+    const data = await response.json();
+    assert.equal(data.ok, true);
+    assert.equal(data.source, "main");
+    assert.deepEqual(data.registries, files["registries.json"]);
+    assert.deepEqual(data.categories, files["categories.json"]);
+    assert.deepEqual(data.countries, files["countries.json"]);
+    assert.equal(urls.length, 3);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("catalogue endpoint rejects anonymous requests before making GitHub calls", async () => {
+  const originalFetch = globalThis.fetch;
+  let githubCalled = false;
+  globalThis.fetch = async () => {
+    githubCalled = true;
+    throw new Error("GitHub must not be called for an anonymous catalogue request");
+  };
+  try {
+    const response = await handleRequest(new Request(ORIGIN + "/api/catalogue"), env);
+    assert.equal(response.status, 401);
+    assert.equal(githubCalled, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("health endpoint reports service status without exposing configuration", async () => {
   const response = await handleRequest(new Request(ORIGIN + "/health"), env);
   assert.equal(response.status, 200);
@@ -141,6 +195,20 @@ test("serves the admin UI through the same-origin static assets binding", async 
   const response = await handleRequest(new Request(ORIGIN + "/"), envWithAssets);
   assert.equal(response.status, 200);
   assert.equal(await response.text(), "admin-ui");
+});
+
+test("serves bundled admin HTML and security headers when static assets are unavailable", async () => {
+  const html = "<!doctype html><html lang=\"en\"><body>admin-ui</body></html>";
+  const envWithHtml = { ...env, ADMIN_HTML: html };
+  const response = await handleRequest(new Request(ORIGIN + "/"), envWithHtml);
+  assert.equal(response.status, 200);
+  assert.equal(await response.text(), html);
+  assert.equal(response.headers.get("content-type"), "text/html; charset=utf-8");
+  assert.equal(response.headers.get("x-frame-options"), "DENY");
+  assert.match(response.headers.get("content-security-policy") || "", /frame-ancestors 'none'/);
+
+  const missing = await handleRequest(new Request(ORIGIN + "/missing.css"), envWithHtml);
+  assert.equal(missing.status, 404);
 });
 
 test("returns 404 for unknown API routes and 405 for non-GET health requests", async () => {

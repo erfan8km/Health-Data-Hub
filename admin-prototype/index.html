@@ -1,38 +1,93 @@
 <!doctype html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>RegistryHub · Admin prototype</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>RegistryHub · پنل مدیریت</title>
 <style>
-:root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;color:#172033;background:#f4f7fb}*{box-sizing:border-box}body{margin:0}header{background:#111b32;color:#fff;padding:24px max(20px,calc((100% - 1100px)/2));display:flex;justify-content:space-between;align-items:center;gap:16px}header small{color:#b9c5dc}.wrap{max-width:1100px;margin:28px auto;padding:0 18px}.notice{border:1px solid #e8c978;background:#fff8e6;border-radius:12px;padding:14px 16px;margin-bottom:20px;line-height:1.5}.toolbar,.panel{background:white;border:1px solid #e1e7f0;border-radius:14px;padding:18px;margin-bottom:18px}.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px}.toolbar input[type=search]{flex:1;min-width:180px}input,select,textarea{font:inherit;border:1px solid #cbd5e1;border-radius:8px;padding:10px;width:100%;background:#fff;color:#172033}button,.filebtn{font:inherit;font-weight:650;border:0;border-radius:9px;padding:10px 14px;background:#243b68;color:#fff;cursor:pointer}button.secondary,.filebtn.secondary{background:#edf2fa;color:#203354}button.danger{background:#a12c38}.filebtn{display:inline-block}.filebtn input{display:none}.stats{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}.stat{background:#fff;border:1px solid #e1e7f0;padding:12px 16px;border-radius:12px;min-width:130px}.stat strong{display:block;font-size:22px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px;color:#40506b}.field.wide{grid-column:1/-1}.field textarea{min-height:90px;resize:vertical}.list{display:grid;gap:10px}.item{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #e2e8f0;border-radius:10px;padding:12px}.item p{margin:4px 0 0;color:#63718a;font-size:13px}.item button{flex-shrink:0}.muted{color:#63718a;font-size:13px}.status{margin:10px 0;color:#244f38;white-space:pre-wrap}.error{color:#a12c38}.hidden{display:none}@media(max-width:650px){header{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr}.field.wide{grid-column:auto}.item{align-items:flex-start;flex-direction:column}}
-</style></head>
+:root{font-family:Tahoma,"Segoe UI",Arial,sans-serif;color:#18243a;background:#f3f6fb;font-synthesis:none;text-rendering:optimizeLegibility;--ink:#18243a;--muted:#66758e;--line:#dfe6f0;--blue:#244a80;--navy:#111c32;--panel:#fff;--green:#21734d;--red:#a33242}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at top right,#eaf1fb 0,transparent 30rem),#f3f6fb;min-height:100vh}
+button,input,select,textarea{font:inherit}
+header{background:linear-gradient(115deg,#10192d,#203e6a);color:#fff;padding:20px max(20px,calc((100% - 1220px)/2));display:flex;justify-content:space-between;align-items:center;gap:20px;border-bottom:3px solid #6ea7ef}
+.brand{display:flex;align-items:center;gap:12px}.brand-mark{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:#dceafe;color:#16345c;font-size:20px;font-weight:900;box-shadow:inset 0 0 0 1px #fff8}.brand strong{font-size:20px;letter-spacing:.2px}.brand small{display:block;color:#bdcce0;margin-top:4px}
+.header-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.header-meta small{color:#c3d1e6}.header-pill{border:1px solid #ffffff38;background:#ffffff12;color:#fff;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700}
+.wrap{max-width:1220px;margin:30px auto;padding:0 22px}
+.page-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin:0 0 20px}.eyebrow{font-size:11px;letter-spacing:1.5px;color:#5c76a2;font-weight:800;margin:0 0 8px}.page-heading h1{font-size:clamp(25px,3vw,34px);letter-spacing:-.7px;margin:0 0 8px}.page-heading p{margin:0;line-height:1.8}.workflow-state{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;background:#fff;border:1px solid var(--line);color:#475a76;border-radius:999px;padding:9px 13px;font-size:12px;font-weight:700}.pulse{width:8px;height:8px;border-radius:50%;background:#d7a33a;box-shadow:0 0 0 4px #d7a33a22}
+.notice{display:flex;gap:13px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-inline-start:4px solid #d8a13a;border-radius:15px;padding:15px 17px;margin:0 0 18px;box-shadow:0 8px 24px #1a31520a}.notice-icon{flex:0 0 28px;height:28px;display:grid;place-items:center;border-radius:50%;background:#fff1d4;color:#80550b;font-weight:900}.notice strong{display:block;margin:1px 0 4px}.notice p{margin:0;color:#586983;font-size:13px;line-height:1.8}
+.auth-panel{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 16px;margin-bottom:18px;box-shadow:0 8px 24px #1a31520a}.auth-panel form{margin-inline-start:auto}.auth-dot{width:9px;height:9px;border-radius:50%;background:#93a3b9;box-shadow:0 0 0 4px #93a3b91c}.auth-panel #auth-status{font-size:13px;color:#4b5d78}
+.toolbar,.panel{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:19px;margin-bottom:18px;box-shadow:0 8px 24px #1a31520a}.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:14px}.toolbar-title{min-width:170px}.toolbar-title h2,.section-title h2{font-size:17px;margin:0 0 5px}.toolbar-title p,.section-title p{font-size:12px;color:var(--muted);margin:0;line-height:1.7}.toolbar-actions{display:flex;align-items:center;flex:1;flex-wrap:wrap;gap:9px;min-width:0}.toolbar input[type=search]{flex:1 1 210px;min-width:180px}
+input,select,textarea{border:1px solid #cdd7e5;border-radius:10px;padding:11px 12px;width:100%;background:#fff;color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s}input:focus,select:focus,textarea:focus{border-color:#6f96d2;box-shadow:0 0 0 3px #6f96d225}
+button,.filebtn{font:inherit;font-size:13px;font-weight:750;border:1px solid transparent;border-radius:10px;padding:10px 13px;background:var(--blue);color:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;text-decoration:none;white-space:nowrap;transition:transform .15s,background .15s;min-height:40px}
+button:hover,.filebtn:hover{transform:translateY(-1px);background:#1c3b69}button:disabled{opacity:.55;cursor:wait;transform:none}
+button.secondary,.filebtn.secondary{background:#f0f4fa;color:#2d4569;border-color:#dfe6f0}button.secondary:hover,.filebtn.secondary:hover{background:#e5edf8}
+button.danger{background:#fff1f2;color:#a33242;border-color:#f2d5d9}button.danger:hover{background:#ffe5e8}
+.filebtn{position:relative;overflow:hidden}.filebtn input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.data-source{display:flex;align-items:center;gap:8px;flex-basis:100%;font-size:12px;color:var(--muted);border-top:1px solid #edf1f6;padding-top:12px}.source-dot{width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:#9ca9bb}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:0 0 18px}.stat{position:relative;overflow:hidden;background:#fff;border:1px solid var(--line);padding:18px;border-radius:15px;box-shadow:0 8px 24px #1a31520a}.stat:after{content:"";position:absolute;inset-inline-end:0;top:0;bottom:0;width:3px;background:#8caddd}.stat-label{font-size:12px;color:var(--muted);margin-bottom:9px}.stat strong{display:block;font-size:27px;line-height:1.2;font-weight:800;color:#203d68}.stat .muted{display:block;margin-top:5px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field label{display:block;font-size:12px;font-weight:800;margin-bottom:7px;color:#435570}.field.wide{grid-column:1/-1}.field textarea{min-height:100px;resize:vertical}.field-hint{font-size:11px;color:#7b879a;margin-top:6px;line-height:1.7}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px}.section-title{min-width:0}.panel-note{font-size:11px;color:var(--muted);line-height:1.7}
+.list{display:grid;gap:10px}.item{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid #e2e8f1;border-radius:12px;padding:14px 15px;background:linear-gradient(115deg,#fff,#fbfcfe)}.item strong{display:block;font-size:14px;line-height:1.7}.item p{margin:4px 0 0;color:#6c7a90;font-size:12px;direction:ltr;text-align:right;overflow-wrap:anywhere}.item>div:last-child{display:flex;gap:7px;flex-shrink:0}
+.muted{color:var(--muted);font-size:12px;line-height:1.8}.status{margin:12px 0 0;padding:10px 12px;border-radius:9px;color:#245d41;background:#edf8f0;border:1px solid #d6eddd;white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;line-height:1.8;direction:auto;text-align:start}.status:empty{display:none}.status.error{color:#982a39;background:#fff1f2;border-color:#f2d5da}
+#editor h2{font-size:18px;margin:0 0 16px}.form-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:17px}.hidden{display:none!important}
+@media(max-width:760px){header{align-items:flex-start;flex-direction:column}.header-meta{width:100%;justify-content:space-between}.wrap{padding:0 13px;margin:18px auto}.page-heading{align-items:flex-start;flex-direction:column}.workflow-state{white-space:normal}.toolbar{padding:14px}.toolbar-actions{width:100%}.toolbar-actions>*{flex:1}.toolbar input[type=search]{flex-basis:100%}.stats{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.field.wide{grid-column:auto}.item{align-items:flex-start;flex-direction:column}.item>div:last-child{width:100%}.item button{flex:1}.panel{padding:15px}.panel-head{align-items:flex-start;flex-direction:column}.auth-panel form{margin-inline-start:0}}
+@media(max-width:420px){.stats{grid-template-columns:1fr}.header-meta small{font-size:10px}}
+</style>
+</head>
 <body>
-<header><div><strong>RegistryHub</strong><div><small>Registry catalogue · Admin prototype</small></div></div><small>Admin prototype · GitHub sign-in</small></header>
+<header>
+ <div class="brand"><span class="brand-mark">R</span><div><strong>RegistryHub</strong><small>سامانه مدیریت کاتالوگ رجیستری‌ها</small></div></div>
+ <div class="header-meta"><span class="header-pill">پنل مدیریت</span><small>Cloudflare Worker · GitHub review workflow</small></div>
+</header>
 <main class="wrap">
-<div class="notice"><strong>Admin safety notice</strong><br>Drafts autosave in this browser. Sign in with the authorized GitHub account before using the hosted admin tools. Proposals create a Pull Request for review; they do not merge or deploy. Never paste a GitHub token here.</div>
-<section id="auth-bar" class="toolbar" aria-live="polite"><span id="auth-status">Checking admin session…</span><a id="login-link" class="filebtn hidden" href="/auth/login">Sign in with GitHub</a><form id="logout-form" class="hidden" action="/auth/logout" method="post"><button type="submit" class="secondary">Sign out</button></form></section>
-<div id="admin-area" class="hidden">
-<section class="toolbar">
-<label class="filebtn">Load registries.json<input id="file" type="file" accept=".json,application/json"></label><label class="filebtn secondary">Load categories.json<input id="categories-file" type="file" accept=".json,application/json"></label><label class="filebtn secondary">Load countries.json<input id="countries-file" type="file" accept=".json,application/json"></label>
-<input id="search" type="search" placeholder="Search by English/Persian name or slug" aria-label="Search registries">
-<button id="new">+ New registry</button>
-<button id="export" class="secondary">Export JSON</button>
-<button id="download-template" class="secondary">Download sample template</button>
-<button id="submit-proposal">Submit proposal (creates PR)</button>
-</section>
-<div class="stats"><div class="stat"><strong id="count">0</strong><span class="muted">Loaded registries</span></div><div class="stat"><strong id="valid">—</strong><span class="muted">Validation</span></div></div>
-<section class="panel hidden" id="editor"><h2 id="editor-title">Registry</h2><form id="form"><div class="grid">
-<div class="field"><label for="slug">Slug (unique)</label><input id="slug" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*"></div>
-<div class="field"><label for="country">Country ID</label><select id="country" required></select></div>
-<div class="field"><label for="en">English name</label><input id="en" required></div>
-<div class="field"><label for="fa">Persian name</label><input id="fa" required dir="rtl"></div>
-<div class="field"><label for="city">City ID</label><select id="city" required></select><input id="new-city" class="hidden" placeholder="New city ID, e.g. tehran" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" style="margin-top:8px"></div>
-<div class="field wide"><label>Categories (select one or more)</label><div id="category-options" class="grid"></div></div>
-<div class="field wide"><label for="description">Description (optional)</label><textarea id="description"></textarea></div>
-<div class="field wide"><label for="url">Official HTTPS URL (optional)</label><input id="url" type="url" placeholder="https://..."></div>
-</div><p class="muted">Matches validate-data.mjs: description and officialUrl must be strings but may be empty; non-empty URLs must be valid HTTPS. Slug is locked during editing because it forms the public detail URL. Load categories.json and countries.json for controlled choices.</p><div class="toolbar"><button type="submit">Save in this tab</button><button type="button" id="cancel" class="secondary">Cancel</button></div></form></section>
-<section class="panel"><h2>Registry records</h2><p class="muted">Load your current <code>registries.json</code> to inspect or edit a copy. This prototype does not fetch repository data automatically. Existing blank descriptions and official URLs are permitted by the current repository validator.</p><div id="list" class="list"><p class="muted">No data loaded yet.</p></div><p id="message" class="status" role="status"></p></section>
-</div>
+ <section class="page-heading">
+  <div><p class="eyebrow">REGISTRY CATALOGUE</p><h1>مدیریت رجیستری‌ها</h1><p class="muted">مشاهده، افزودن و ویرایش رکوردها؛ تغییرات نهایی پس از بررسی انسانی ثبت می‌شوند.</p></div>
+  <span class="workflow-state"><span class="pulse"></span> انتشار مستقیم غیرفعال است</span>
+ </section>
+ <div class="notice"><span class="notice-icon">i</span><div><strong>گردش کار امن</strong><p>ارسال تغییرات فقط یک Pull Request ایجاد می‌کند؛ این پنل چیزی را ادغام یا منتشر نمی‌کند. هرگز توکن GitHub را در این صفحه وارد نکن.</p></div></div>
+ <section id="auth-bar" class="auth-panel" aria-live="polite"><span class="auth-dot"></span><span id="auth-status">در حال بررسی نشست مدیر…</span><a id="login-link" class="filebtn hidden" href="/auth/login">ورود با GitHub</a><form id="logout-form" class="hidden" action="/auth/logout" method="post"><button type="submit" class="secondary">خروج</button></form></section>
+ <div id="admin-area" class="hidden">
+  <section class="toolbar">
+   <div class="toolbar-title"><h2>داده‌های کاتالوگ</h2><p>بارگذاری خودکار از شاخهٔ main؛ در صورت نیاز می‌توان فایل محلی هم وارد کرد.</p></div>
+   <div class="toolbar-actions">
+    <button id="reload-catalogue" class="secondary" type="button">↻ بارگذاری از GitHub</button>
+    <label class="filebtn">واردکردن registries.json<input id="file" type="file" accept=".json,application/json"></label>
+    <label class="filebtn secondary">دسته‌بندی‌ها<input id="categories-file" type="file" accept=".json,application/json"></label>
+    <label class="filebtn secondary">کشورها<input id="countries-file" type="file" accept=".json,application/json"></label>
+    <input id="search" type="search" placeholder="جست‌وجو بر اساس نام، شهر یا slug…" aria-label="جست‌وجوی رجیستری‌ها">
+   </div>
+   <div class="data-source"><span class="source-dot"></span><span id="source-status">داده‌ها هنوز بارگذاری نشده‌اند.</span></div>
+  </section>
+  <div class="stats">
+   <div class="stat"><div class="stat-label">تعداد رکوردها</div><strong id="count">0</strong><span class="muted">رکوردهای کاتالوگ</span></div>
+   <div class="stat"><div class="stat-label">وضعیت اعتبارسنجی</div><strong id="valid">—</strong><span class="muted">بررسی ساختار و شناسه‌ها</span></div>
+  </div>
+  <section class="panel hidden" id="editor">
+   <h2 id="editor-title">رکورد رجیستری</h2>
+   <form id="form">
+    <div class="grid">
+     <div class="field"><label for="slug">شناسهٔ یکتا (Slug)</label><input id="slug" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*"><div class="field-hint">حروف انگلیسی کوچک، عدد و خط تیره.</div></div>
+     <div class="field"><label for="country">شناسهٔ کشور</label><select id="country" required></select></div>
+     <div class="field"><label for="en">نام انگلیسی</label><input id="en" required dir="ltr"></div>
+     <div class="field"><label for="fa">نام فارسی</label><input id="fa" required dir="rtl"></div>
+     <div class="field"><label for="city">شناسهٔ شهر</label><select id="city" required></select><input id="new-city" class="hidden" placeholder="شناسهٔ شهر جدید، مثل tehran" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" style="margin-top:8px" dir="ltr"></div>
+     <div class="field wide"><label>دسته‌بندی‌ها (انتخاب یک یا چند مورد)</label><div id="category-options" class="grid"></div></div>
+     <div class="field wide"><label for="description">توضیحات (اختیاری)</label><textarea id="description"></textarea></div>
+     <div class="field wide"><label for="url">نشانی رسمی HTTPS (اختیاری)</label><input id="url" type="url" placeholder="https://…" dir="ltr"></div>
+    </div>
+    <p class="muted">در ویرایش رکورد موجود، slug قفل است چون بخشی از نشانی عمومی رجیستری محسوب می‌شود. برای دسته‌بندی و کشور از شناسه‌های موجود استفاده کن.</p>
+    <div class="form-actions"><button type="submit">ذخیره در پیش‌نویس</button><button type="button" id="cancel" class="secondary">انصراف</button></div>
+   </form>
+  </section>
+  <section class="panel">
+   <div class="panel-head"><div class="section-title"><h2>رکوردهای رجیستری</h2><p>ویرایش‌ها تا زمان ارسال، فقط در پیش‌نویس این مرورگر ذخیره می‌شوند.</p></div>
+    <div class="toolbar-actions"><button id="new" type="button">+ رجیستری جدید</button><button id="export" type="button" class="secondary">خروجی JSON</button><button id="download-template" type="button" class="secondary">دانلود قالب نمونه</button><button id="submit-proposal" type="button">ارسال برای بازبینی</button></div>
+   </div>
+   <div id="list" class="list"><p class="muted">هنوز داده‌ای بارگذاری نشده است.</p></div>
+   <p id="message" class="status" role="status" aria-live="polite"></p>
+  </section>
+ </div>
 </main>
 <script>const $=id=>document.getElementById(id);
 let records=[],editIndex=-1,categoriesData=[],countriesData=[],dirty=false;
@@ -40,7 +95,7 @@ const STORAGE_KEY='registryhub-admin-draft-v2';
 const fields=['slug','fa','en','country','city','description','url'];
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function canonicalCity(s){return String(s||'').trim().toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
-function persistDraft(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify({records,categoriesData,countriesData,dirty}));}catch(e){$('message').textContent='Could not save local draft: '+e.message;$('message').className='status error';}}
+function persistDraft(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify({records,categoriesData,countriesData,dirty}));}catch(e){$('message').textContent='ذخیرهٔ پیش‌نویس محلی ناموفق بود: '+e.message;$('message').className='status error';}}
 function markDirty(){dirty=true;persistDraft();}
 window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
 function loadSelect(id,rows,selected){const el=$(id),previous=selected??el.value;el.innerHTML=rows.map(x=>'<option value="'+esc(x.id)+'">'+esc(x.id)+' — '+esc(x.en||x.fa||x.id)+'</option>').join('');if(previous&&!rows.some(x=>x.id===previous)){const opt=document.createElement('option');opt.value=previous;opt.textContent=previous+' (not in loaded list)';el.append(opt);}if(previous)el.value=previous;if(!el.value&&rows.length)el.value=rows[0].id;}
@@ -48,14 +103,38 @@ function renderCategories(selected=[]){$('category-options').innerHTML=categorie
 function renderCities(selected='mashhad'){const vals=[...new Set(['mashhad',...records.map(r=>r.city).filter(Boolean)].map(canonicalCity))].filter(Boolean).sort();$('city').innerHTML=vals.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('')+'<option value="__new">+ Add new city ID…</option>';if(vals.includes(selected)){$('city').value=selected;$('new-city').classList.add('hidden');}else if(selected){$('city').value='__new';$('new-city').value=selected;$('new-city').classList.remove('hidden');}else{$('city').value=vals[0]||'__new';$('new-city').classList.toggle('hidden',$('city').value!=='__new');}}
 $('city').addEventListener('change',()=>{$('new-city').classList.toggle('hidden',$('city').value!=='__new');if($('city').value==='__new')$('new-city').focus();});
 function validate(){const errors=[],slugs=new Set(),countryIds=new Set(countriesData.map(x=>x.id)),categoryIds=new Set(categoriesData.map(x=>x.id));records.forEach((r,i)=>{if(typeof r.slug!=='string'||!r.slug.trim()||!r.fa?.trim()||!r.en?.trim())errors.push('Record '+(i+1)+': slug and bilingual names are required');if(r.slug){if(slugs.has(r.slug))errors.push('Duplicate slug: '+r.slug);slugs.add(r.slug);}if(!r.country||(countriesData.length&&!countryIds.has(r.country)))errors.push('Record '+(i+1)+': unknown country "'+r.country+'"');if(typeof r.city!=='string'||!r.city.trim())errors.push('Record '+(i+1)+': city is required');if(!Array.isArray(r.categories)||!r.categories.length)errors.push('Record '+(i+1)+': at least one category is required');else if(categoriesData.length)r.categories.forEach(id=>{if(!categoryIds.has(id))errors.push('Record '+(i+1)+': unknown category "'+id+'"');});if(typeof r.description!=='string')errors.push('Record '+(i+1)+': description must be a string');if(typeof r.officialUrl!=='string')errors.push('Record '+(i+1)+': officialUrl must be a string');if(r.officialUrl){try{if(new URL(r.officialUrl).protocol!=='https:')throw Error();}catch{errors.push('Record '+(i+1)+': officialUrl must be a valid HTTPS URL');}}});return errors;}
-function render(){const q=$('search').value.trim().toLowerCase(),filtered=records.map((r,i)=>({...r,__i:i})).filter(r=>[r.slug,r.fa,r.en,r.city,r.country].some(v=>String(v||'').toLowerCase().includes(q)));$('count').textContent=records.length;const errs=validate();$('valid').textContent=records.length?(errs.length?'Issues: '+errs.length:'Looks good'):'—';$('valid').style.color=errs.length?'#a12c38':'#244f38';$('list').innerHTML=filtered.length?filtered.map(r=>'<div class="item"><div><strong>'+esc(r.en)+' / '+esc(r.fa)+'</strong><p>'+esc(r.slug)+' · '+esc(r.city)+' · '+esc(r.country)+'</p></div><div><button class="secondary" data-edit="'+r.__i+'">Edit</button> <button class="danger" data-delete="'+r.__i+'">Delete</button></div></div>').join(''):'<p class="muted">No matching records.</p>';$('message').textContent=errs.slice(0,8).join('\n');$('message').className='status'+(errs.length?' error':'');}
+function render(){const q=$('search').value.trim().toLowerCase(),filtered=records.map((r,i)=>({...r,__i:i})).filter(r=>[r.slug,r.fa,r.en,r.city,r.country].some(v=>String(v||'').toLowerCase().includes(q)));$('count').textContent=records.length;const errs=validate();$('valid').textContent=records.length?(errs.length?'خطا: '+errs.length:'معتبر'):'—';$('valid').style.color=errs.length?'#a12c38':'#244f38';$('list').innerHTML=filtered.length?filtered.map(r=>'<div class="item"><div><strong>'+esc(r.en)+' / '+esc(r.fa)+'</strong><p>'+esc(r.slug)+' · '+esc(r.city)+' · '+esc(r.country)+'</p></div><div><button class="secondary" data-edit="'+r.__i+'">Edit</button> <button class="danger" data-delete="'+r.__i+'">Delete</button></div></div>').join(''):'<p class="muted">No matching records.</p>';$('message').textContent=errs.slice(0,8).join('\n');$('message').className='status'+(errs.length?' error':'');}
 function showEditor(index=-1){editIndex=index;$('editor').classList.remove('hidden');$('editor-title').textContent=index<0?'New registry':'Edit registry';const r=index<0?{slug:'',fa:'',en:'',country:countriesData[0]?.id||'IR',city:'mashhad',categories:[],description:'',officialUrl:''}:records[index];for(const f of fields){const key=f==='url'?'officialUrl':f;$(f).value=r[key]??'';}$('slug').disabled=index>=0;loadSelect('country',countriesData,r.country);renderCities(r.city||'mashhad');renderCategories(r.categories||[]);window.scrollTo({top:$('editor').offsetTop-10,behavior:'smooth'});}
 async function loadJsonFile(file,kind){try{const rows=JSON.parse(await file.text());if(!Array.isArray(rows))throw Error('Expected a JSON array.');if(kind==='registries'){if(dirty&&!confirm('Replace the current draft with this file?'))return;records=rows;}else if(kind==='categories'){if(rows.some(x=>typeof x.id!=='string'||!x.id))throw Error('Every category needs an id.');categoriesData=rows;renderCategories([...document.querySelectorAll('input[name="category"]:checked')].map(x=>x.value));}else{if(rows.some(x=>typeof x.id!=='string'||!x.id))throw Error('Every country needs an id.');countriesData=rows;loadSelect('country',countriesData,$('country').value);}markDirty();render();$('message').textContent='Loaded '+rows.length+' '+kind+' entries; local draft autosaved.';}catch(e){$('message').textContent='Could not load '+kind+': '+e.message;$('message').className='status error';}}
+async function loadCurrentCatalogue({force=false}={}){
+ if(location.protocol==='file:'){
+  $('source-status').textContent='پیش‌نمایش محلی؛ API در دسترس نیست.';
+  return;
+ }
+ if(force&&dirty&&records.length&&!confirm('بارگذاری از GitHub پیش‌نویس محلی فعلی را جایگزین می‌کند. ادامه می‌دهی؟'))return;
+ const button=$('reload-catalogue');button.disabled=true;
+ $('source-status').textContent='در حال دریافت اطلاعات از GitHub main…';
+ $('message').textContent='در حال بارگذاری کاتالوگ…';$('message').className='status';
+ try{
+  const response=await fetch('/api/catalogue',{credentials:'same-origin',cache:'no-store',headers:{accept:'application/json'}});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(data.error||('درخواست ناموفق بود ('+response.status+')'));
+  if(!Array.isArray(data.registries)||!Array.isArray(data.categories)||!Array.isArray(data.countries))throw new Error('ساختار دادهٔ دریافتی معتبر نیست.');
+  records=data.registries;categoriesData=data.categories;countriesData=data.countries;dirty=false;
+  loadSelect('country',countriesData,'IR');renderCategories();renderCities('mashhad');persistDraft();render();
+  $('source-status').textContent='منبع: GitHub · شاخهٔ main · '+new Date(data.loadedAt||Date.now()).toLocaleString('fa-IR');
+  $('message').textContent='کاتالوگ جاری با '+records.length+' رکورد بارگذاری شد. تغییرات بعدی تا زمان ارسال، فقط پیش‌نویس محلی هستند.';$('message').className='status';
+ }catch(error){
+  $('source-status').textContent=records.length?'اطلاعات محلی/پیش‌نویس در حال نمایش است.':'بارگذاری کاتالوگ ناموفق بود.';
+  $('message').textContent='بارگذاری از GitHub انجام نشد: '+error.message+'\nورود مدیر و پیکربندی API را بررسی کن.';$('message').className='status error';
+ }finally{button.disabled=false;}
+}
+$('reload-catalogue').addEventListener('click',()=>loadCurrentCatalogue({force:true}));
 $('file').addEventListener('change',e=>{if(e.target.files[0])loadJsonFile(e.target.files[0],'registries');});
 $('categories-file').addEventListener('change',e=>{if(e.target.files[0])loadJsonFile(e.target.files[0],'categories');});
 $('countries-file').addEventListener('change',e=>{if(e.target.files[0])loadJsonFile(e.target.files[0],'countries');});
 $('search').addEventListener('input',render);$('new').onclick=()=>showEditor();$('cancel').onclick=()=>{$('editor').classList.add('hidden');$('slug').disabled=false;};
-$('form').addEventListener('submit',e=>{e.preventDefault();const city=$('city').value==='__new'?canonicalCity($('new-city').value):canonicalCity($('city').value),selected=[...document.querySelectorAll('input[name="category"]:checked')].map(x=>x.value),r={slug:$('slug').value.trim(),fa:$('fa').value.trim(),en:$('en').value.trim(),country:$('country').value.trim(),city,categories:selected,description:$('description').value,officialUrl:$('url').value.trim()};if(!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(city)){alert('City ID must use lowercase English letters, numbers and hyphens, e.g. mashhad.');return;}if(!r.country){alert('Load countries.json and select a country.');return;}if(!r.categories.length){alert('Select at least one category.');return;}if(r.officialUrl){try{if(new URL(r.officialUrl).protocol!=='https:')throw Error();}catch{alert('Official URL must be a valid HTTPS URL, or left empty.');return;}}if(records.some((x,i)=>x.slug===r.slug&&i!==editIndex)){alert('Slug must be unique.');return;}if(editIndex<0)records.push(r);else records[editIndex]={...records[editIndex],...r};$('editor').classList.add('hidden');$('slug').disabled=false;markDirty();render();$('message').textContent='Saved to local draft. Export JSON for a portable copy.';});
+$('form').addEventListener('submit',e=>{e.preventDefault();const city=$('city').value==='__new'?canonicalCity($('new-city').value):canonicalCity($('city').value),selected=[...document.querySelectorAll('input[name="category"]:checked')].map(x=>x.value),r={slug:$('slug').value.trim(),fa:$('fa').value.trim(),en:$('en').value.trim(),country:$('country').value.trim(),city,categories:selected,description:$('description').value,officialUrl:$('url').value.trim()};if(!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(city)){alert('City ID must use lowercase English letters, numbers and hyphens, e.g. mashhad.');return;}if(!r.country){alert('Load countries.json and select a country.');return;}if(!r.categories.length){alert('Select at least one category.');return;}if(r.officialUrl){try{if(new URL(r.officialUrl).protocol!=='https:')throw Error();}catch{alert('Official URL must be a valid HTTPS URL, or left empty.');return;}}if(records.some((x,i)=>x.slug===r.slug&&i!==editIndex)){alert('Slug must be unique.');return;}if(editIndex<0)records.push(r);else records[editIndex]={...records[editIndex],...r};$('editor').classList.add('hidden');$('slug').disabled=false;markDirty();render();$('message').textContent='تغییرات در پیش‌نویس محلی ذخیره شد. برای دریافت فایل، خروجی JSON بگیر.';});
 $('list').addEventListener('click',e=>{const ed=e.target.closest('[data-edit]'),del=e.target.closest('[data-delete]');if(ed)showEditor(Number(ed.dataset.edit));if(del){const i=Number(del.dataset.delete);if(confirm('Delete '+(records[i]?.en||records[i]?.slug)+' from this local draft?')){records.splice(i,1);markDirty();render();}}});
 $('export').onclick=()=>{const errs=validate();if(errs.length&&!confirm('Validation found issues. Export anyway?\n'+errs.slice(0,8).join('\n')))return;const blob=new Blob([JSON.stringify(records,null,2)+'\n'],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='registries.json';a.click();URL.revokeObjectURL(a.href);dirty=false;persistDraft();$('message').textContent='Exported registries.json.';};
 $('download-template').onclick=()=>{const sample=[{slug:'example-registry',fa:'نام نمونه',en:'Example Registry',country:'IR',city:'mashhad',categories:['gyn'],description:'',officialUrl:''}],blob=new Blob([JSON.stringify(sample,null,2)+'\n'],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='registries-template.json';a.click();URL.revokeObjectURL(a.href);};
@@ -88,18 +167,24 @@ async function initializeAdminAuth(){
   const response=await fetch('/api/session',{credentials:'same-origin',cache:'no-store',headers:{accept:'application/json'}});
   const session=response.ok?await response.json():{authenticated:false};
   if(session.authenticated){
-   $('auth-status').textContent='Signed in as '+session.user.login+'.';
+   $('auth-status').textContent='ورود انجام شد: '+session.user.login;
    $('login-link').classList.add('hidden');
    $('logout-form').classList.remove('hidden');
    $('admin-area').classList.remove('hidden');
+   if(dirty && records.length){
+    $('source-status').textContent='پیش‌نویس محلی بازیابی شد؛ برای دریافت نسخهٔ فعلی main از دکمهٔ بارگذاری دوباره استفاده کن.';
+    $('message').textContent='پیش‌نویس محلی حفظ شد و به‌صورت خودکار جایگزین نشد.';
+   }else{
+    await loadCurrentCatalogue();
+   }
   }else{
-   $('auth-status').textContent='Sign in with the authorized GitHub account to access admin tools.';
+   $('auth-status').textContent='برای دسترسی به پنل، با حساب مجاز GitHub وارد شو.';
    $('login-link').classList.remove('hidden');
    $('logout-form').classList.add('hidden');
    $('admin-area').classList.add('hidden');
   }
  }catch{
-  $('auth-status').textContent='Could not verify sign-in status. The admin tools remain locked.';
+  $('auth-status').textContent='وضعیت ورود تأیید نشد؛ پنل قفل باقی می‌ماند.';
   $('login-link').classList.remove('hidden');
   $('admin-area').classList.add('hidden');
  }
