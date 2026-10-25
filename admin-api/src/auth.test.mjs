@@ -189,3 +189,29 @@ test("authentication routes reject unsupported methods", async () => {
   const response = await handleAuthRequest(new Request(ORIGIN + "/auth/login", { method: "POST" }), env);
   assert.equal(response.status, 405);
 });
+
+
+test("login fails closed when the rate limiter is missing", async () => {
+  const { AUTH_RATE_LIMITER, ...withoutLimiter } = env;
+  const response = await handleAuthRequest(new Request(ORIGIN + "/auth/login"), withoutLimiter);
+  assert.equal(response.status, 503);
+  assert.match(await response.text(), /protection is unavailable/);
+});
+
+test("login rate limit blocks OAuth redirects", async () => {
+  const limitedEnv = { ...env, AUTH_RATE_LIMITER: { limit: async () => ({ success: false }) } };
+  const response = await handleAuthRequest(new Request(ORIGIN + "/auth/login", {
+    headers: { "cf-connecting-ip": "192.0.2.10" },
+  }), limitedEnv);
+  assert.equal(response.status, 429);
+  assert.equal(response.headers.get("retry-after"), "60");
+  assert.equal(response.headers.get("location"), null);
+});
+
+test("placeholder OAuth configuration fails closed", async () => {
+  const response = await handleAuthRequest(new Request(ORIGIN + "/auth/login"), {
+    ...env,
+    GITHUB_OAUTH_CLIENT_ID: "REPLACE_AFTER_REGISTERING_OAUTH_APP",
+  });
+  assert.equal(response.status, 503);
+});
