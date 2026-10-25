@@ -42,7 +42,18 @@ function json(data, status = 200, origin = "") {
 }
 
 async function serveAdminAssets(request, env) {
-  const asset = await env.ASSETS.fetch(request);
+  const url = new URL(request.url);
+  let asset;
+  if (env.ASSETS && typeof env.ASSETS.fetch === "function") {
+    asset = await env.ASSETS.fetch(request);
+  } else if (typeof env.ADMIN_HTML === "string" && (url.pathname === "/" || url.pathname === "/index.html")) {
+    asset = new Response(env.ADMIN_HTML, {
+      status: 200,
+      headers: { "content-type": "text/html; charset=utf-8" },
+    });
+  } else {
+    return json({ error: "not found" }, 404);
+  }
   const headers = new Headers(asset.headers);
   headers.set("x-content-type-options", "nosniff");
   headers.set("x-frame-options", "DENY");
@@ -182,7 +193,7 @@ export async function handleRequest(request, env) {
     return json({ error: "method not allowed" }, 405);
   }
   if (!url.pathname.startsWith("/api/")) {
-    if (env.ASSETS && typeof env.ASSETS.fetch === "function") return serveAdminAssets(request, env);
+    if ((env.ASSETS && typeof env.ASSETS.fetch === "function") || typeof env.ADMIN_HTML === "string") return serveAdminAssets(request, env);
     return json({ error: "not found" }, 404);
   }
   if (url.pathname === "/api/catalogue") {
