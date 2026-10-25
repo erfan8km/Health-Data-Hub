@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { handleAuthRequest, readAdminSession } from "./auth.mjs";
+import { createOAuthStateStoreBinding } from "./test-support.mjs";
 
 const ORIGIN = "https://admin.example.test";
 const env = {
@@ -9,6 +10,7 @@ const env = {
   GITHUB_OAUTH_CLIENT_ID: "oauth-client-id",
   GITHUB_OAUTH_CLIENT_SECRET: "oauth-client-secret-long-enough",
   SESSION_SIGNING_SECRET: "s".repeat(64),
+  OAUTH_STATE_STORE: createOAuthStateStoreBinding(),
   AUTH_RATE_LIMITER: { limit: async () => ({ success: true }) },
   PROPOSAL_RATE_LIMITER: { limit: async () => ({ success: true }) },
 };
@@ -118,6 +120,14 @@ test("callback exchanges code with PKCE and creates a signed HttpOnly session on
   assert.equal(session.login, "erfan8km");
 });
 
+test("login fails closed when the one-time OAuth state store binding is missing", async () => {
+  const { OAUTH_STATE_STORE, ...withoutStateStore } = env;
+  const response = await handleAuthRequest(new Request(ORIGIN + "/auth/login"), withoutStateStore);
+  assert.equal(response.status, 503);
+  assert.match(await response.text(), /replay protection is unavailable/);
+  assert.equal(response.headers.get("location"), null);
+});
+
 test("callback rejects a state mismatch without making a network request", async () => {
   const started = await beginLogin();
   const callbackUrl = new URL(ORIGIN + "/auth/callback");
@@ -132,6 +142,99 @@ test("callback rejects a state mismatch without making a network request", async
     }), env);
     assert.equal(response.status, 400);
     assert.equal(called, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("callback rejects reuse of a previously consumed OAuth state even when the state cookie is replayed", async () => {
+  const { response, started } = await completeLogin();
+  assert.equal(response.status, 303);
+
+  const replayUrl = new URL(ORIGIN + "/auth/callback");
+  replayUrl.searchParams.set("code", "second-test-code");
+  replayUrl.searchParams.set("state", started.location.searchParams.get("state"));
+  const originalFetch = globalThis.fetch;
+  let called = false;
+  globalThis.fetch = async () => {
+    called = true;
+    throw new Error("GitHub token exchange must not run for a consumed state");
+  };
+  try {
+    const replay = await handleAuthRequest(new Request(replayUrl, {
+      headers: { cookie: cookiePair(started.stateCookie) },
+    }), env);
+    assert.equal(replay.status, 400);
+    assert.match(await replay.text(), /already been used/);
+    assert.equal(called, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("callback fails closed when the verifier does not match the issued PKCE challenge", async () => {
+  const started = await beginLogin();
+  const stateCookiePair = cookiePair(started.stateCookie);
+  const signedValue = stateCookiePair.slice("__Host-rh_oauth=".length);
+  const encodedPayload = signedValue.split(".")[0];
+  const normalized = encodedPayload.replace(/-/g, "+").replace(/_/g, "/");
+  const padded = normalized + "=".repeat((4 - normalized.length % 4) % 4);
+  const decodedPayload = JSON.parse(new TextDecoder().decode(
+    Uint8Array.from(atob(padded), (character) => character.charCodeAt(0)),
+  ));
+  // Tamper with the verifier but re-sign the cookie with the test secret so
+  // the callback reaches the PKCE exchange rather than failing its HMAC check.
+  decodedPayload.verifier = "B".repeat(64);
+  const encodeBase64url = (bytes) => {
+    let binary = "";
+    for (const byte of bytes) binary += String.fromCharCode(byte);
+    return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+  };
+  const encoded = encodeBase64url(new TextEncoder().encode(JSON.stringify(decodedPayload)));
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(env.SESSION_SIGNING_SECRET),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const signature = encodeBase64url(new Uint8Array(await crypto.subtle.sign(
+    "HMAC", key, new TextEncoder().encode(encoded),
+  )));
+  const mismatchedCookie = "__Host-rh_oauth=" + encoded + "." + signature;
+
+  const callbackUrl = new URL(ORIGIN + "/auth/callback");
+  callbackUrl.searchParams.set("code", "test-code");
+  callbackUrl.searchParams.set("state", started.location.searchParams.get("state"));
+  const expectedChallenge = started.location.searchParams.get("code_challenge");
+  const originalFetch = globalThis.fetch;
+  let userEndpointCalled = false;
+  globalThis.fetch = async (input, init = {}) => {
+    if (String(input) === "https://github.com/login/oauth/access_token") {
+      const verifier = new URLSearchParams(String(init.body || "")).get("code_verifier");
+      const challengeBytes = new Uint8Array(await crypto.subtle.digest(
+        "SHA-256", new TextEncoder().encode(verifier || ""),
+      ));
+      if (encodeBase64url(challengeBytes) !== expectedChallenge) {
+        return new Response(JSON.stringify({ error: "incorrect_verification_code" }), {
+          status: 400,
+          headers: { "content-type": "application/json" },
+        });
+      }
+      return new Response(JSON.stringify({ access_token: "unexpected-token", token_type: "bearer" }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
+    }
+    if (String(input) === "https://api.github.com/user") userEndpointCalled = true;
+    throw new Error("Unexpected request");
+  };
+  try {
+    const response = await handleAuthRequest(new Request(callbackUrl, {
+      headers: { cookie: mismatchedCookie },
+    }), env);
+    assert.equal(response.status, 502);
+    assert.equal(userEndpointCalled, false);
   } finally {
     globalThis.fetch = originalFetch;
   }

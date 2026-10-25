@@ -72,6 +72,27 @@ export async function checkRateLimit(env, bindingName, key) {
   return textError("Request protection is unavailable.", 503);
 }
 
+async function oauthStateStoreRequest(env, operation, state, expiresAt) {
+  const binding = env.OAUTH_STATE_STORE;
+  if (!binding || typeof binding.idFromName !== "function" || typeof binding.get !== "function") return null;
+  try {
+    const stub = binding.get(binding.idFromName("registryhub-oauth-state"));
+    const payload = { state };
+    if (Number.isSafeInteger(expiresAt)) payload.expiresAt = expiresAt;
+    const result = await stub.fetch("https://oauth-state-store/" + operation, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (result.status === 409) return false;
+    if (!result.ok) return null;
+    const data = await result.json();
+    return data?.[operation === "reserve" ? "reserved" : "consumed"] === true;
+  } catch {
+    return null;
+  }
+}
+
 async function hmac(secret, message) {
   const key = await crypto.subtle.importKey(
     "raw",
@@ -207,11 +228,15 @@ async function beginLogin(request, env) {
   const origin = originFromEnv(env);
   const state = randomToken(32);
   const verifier = randomToken(48);
+  const expiresAt = Math.floor(Date.now() / 1000) + STATE_TTL_SECONDS;
   const signedState = await signJson({
     state,
     verifier,
-    exp: Math.floor(Date.now() / 1000) + STATE_TTL_SECONDS,
+    exp: expiresAt,
   }, env.SESSION_SIGNING_SECRET);
+  if (await oauthStateStoreRequest(env, "reserve", state, expiresAt) !== true) {
+    return textError("Sign-in replay protection is unavailable.", 503);
+  }
   const challenge = await pkceChallenge(verifier);
   const authorize = new URL(GITHUB_AUTHORIZE_URL);
   authorize.searchParams.set("client_id", env.GITHUB_OAUTH_CLIENT_ID);
@@ -236,21 +261,35 @@ async function completeLogin(request, env) {
     if (retryAfter) headers["retry-after"] = retryAfter;
     return response(await limited.text(), limited.status, headers, [clearState]);
   }
+  const returnedState = url.searchParams.get("state") || "";
+  if (!returnedState || returnedState.length > 256) {
+    return textError("Invalid sign-in response.", 400, [clearState]);
+  }
+
+  const signedState = cookies(request).get(STATE_COOKIE);
+  const state = await verifyJson(signedState, env.SESSION_SIGNING_SECRET);
+  const now = Math.floor(Date.now() / 1000);
+  if (!state || typeof state.state !== "string" ||
+      typeof state.verifier !== "string" || !/^[A-Za-z0-9_-]{64}$/.test(state.verifier) ||
+      !Number.isSafeInteger(state.exp) || state.exp <= now ||
+      !constantTimeEqual(state.state, returnedState)) {
+    return textError("Sign-in state is invalid or expired. Please start again.", 400, [clearState]);
+  }
+
+  const consumed = await oauthStateStoreRequest(env, "consume", state.state);
+  if (consumed === null) {
+    return textError("Sign-in replay protection is unavailable.", 503, [clearState]);
+  }
+  if (!consumed) {
+    return textError("Sign-in state has already been used or expired. Please start again.", 400, [clearState]);
+  }
+
   if (url.searchParams.has("error")) {
     return textError("GitHub sign-in was not completed.", 401, [clearState]);
   }
   const code = url.searchParams.get("code") || "";
-  const returnedState = url.searchParams.get("state") || "";
-  if (!code || code.length > 2048 || !returnedState || returnedState.length > 256) {
+  if (!code || code.length > 2048) {
     return textError("Invalid sign-in response.", 400, [clearState]);
-  }
-  const signedState = cookies(request).get(STATE_COOKIE);
-  const state = await verifyJson(signedState, env.SESSION_SIGNING_SECRET);
-  const now = Math.floor(Date.now() / 1000);
-  if (!state || typeof state.state !== "string" || typeof state.verifier !== "string" ||
-      typeof state.exp !== "number" || state.exp <= now ||
-      !constantTimeEqual(state.state, returnedState)) {
-    return textError("Sign-in state is invalid or expired. Please start again.", 400, [clearState]);
   }
 
   let accessToken;

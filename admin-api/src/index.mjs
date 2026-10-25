@@ -1,5 +1,6 @@
 import { validateRegistryPayload } from "./validate.mjs";
 import { checkRateLimit, handleAuthRequest, readAdminSession } from "./auth.mjs";
+export { OAuthStateStore } from "./oauth-state-store.mjs";
 
 const API_VERSION = "2022-11-28";
 const DATA_PATH = "artifacts/iedr/public/data";

@@ -37,14 +37,14 @@ The configured numeric GitHub user ID is `323634447`, corresponding to the repos
 
 ## 4. Required runtime values
 
-**Gate:** do not create the fine-grained `GITHUB_TOKEN` until the active `main` ruleset is configured and verified. The repository rulesets endpoint was empty when checked on 2026-10-25, and the connected integration cannot inspect legacy branch protection.
+**Gate:** do not create/install the fine-grained `GITHUB_TOKEN` or deploy the Worker yet. A fresh GitHub ruleset API readback on 2026-10-25 confirmed that the active `main` ruleset (`25821290`) has `required_approving_review_count: 1` and an empty bypass list. Before any credential setup, manually re-open [the ruleset settings](https://github.com/erfan8km/Health-Data-Hub/rules/25821290) and verify the saved value remains `1`. A separate trusted reviewer is still needed to review/merge the eventual PR; do not add a bypass actor to get around the rule. The connected integration cannot write ruleset settings.
 
 These non-secret values are in `admin-api/wrangler.jsonc`:
 
 - `GITHUB_REPOSITORY=erfan8km/Health-Data-Hub`
 - `ADMIN_ORIGIN=https://registryhub-admin-api.erfan8km.workers.dev`
 - `ADMIN_GITHUB_USER_ID=323634447`
-- `GITHUB_OAUTH_CLIENT_ID` — currently a fail-closed placeholder. Replace it after creating the dedicated OAuth App.
+- `GITHUB_OAUTH_CLIENT_ID` — configured with the non-secret Client ID from the registered `RegistryHub Admin` OAuth App.
 
 These values must be configured as **Worker secrets** before the first live login or write action:
 
@@ -65,7 +65,13 @@ Copy the output directly into Cloudflare's secret-value field. Never send it thr
 Cloudflare's official guidance says secrets should be set as Worker secrets rather than plaintext `vars`, and local `.dev.vars` files should be excluded from Git. See:
 https://developers.cloudflare.com/workers/configuration/secrets/
 
-## 5. Rate limits in this branch
+## 5. OAuth state replay protection
+
+OAuth login state is reserved and consumed through the `OAUTH_STATE_STORE` SQLite-backed Durable Object. A callback can consume a state only once, including concurrent callback attempts; missing or unavailable state storage fails closed. The binding and initial migration are declared in `wrangler.jsonc`. The namespace is provisioned only when this experimental Worker is first deployed; this code change has not created a live Cloudflare resource.
+
+Do not deploy merely to provision the Durable Object. Keep the existing no-deploy gate in place until the authentication flow and review checklist pass.
+
+## 6. Rate limits in this branch
 
 The configuration uses Cloudflare Rate Limiting bindings:
 
@@ -75,11 +81,11 @@ The configuration uses Cloudflare Rate Limiting bindings:
 Cloudflare documents these bindings as approximate per-location limits, not strict global ceilings. They help with ordinary abuse but are not a substitute for monitoring or a strict globally consistent limiter:
 https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/
 
-## 6. Secret handling and deployment gate
+## 7. Secret handling and deployment gate
 
 - `admin-api/.dev.vars.example` is a placeholder template only. For local development, copy it to `admin-api/.dev.vars` and replace every placeholder with test-only values. The actual `.dev.vars` is ignored by Git.
 - Do not paste secrets into GitHub issues, PR text, commits, browser code, or chat.
 - Wrangler secret-management commands can publish a Worker version; do not run them until a deployment has been explicitly approved.
 - A first deployment would create a new, separate `registryhub-admin-api` Worker. It must not edit, replace, or share the public catalogue Worker.
-- The admin Worker has not been deployed and no OAuth App or real secret has been created by this change.
+- The admin Worker has not been deployed and the OAuth App has been registered manually, but its client secret and the other Worker secrets have not been created or stored by this change.
 - Before authorizing deployment, run the complete CI checks, confirm that all runtime values are configured, and manually test login, logout, session expiry, unauthorized account rejection, rate limiting, and a proposal that opens a PR without merging or deploying the catalogue.
