@@ -1,6 +1,6 @@
 # RegistryHub Admin: OAuth and Worker setup checklist
 
-This checklist prepares the independent-authentication branch only. **Do not deploy the Worker yet.** The public catalogue Worker `health-data-hub` is separate and must not be changed.
+This checklist prepares the independent-authentication branch only. **Do not deploy the Worker yet.** The public catalogue Worker `health-data-hub` is separate and must not be changed. Before creating any GitHub write token, follow and verify [REPOSITORY-PROTECTION.md](./REPOSITORY-PROTECTION.md); do not continue with token creation while that prerequisite is outstanding.
 
 ## 1. Planned admin origin
 
@@ -36,6 +36,8 @@ The Worker must not be deployed until the registered callback URL and `ADMIN_ORI
 The configured numeric GitHub user ID is `323634447`, corresponding to the repository owner account. Authentication is restricted to that numeric ID, not a value submitted by the browser. Do not change it unless a deliberate administrator handover is intended.
 
 ## 4. Required runtime values
+
+**Gate:** do not create the fine-grained `GITHUB_TOKEN` until the active `main` ruleset is configured and verified. The repository rulesets endpoint was empty when checked on 2026-10-25, and the connected integration cannot inspect legacy branch protection.
 
 These non-secret values are in `admin-api/wrangler.jsonc`:
 
