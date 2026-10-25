@@ -197,6 +197,20 @@ test("serves the admin UI through the same-origin static assets binding", async 
   assert.equal(await response.text(), "admin-ui");
 });
 
+test("serves bundled admin HTML and security headers when static assets are unavailable", async () => {
+  const html = "<!doctype html><html lang=\"en\"><body>admin-ui</body></html>";
+  const envWithHtml = { ...env, ADMIN_HTML: html };
+  const response = await handleRequest(new Request(ORIGIN + "/"), envWithHtml);
+  assert.equal(response.status, 200);
+  assert.equal(await response.text(), html);
+  assert.equal(response.headers.get("content-type"), "text/html; charset=utf-8");
+  assert.equal(response.headers.get("x-frame-options"), "DENY");
+  assert.match(response.headers.get("content-security-policy") || "", /frame-ancestors 'none'/);
+
+  const missing = await handleRequest(new Request(ORIGIN + "/missing.css"), envWithHtml);
+  assert.equal(missing.status, 404);
+});
+
 test("returns 404 for unknown API routes and 405 for non-GET health requests", async () => {
   const unknown = await handleRequest(new Request(ORIGIN + "/api/unknown"), env);
   assert.equal(unknown.status, 404);
