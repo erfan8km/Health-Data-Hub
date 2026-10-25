@@ -164,17 +164,57 @@ test("callback rejects reuse of a previously consumed OAuth state even when the 
   }
 });
 
-test("callback fails closed if GitHub rejects the PKCE verifier during token exchange", async () => {
+test("callback fails closed when the verifier does not match the issued PKCE challenge", async () => {
   const started = await beginLogin();
+  const stateCookiePair = cookiePair(started.stateCookie);
+  const signedValue = stateCookiePair.slice("__Host-rh_oauth=".length);
+  const encodedPayload = signedValue.split(".")[0];
+  const normalized = encodedPayload.replace(/-/g, "+").replace(/_/g, "/");
+  const padded = normalized + "=".repeat((4 - normalized.length % 4) % 4);
+  const decodedPayload = JSON.parse(new TextDecoder().decode(
+    Uint8Array.from(atob(padded), (character) => character.charCodeAt(0)),
+  ));
+  // Tamper with the verifier but re-sign the cookie with the test secret so
+  // the callback reaches the PKCE exchange rather than failing its HMAC check.
+  decodedPayload.verifier = "B".repeat(64);
+  const encodeBase64url = (bytes) => {
+    let binary = "";
+    for (const byte of bytes) binary += String.fromCharCode(byte);
+    return btoa(binary).replace(/\\+/g, "-").replace(/\\//g, "_").replace(/=+$/g, "");
+  };
+  const encoded = encodeBase64url(new TextEncoder().encode(JSON.stringify(decodedPayload)));
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(env.SESSION_SIGNING_SECRET),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const signature = encodeBase64url(new Uint8Array(await crypto.subtle.sign(
+    "HMAC", key, new TextEncoder().encode(encoded),
+  )));
+  const mismatchedCookie = "__Host-rh_oauth=" + encoded + "." + signature;
+
   const callbackUrl = new URL(ORIGIN + "/auth/callback");
   callbackUrl.searchParams.set("code", "test-code");
   callbackUrl.searchParams.set("state", started.location.searchParams.get("state"));
+  const expectedChallenge = started.location.searchParams.get("code_challenge");
   const originalFetch = globalThis.fetch;
   let userEndpointCalled = false;
-  globalThis.fetch = async (input) => {
+  globalThis.fetch = async (input, init = {}) => {
     if (String(input) === "https://github.com/login/oauth/access_token") {
-      return new Response(JSON.stringify({ error: "incorrect_verification_code" }), {
-        status: 400,
+      const verifier = new URLSearchParams(String(init.body || "")).get("code_verifier");
+      const challengeBytes = new Uint8Array(await crypto.subtle.digest(
+        "SHA-256", new TextEncoder().encode(verifier || ""),
+      ));
+      if (encodeBase64url(challengeBytes) !== expectedChallenge) {
+        return new Response(JSON.stringify({ error: "incorrect_verification_code" }), {
+          status: 400,
+          headers: { "content-type": "application/json" },
+        });
+      }
+      return new Response(JSON.stringify({ access_token: "unexpected-token", token_type: "bearer" }), {
+        status: 200,
         headers: { "content-type": "application/json" },
       });
     }
@@ -183,7 +223,7 @@ test("callback fails closed if GitHub rejects the PKCE verifier during token exc
   };
   try {
     const response = await handleAuthRequest(new Request(callbackUrl, {
-      headers: { cookie: cookiePair(started.stateCookie) },
+      headers: { cookie: mismatchedCookie },
     }), env);
     assert.equal(response.status, 502);
     assert.equal(userEndpointCalled, false);
