@@ -1,37 +1,62 @@
 # RegistryHub Admin API
 
-This folder contains the separate Cloudflare Worker for the admin UI and proposal API. It is not the public catalogue Worker, and it must not be deployed with write credentials until Cloudflare Access is configured and verified.
+This folder contains an experimental, separate Cloudflare Worker for the admin UI and proposal API. It is isolated from the public catalogue Worker. It must not be deployed with a GitHub write credential until the authentication implementation is reviewed and the runtime configuration is tested.
 
-## What the API does
-- Static UI files are served from `../admin-prototype` on the same origin.
-- `GET /health`: returns a minimal health response without configuration details.
-- `POST /api/proposals`: requires a valid Cloudflare Access JWT, checks the exact configured admin origin, validates a bounded registry payload against the trusted `categories.json` and `countries.json` files on `main`, creates a branch, writes `registries.json` on that branch, and opens a pull request to `main`.
-- It does not merge pull requests or deploy the public catalogue.
+## Authentication design
 
-## Required Worker configuration
-Non-secret settings:
-- `GITHUB_REPOSITORY` — repository name; currently set in `wrangler.jsonc`.
-- `ADMIN_ORIGIN` — exact origin of the admin UI, including scheme and port if present, without a trailing slash.
-- `ADMIN_EMAIL` — the single administrator email allowed by the API.
-- `CF_ACCESS_TEAM_DOMAIN` — Cloudflare Access team hostname used as the JWT issuer, e.g. `your-team.cloudflareaccess.com` (hostname only).
-- `CF_ACCESS_AUD` — audience tag for the Cloudflare Access application protecting the API.
+The experimental branch replaces the Cloudflare Access dependency with GitHub OAuth sign-in and a signed, server-side-verified session cookie.
 
-Secret:
-- `GITHUB_TOKEN` — set as a Worker secret with `wrangler secret put GITHUB_TOKEN`. Never commit the token, put it in a plaintext variable, or expose it to the browser.
+- `GET /auth/login` starts GitHub OAuth using a random state value and PKCE S256.
+- `GET /auth/callback` validates the signed, short-lived state cookie, exchanges the code with the PKCE verifier, calls GitHub's authenticated user endpoint, and permits only the configured numeric GitHub user ID.
+- `GET /api/session` returns a minimal session status.
+- `POST /auth/logout` clears the session cookie and requires the exact configured Origin.
+- `POST /api/proposals` requires a valid signed session, the exact configured Origin, JSON, a bounded request body, and server-side catalogue validation.
 
-## Required before deployment
-1. Protect the **entire admin Worker** with Cloudflare Access and restrict the policy to the intended administrator. Cloudflare documents that Worker-level Access can protect the Worker, its `workers.dev` hostname, and previews; see the official [Cloudflare Access for Workers documentation](https://developers.cloudflare.com/workers/configuration/cloudflare-access/).
-2. Set `ADMIN_ORIGIN` to the exact origin of the same Worker UI. The UI calls `/api/proposals` on the same origin, avoiding a cross-origin browser flow. Origin checking is an additional control, not authentication.
-4. Create a narrowly scoped GitHub credential limited to this repository, with only the permissions needed to read contents, create a branch, write the catalogue file on that branch, and open a pull request. Confirm endpoint-specific permissions against GitHub's current API documentation.
-5. Store the credential only as a Worker secret. Never send it to the browser, return it in responses, or log it.
-6. Test unauthenticated, invalid-token, wrong-origin, oversized, malformed, and invalid-data requests. Run `pnpm test:admin-api`, `pnpm validate`, `pnpm typecheck`, `pnpm test`, and `pnpm build`.
-7. Confirm that a valid submission creates a branch and reviewable PR only. Human review and merge remain required; production deployment is a separate step.
-8. Add appropriate rate limiting/abuse controls and a token rotation/revocation procedure.
+The OAuth token is used only to read the GitHub identity during sign-in. It is not stored or returned to the browser, and the login flow requests no repository permissions. Catalogue writes use a separate server-side `GITHUB_TOKEN` secret. The API creates a branch and a reviewable Pull Request only; it never merges or deploys.
 
-## Current limitations and boundaries
-- The HTML editor submits to the same-origin `/api/proposals` endpoint, but the Worker is not deployed/configured by this PR.
-- No API deployment workflow or live Access application is configured by this PR.
-- The current Worker configuration has `workers_dev: true`. Do not deploy with a GitHub write secret until Worker-level Cloudflare Access protection is enabled and verified for the `workers.dev` hostname and previews.
-- The API currently reads trusted country/category metadata and the base ref from `main`; it does not accept these from the browser.
-- `/health` is intentionally unauthenticated and exposes only a static status.
-- A PR is not a deployment. Never merge or deploy the admin API just to preview the local HTML editor.
+## Required configuration
+
+Non-secret Worker variables:
+
+- `GITHUB_REPOSITORY` — repository name, currently set in `wrangler.jsonc`.
+- `ADMIN_ORIGIN` — exact HTTPS origin where this admin Worker is served, without a trailing slash.
+- `ADMIN_GITHUB_USER_ID` — the numeric GitHub account ID allowed to administer the panel. Do not substitute a display name or browser-supplied username.
+- `GITHUB_OAUTH_CLIENT_ID` — Client ID from the GitHub OAuth App.
+
+Worker secrets (never commit them or send them to the browser):
+
+- `GITHUB_OAUTH_CLIENT_SECRET` — OAuth App client secret.
+- `SESSION_SIGNING_SECRET` — independent high-entropy secret of at least 32 bytes. Rotating it invalidates existing sessions.
+- `GITHUB_TOKEN` — separate, least-privilege repository credential used only by the proposal API.
+
+## GitHub OAuth App setup (manual; do not deploy yet)
+
+1. Register an OAuth App in GitHub settings.
+2. Set its Homepage URL to the exact `ADMIN_ORIGIN`.
+3. Set its Authorization callback URL to `ADMIN_ORIGIN/auth/callback` exactly. Do not enable wildcard callback matching.
+4. Store its Client ID as `GITHUB_OAUTH_CLIENT_ID` and its client secret using the Cloudflare Worker secret mechanism. Do not paste secrets into this repository, issue comments, or chat.
+5. Configure `ADMIN_GITHUB_USER_ID` using the numeric ID of the single permitted administrator.
+6. Verify the intended operator can access both the Worker hostname and GitHub OAuth sign-in from their network. This setup is not a method for bypassing regional restrictions.
+
+The application requests no OAuth scopes; the OAuth token is used only to retrieve the authenticated account's public identity. If a future design needs GitHub access as the signed-in user, re-review permissions rather than adding broad scopes to this login flow.
+
+## Required checks before any deployment
+
+- Keep the admin Worker separate from the public catalogue Worker. Do not alter the public Worker, main branch, domain, or active Cloudflare configuration as part of this prototype.
+- Verify `ADMIN_ORIGIN` and the OAuth callback URI match exactly and use HTTPS.
+- Use a strong, independently generated `SESSION_SIGNING_SECRET`; never use the OAuth client secret for session signing.
+- Configure a separate least-privilege `GITHUB_TOKEN` secret. Confirm current GitHub endpoint permissions before granting any write access.
+- Test OAuth state mismatch/expiry, PKCE, token-exchange errors, unauthorized user IDs, session signature tampering/expiry, logout, origin mismatch, oversized bodies, malformed payloads, and proposal creation behavior.
+- Run `pnpm test:admin-api`, `pnpm validate`, `pnpm typecheck`, `pnpm test`, and `pnpm build`.
+- Add rate limiting/abuse controls and document the token rotation/revocation procedure before deployment.
+- Confirm security headers, runtime compatibility, and successful tests in CI.
+- A Pull Request is not a deployment. The API must not be deployed until the user explicitly approves after review and has configured all required variables and secrets.
+
+## Current status and limits
+
+- Authentication code is an experimental implementation in a feature branch; it has not been live-tested against a registered OAuth App.
+- No OAuth App has been registered by this change, no secrets have been created or stored, and no Worker has been deployed.
+- The admin UI files may be delivered as static assets, but all write operations remain server-side protected by session validation. UI hiding is only a user-experience measure, not a security boundary.
+- The current Worker configuration uses `workers_dev: true`; the hostname may be accessible publicly, so session validation is mandatory and production hardening is still required.
+- Session cookies are `Secure`, `HttpOnly`, `SameSite=Lax`, root-path `__Host-` cookies, expire after eight hours, and are signed with HMAC. Sessions are not stored server-side; rotating `SESSION_SIGNING_SECRET` invalidates them.
+- A PR is not a deployment. The API never merges the proposal or deploys the public catalogue.
