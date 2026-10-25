@@ -2,11 +2,19 @@
 
 **Deployment gate:** Do not create or install the admin Worker's GitHub write token until an active ruleset protecting main has been created and verified. A fine-grained token with Contents: write is still able to write code or workflow files if repository rules let it; the API-side file allowlist is defense in depth, not a replacement for a GitHub ruleset.
 
-## What was checked
+## Current verified state
 
-On 2026-10-25, GitHub's repository rulesets endpoint returned an empty list for this repository. The connected GitHub integration cannot read the legacy branch-protection endpoint (403: resource not accessible by integration), and it does not expose a ruleset-creation action. Therefore this document **does not claim that main is protected**. A repository administrator must apply and verify the rule in GitHub Settings.
+Checked through the GitHub rulesets API on 2026-10-25:
 
-## Create the ruleset
+- Ruleset **Protect main — require PR**, ID `25821290`, is `active` and targets only `refs/heads/main`.
+- The bypass list is empty and the connected account cannot bypass the ruleset.
+- Pull requests, stale-approval dismissal, conversation resolution, force-push blocking, deletion restriction, and strict `validate-and-build` status checking are enabled.
+- **Important unresolved gap:** `required_approving_review_count` is still `0`. The ruleset currently requires a PR but does not require a separate human approval. This must be changed to `1` manually in GitHub Settings before configuring a GitHub write token.
+- The connected GitHub integration can read the ruleset but does not expose a ruleset-write action. Verify the saved value by reopening [the ruleset](https://github.com/erfan8km/Health-Data-Hub/rules/25821290) after saving.
+
+If there is no second trusted reviewer, do not work around this by adding a bypass actor. Arrange a separate reviewer first; otherwise a one-approval requirement will prevent the sole PR author from merging their own PR.
+
+## Create the ruleset only if the existing ruleset is absent
 
 1. Open the repository's **Settings → Rules → Rulesets**:
    https://github.com/erfan8km/Health-Data-Hub/settings/rules
