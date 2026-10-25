@@ -44,7 +44,7 @@ These non-secret values are in `admin-api/wrangler.jsonc`:
 - `GITHUB_REPOSITORY=erfan8km/Health-Data-Hub`
 - `ADMIN_ORIGIN=https://registryhub-admin-api.erfan8km.workers.dev`
 - `ADMIN_GITHUB_USER_ID=323634447`
-- `GITHUB_OAUTH_CLIENT_ID` — currently a fail-closed placeholder. Replace it after creating the dedicated OAuth App.
+- `GITHUB_OAUTH_CLIENT_ID` — configured with the non-secret Client ID from the registered `RegistryHub Admin` OAuth App.
 
 These values must be configured as **Worker secrets** before the first live login or write action:
 
@@ -87,5 +87,5 @@ https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/
 - Do not paste secrets into GitHub issues, PR text, commits, browser code, or chat.
 - Wrangler secret-management commands can publish a Worker version; do not run them until a deployment has been explicitly approved.
 - A first deployment would create a new, separate `registryhub-admin-api` Worker. It must not edit, replace, or share the public catalogue Worker.
-- The admin Worker has not been deployed and no OAuth App or real secret has been created by this change.
+- The admin Worker has not been deployed and the OAuth App has been registered manually, but its client secret and the other Worker secrets have not been created or stored by this change.
 - Before authorizing deployment, run the complete CI checks, confirm that all runtime values are configured, and manually test login, logout, session expiry, unauthorized account rejection, rate limiting, and a proposal that opens a PR without merging or deploying the catalogue.
