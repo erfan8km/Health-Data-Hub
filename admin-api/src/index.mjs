@@ -4,6 +4,32 @@ const API_VERSION = "2022-11-28";
 const DATA_PATH = "artifacts/iedr/public/data";
 const MAX_BODY_BYTES = 2_000_000;
 
+async function readBodyLimited(request, limit) {
+  const reader = request.body?.getReader();
+  if (!reader) return "";
+  const chunks = [];
+  let total = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > limit) {
+      await reader.cancel();
+      const error = new Error("request too large");
+      error.status = 413;
+      throw error;
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return new TextDecoder().decode(bytes);
+}
+
 function json(data, status = 200, origin = "") {
   const headers = { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", "x-content-type-options": "nosniff" };
   if (origin) {
@@ -171,10 +197,9 @@ export async function handleRequest(request, env) {
   }
   let payload;
   try {
-    const raw = await request.text();
-    if (new TextEncoder().encode(raw).byteLength > MAX_BODY_BYTES) return json({ error: "request too large" }, 413, expectedOrigin);
-    payload = JSON.parse(raw);
-  } catch {
+    payload = JSON.parse(await readBodyLimited(request, MAX_BODY_BYTES));
+  } catch (error) {
+    if (error?.status === 413) return json({ error: "request too large" }, 413, expectedOrigin);
     return json({ error: "invalid JSON body" }, 400, expectedOrigin);
   }
   if (!payload || !Array.isArray(payload.registries)) return json({ error: "body must contain a registries array" }, 400, expectedOrigin);
