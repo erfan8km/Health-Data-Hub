@@ -38,7 +38,38 @@ function constantTimeEqual(left, right) {
 }
 
 function validSecret(secret) {
-  return typeof secret === "string" && encoder.encode(secret).byteLength >= 32;
+  return typeof secret === "string" &&
+    encoder.encode(secret).byteLength >= 32 &&
+    !/^replace[_ -]?/i.test(secret) &&
+    !/^change[_ -]?me/i.test(secret);
+}
+
+function clientKey(request) {
+  const address = request.headers.get("cf-connecting-ip") || "";
+  return address.length > 0 && address.length <= 64 ? address : "unknown-client";
+}
+
+async function rateLimitStatus(env, bindingName, key) {
+  const binding = env[bindingName];
+  if (!binding || typeof binding.limit !== "function") return "unavailable";
+  try {
+    const result = await binding.limit({ key: String(key).slice(0, 128) });
+    return result?.success === true ? "ok" : "limited";
+  } catch {
+    return "unavailable";
+  }
+}
+
+async function checkRateLimit(request, env, bindingName, key) {
+  const status = await rateLimitStatus(env, bindingName, key);
+  if (status === "ok") return null;
+  if (status === "limited") {
+    return response("Too many requests. Please try again shortly.", 429, {
+      "content-type": "text/plain; charset=utf-8",
+      "retry-after": "60",
+    });
+  }
+  return textError("Request protection is unavailable.", 503);
 }
 
 async function hmac(secret, message) {
@@ -167,8 +198,10 @@ export async function readAdminSession(request, env) {
   return { id: payload.sub, login: payload.login, expiresAt: payload.exp };
 }
 
-async function beginLogin(env) {
+async function beginLogin(request, env) {
   if (!configReady(env)) return textError("Admin authentication is not configured.", 503);
+  const limited = await checkRateLimit(request, env, "AUTH_RATE_LIMITER", clientKey(request) + ":login");
+  if (limited) return limited;
   const origin = originFromEnv(env);
   const state = randomToken(32);
   const verifier = randomToken(48);
@@ -194,6 +227,11 @@ async function completeLogin(request, env) {
   const clearState = expiredCookie(STATE_COOKIE);
   if (!configReady(env)) return textError("Admin authentication is not configured.", 503, [clearState]);
   const url = new URL(request.url);
+  const limited = await checkRateLimit(request, env, "AUTH_RATE_LIMITER", clientKey(request) + ":callback");
+  if (limited) return response(await limited.text(), limited.status, {
+    "content-type": "text/plain; charset=utf-8",
+    "retry-after": limited.headers.get("retry-after") || "60",
+  }, [clearState]);
   if (url.searchParams.has("error")) {
     return textError("GitHub sign-in was not completed.", 401, [clearState]);
   }
@@ -298,7 +336,7 @@ export async function handleAuthRequest(request, env) {
   const url = new URL(request.url);
   if (url.pathname === "/auth/login") {
     if (request.method !== "GET") return json({ error: "method not allowed" }, 405);
-    return beginLogin(env);
+    return beginLogin(request, env);
   }
   if (url.pathname === "/auth/callback") {
     if (request.method !== "GET") return json({ error: "method not allowed" }, 405, {}, [expiredCookie(STATE_COOKIE)]);
