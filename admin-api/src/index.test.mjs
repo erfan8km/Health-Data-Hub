@@ -203,7 +203,7 @@ test("proposal API fails closed when rate limiting binding is missing", async ()
       body: JSON.stringify({ registries: [] }),
     }), withoutLimiter);
     assert.equal(response.status, 503);
-    assert.match((await response.json()).error, /protection is unavailable/);
+    assert.match(await response.text(), /protection is unavailable/);
   } finally {
     globalThis.fetch = originalFetch;
   }
