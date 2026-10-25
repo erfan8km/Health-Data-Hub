@@ -4,7 +4,7 @@ const API_VERSION = "2022-11-28";
 const DATA_PATH = "artifacts/iedr/public/data";
 const MAX_BODY_BYTES = 2_000_000;
 
-async function readBodyLimited(request, limit) {
+export async function readBodyLimited(request, limit) {
   const reader = request.body?.getReader();
   if (!reader) return "";
   const chunks = [];
