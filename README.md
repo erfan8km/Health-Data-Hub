@@ -1,67 +1,58 @@
 # Iran Epidemiology Data Repository (IEDR)
 
-IEDR is a static, bilingual Persian/English catalogue of Iranian medical and clinical registry metadata. The prototype introduces an interactive CesiumJS globe, an Iran-focused fly-in, clinical categories, registry lists, and individual registry profiles. It does not host individual-level health data and has no API server or database.
+IEDR / RegistryHub is a static, bilingual Persian/English catalogue of Iranian medical and clinical registry metadata. It does not host individual-level health data and has no public catalogue database or API server.
 
 ## Run locally
 
 Requirements: Node.js 20.19+ and pnpm 10.26.1.
 
-```sh
+~~~sh
 pnpm install --no-frozen-lockfile
 pnpm dev
-```
+~~~
 
 Check data and build the static site:
 
-```sh
+~~~sh
 pnpm validate
 pnpm typecheck
 pnpm test
-SITE_URL=https://example.com/ pnpm run build
-```
+SITE_URL=https://registryhub.erfan8km.workers.dev/ pnpm run build
+~~~
 
-The production output is written to the repository-root `dist/` directory. The `SITE_URL` build variable is used only for canonical metadata and the sitemap; it is not a secret.
+The production output is written to the repository-root `dist/` directory. The SITE_URL build variable is used for canonical metadata and the sitemap; it is not a secret.
 
 ## Data files
 
 All prototype data is in `artifacts/iedr/public/data/`:
 
-- `categories.json` — the 11 clinical categories in the prototype.
-- `registries.json` — registry metadata, including country, province, city, and category IDs.
-- `countries.json` — active countries and camera coordinates.
-- `provinces.json` — bilingual province directory; only Razavi Khorasan is currently active.
-- `borders.geojson` — the initial Iran boundary subset, used for the glowing interactive outline.
+- **categories.json** — clinical categories.
+- **registries.json** — registry metadata.
+- **countries.json** — active countries and camera coordinates.
+- **provinces.json** — bilingual province directory; only Razavi Khorasan is currently active.
+- **borders.geojson** — the initial Iran boundary subset used for the globe outline.
 
-After Iran is selected, the interface shows an Iran province map before clinical categories. Only active provinces can be selected. Province boundaries are loaded from an OpenStreetMap-derived GeoJSON dataset; an attributed Wikimedia Commons map is used as a visual fallback if the GeoJSON cannot be fetched. Credits and license links are displayed in the province selector.
+The province selector uses locally bundled, simplified boundary paths in `artifacts/iedr/src/data/iran-province-shapes.ts`. It no longer downloads province GeoJSON at runtime, so the map does not depend on the availability of an external GeoJSON host. Boundary data is derived from OpenStreetMap and distributed under ODbL 1.0; attribution and licence details are in `artifacts/iedr/public/data/BOUNDARY-DATA-LICENSE.md` and shown in the province selector.
 
-Adding a registry means assigning an existing country ID, province ID, and one or more existing category IDs. A registry may belong to multiple categories. To enable a province, update its `active` flag in `provinces.json` and ensure the catalogue data is valid. Unknown descriptions and official URLs are intentionally empty; the UI hides the official university-link button until an HTTPS URL is supplied. The initial boundary file contains Iran only; adding another active country later also requires adding its boundary geometry.
+Only active provinces can be selected. Adding a registry means assigning an existing country ID, province ID, and one or more existing category IDs. A registry may belong to multiple categories. To enable a province, update its active flag in `provinces.json` and ensure catalogue data is valid. Unknown descriptions and official URLs are intentionally empty; the UI hides the official university-link button until an HTTPS URL is supplied.
 
-## Satellite imagery / Cesium ion
+## Deploy — Cloudflare Workers only
 
-The Cesium ion token is optional. When configured, the viewer requests ion imagery asset 2. Without a token, the viewer attempts public Esri World Imagery tiles. Public tile services may be blocked, rate-limited, or unavailable in some networks; the rest of the catalogue is designed to remain accessible if imagery fails.
+The root `wrangler.jsonc` targets the production Worker named `registryhub`, which serves `dist/` as static assets.
 
-For a local token, copy `artifacts/iedr/.env.example` to `artifacts/iedr/.env.local` and set `VITE_CESIUM_ION_TOKEN`. The `VITE_` prefix means the token is delivered to the browser: it is not a secret. Create/restrict it in Cesium ion to the exact website domains that should use it. Do not commit a personal token.
+- Build and deploy: `pnpm install --no-frozen-lockfile && pnpm run build`, then `npx --yes wrangler@4 deploy`.
+- Production origin: https://registryhub.erfan8km.workers.dev/
+- GitHub Actions runs `.github/workflows/deploy-cloudflare-worker.yml` on pushes to main. It now fails explicitly if required Cloudflare credentials are absent instead of reporting a successful skipped deployment.
 
-## Deploy
+Configure these repository secrets under **Settings → Secrets and variables → Actions**:
 
-### Cloudflare Workers (current project configuration)
+- `CLOUDFLARE_API_TOKEN` — Cloudflare API token scoped to the correct account with permission to edit Worker scripts.
+- `CLOUDFLARE_ACCOUNT_ID` — account identifier for Wrangler.
 
-The repository has a root `wrangler.jsonc` that serves the root `dist/` folder as static assets.
+`CESIUM_ION_TOKEN` is optional; it is exposed to the browser as a public client token and should be domain-restricted in Cesium ion. Its absence should not block deployment.
 
-- Build command: `pnpm install --no-frozen-lockfile && pnpm run build`
-- Deploy command: `npx wrangler deploy`
-- Set `SITE_URL` in the **build** variables to the actual production origin, for example `https://health-data-hub.erfan8km.workers.dev/`.
-- Optionally set `VITE_CESIUM_ION_TOKEN` as a build variable (public in the browser; domain-restrict it in ion).
+GitHub Pages publishing is not a deployment target and its workflow is being removed. After merging this change, verify **Settings → Pages** in GitHub: deleting a workflow stops that workflow from publishing future versions but does not necessarily unpublish an already-published site. Set Pages to disabled/None if that setting is still enabled.
 
-### Cloudflare Pages
+## Admin API
 
-- Project root: `/` (repository root).
-- Build command: `pnpm install --no-frozen-lockfile && pnpm run build`.
-- Output directory: `dist`.
-- Set `SITE_URL` to the actual Pages/custom domain URL in the build environment.
-
-### GitHub Pages
-
-The workflow at `.github/workflows/deploy-github-pages.yml` publishes the `dist/` folder on pushes to `main`. Enable GitHub Pages for the repository with **GitHub Actions** as the publishing source. The workflow sets the site base to `https://erfan8km.github.io/Health-Data-Hub/`; adjust it if the repository owner or name changes. Optionally add the `CESIUM_ION_TOKEN` repository secret. The no-token Esri fallback is attempted when that secret is not provided.
-
-Hash routes (`#/categories`, `#/category/gyn`, `#/registry/endometriosis`) are used so category and registry navigation works on static hosting and beneath a GitHub Pages repository path.
+The separate `registryhub-admin-api` Worker source is versioned under `workers/registryhub-admin-api/`. Recovery steps, required bindings, and secret names are documented in `docs/REGISTRYHUB-ADMIN-API-RECOVERY.md`. Do not put Cloudflare secrets, GitHub tokens, or OAuth client secrets into the repository.
