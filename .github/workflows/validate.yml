@@ -29,3 +29,6 @@ jobs:
         env:
           SITE_URL: https://example.invalid/
           VITE_CESIUM_ION_TOKEN: ${{ secrets.CESIUM_ION_TOKEN }}
+      - name: Validate admin Worker bundle without deploying
+        working-directory: workers/registryhub-admin-api
+        run: npx --yes wrangler@4 deploy --dry-run
