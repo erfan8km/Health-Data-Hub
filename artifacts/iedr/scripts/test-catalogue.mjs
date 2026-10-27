@@ -87,9 +87,15 @@ test("the SSNHL and ROP identifiers remain unchanged and are in their intended c
   assert.equal(registries.find((registry) => registry.slug === "rop-screening")?.categories[0], "eye");
 });
 
-test("unknown descriptions and official URLs are left unchanged rather than invented", () => {
+test("all registry metadata fields exist with empty placeholders until entered in the admin panel", () => {
+  const textFields = ["description", "targetPopulation", "center", "status", "lastReviewedAt", "startYear", "registryType", "dataSummary", "researchContact"];
   for (const registry of registries) {
-    assert.equal(registry.description, "");
+    for (const field of textFields) {
+      assert.equal(typeof registry[field], "string", registry.slug + ": " + field + " should be a string");
+      assert.equal(registry[field], "", registry.slug + ": " + field + " should remain blank until verified");
+    }
+    assert.ok(Array.isArray(registry.keyPublications), registry.slug + ": keyPublications should be an array");
+    assert.deepEqual(registry.keyPublications, []);
     assert.equal(registry.officialUrl, "");
   }
 });
