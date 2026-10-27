@@ -10,7 +10,7 @@
     "dev": "pnpm --filter @workspace/iedr run dev",
     "typecheck": "pnpm --filter @workspace/iedr run typecheck",
     "validate": "pnpm --filter @workspace/iedr run validate",
-    "test": "pnpm --filter @workspace/iedr run test",
+    "test": "pnpm --filter @workspace/iedr run test && node --test workers/registryhub-admin-api/src/validate.test.mjs",
     "build": "pnpm --filter @workspace/iedr run build",
     "check-links": "pnpm --filter @workspace/iedr run check-links"
   }

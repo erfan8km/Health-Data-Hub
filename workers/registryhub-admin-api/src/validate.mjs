@@ -1,21 +1,23 @@
-const REGISTRY_KEYS = new Set(["slug", "fa", "en", "country", "city", "categories", "description", "officialUrl", "targetPopulation", "center", "status", "lastReviewedAt", "startYear", "registryType", "dataSummary", "researchContact", "keyPublications"]);
+const REGISTRY_KEYS = new Set(["slug", "fa", "en", "country", "province", "city", "categories", "description", "officialUrl", "targetPopulation", "center", "status", "lastReviewedAt", "startYear", "registryType", "dataSummary", "researchContact", "keyPublications"]);
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const MAX_REGISTRIES = 5000;
 const MAX_TEXT_LENGTH = 20000;
 
 /**
- * Pure payload validation for the future server-side admin API.
- * Returns { ok, errors }; does not mutate inputs or perform network/file access.
+ * Pure payload validation for the admin API.
+ * Province IDs are checked against trusted metadata, but the active flag is
+ * intentionally not enforced: inactive provinces may be prepared as metadata.
  */
-export function validateRegistryPayload(registries, categories, countries) {
+export function validateRegistryPayload(registries, categories, countries, provinces) {
   const errors = [];
   if (!Array.isArray(registries)) return { ok: false, errors: ["payload must be an array"] };
-  if (!Array.isArray(categories) || !Array.isArray(countries)) {
-    return { ok: false, errors: ["trusted categories and countries must be arrays"] };
+  if (!Array.isArray(categories) || !Array.isArray(countries) || !Array.isArray(provinces)) {
+    return { ok: false, errors: ["trusted categories, countries, and provinces must be arrays"] };
   }
   if (registries.length > MAX_REGISTRIES) errors.push(`payload exceeds ${MAX_REGISTRIES} registry records`);
   const categoryIds = new Set(categories.map((row) => row?.id).filter((id) => typeof id === "string"));
   const countryIds = new Set(countries.map((row) => row?.id).filter((id) => typeof id === "string"));
+  const provinceIds = new Set(provinces.map((row) => row?.id).filter((id) => typeof id === "string"));
   const slugs = new Set();
 
   registries.forEach((row, index) => {
@@ -27,7 +29,7 @@ export function validateRegistryPayload(registries, categories, countries) {
     for (const key of Object.keys(row)) {
       if (!REGISTRY_KEYS.has(key)) errors.push(`${label} has unsupported field "${key}"`);
     }
-    for (const key of ["slug", "fa", "en", "country", "city", "description", "officialUrl", "targetPopulation", "center", "status", "lastReviewedAt", "startYear", "registryType", "dataSummary", "researchContact"]) {
+    for (const key of ["slug", "fa", "en", "country", "province", "city", "description", "officialUrl", "targetPopulation", "center", "status", "lastReviewedAt", "startYear", "registryType", "dataSummary", "researchContact"]) {
       if (typeof row[key] !== "string") errors.push(`${label}.${key} must be a string`);
       else if (row[key].length > MAX_TEXT_LENGTH) errors.push(`${label}.${key} is too long`);
     }
@@ -36,11 +38,14 @@ export function validateRegistryPayload(registries, categories, countries) {
       if (slugs.has(row.slug)) errors.push(`duplicate slug "${row.slug}"`);
       slugs.add(row.slug);
     }
-    for (const key of ["fa", "en", "country", "city"]) {
+    for (const key of ["fa", "en", "country", "province", "city"]) {
       if (typeof row[key] === "string" && !row[key].trim()) errors.push(`${label}.${key} is required`);
     }
     if (typeof row.country === "string" && !countryIds.has(row.country)) {
       errors.push(`${label} references unknown country "${row.country}"`);
+    }
+    if (typeof row.province === "string" && row.province && !provinceIds.has(row.province)) {
+      errors.push(`${label} references unknown province "${row.province}"`);
     }
     if (!Array.isArray(row.categories) || row.categories.length !== 1) {
       errors.push(`${label}.categories must contain exactly one category ID`);
@@ -64,7 +69,7 @@ export function validateRegistryPayload(registries, categories, countries) {
       }
     }
     if (!Array.isArray(row.keyPublications)) {
-      errors.push(label + ".keyPublications must be an array");
+      errors.push(`${label}.keyPublications must be an array`);
     } else {
       row.keyPublications.forEach((publication, publicationIndex) => {
         const publicationLabel = label + ".keyPublications[" + publicationIndex + "]";
