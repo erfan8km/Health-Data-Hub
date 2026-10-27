@@ -20,25 +20,25 @@ const icons: Record<string, typeof Activity> = {
   sleep: Moon, gi: Stethoscope, immun: ShieldCheck, "neuro-icu": Brain, oral: Sparkles,
 };
 const englishBlurbs: Record<string, string> = {
-  gyn: "Women's health, obstetrics and reproductive medicine",
+  gyn: "Women's health and obstetrics",
   onc: "Cancer registries and oncology research",
-  peds: "Paediatric registries and child health",
-  endo: "Endocrine, metabolic and obesity-related registries",
-  ent: "Otolaryngology and hearing-related registries",
-  eye: "Ophthalmology and vision research",
-  sleep: "Sleep medicine and sleep-disorder registries",
+  peds: "Paediatric diseases and child-health registries",
+  endo: "Endocrine and metabolic disorders",
+  ent: "Otolaryngology and audiology",
+  eye: "Ophthalmology and vision sciences",
+  sleep: "Respiratory medicine and sleep disorders",
   gi: "Gastroenterology, hepatology and transplantation",
-  immun: "Immunology and infectious-disease registries",
-  "neuro-icu": "Neurology, brain health and critical care",
-  oral: "Oral medicine and dental research",
+  immun: "Infectious diseases and immunology",
+  "neuro-icu": "Neurology and brain-death care",
+  oral: "Dermatology and oral mucosal disease",
 };
 const persianBlurbs: Record<string, string> = {
-  gyn: "سلامت زنان، مامایی و پزشکی باروری", onc: "ریجستری‌های سرطان و پژوهش‌های انکولوژی",
-  peds: "ریجستری‌های کودکان و سلامت اطفال", endo: "غدد درون‌ریز، متابولیسم و چاقی",
-  ent: "گوش، حلق و بینی و شنوایی", eye: "چشم‌پزشکی و پژوهش‌های بینایی",
-  sleep: "پزشکی خواب و اختلالات خواب", gi: "گوارش، کبد و پیوند",
-  immun: "ایمنی‌شناسی و بیماری‌های عفونی", "neuro-icu": "مغز و اعصاب و مراقبت‌های ویژه",
-  oral: "پزشکی دهان و پژوهش‌های دندان‌پزشکی",
+  gyn: "سلامت زنان و مامایی", onc: "ریجستری‌های سرطان و پژوهش‌های سرطان‌شناسی",
+  peds: "بیماری‌های کودکان و سلامت اطفال", endo: "غدد درون‌ریز و اختلالات متابولیک",
+  ent: "گوش، حلق و بینی و شنوایی‌شناسی", eye: "چشم‌پزشکی و علوم بینایی",
+  sleep: "بیماری‌های تنفسی و اختلالات خواب", gi: "گوارش، کبد و پیوند",
+  immun: "بیماری‌های عفونی و ایمنی‌شناسی", "neuro-icu": "مغز و اعصاب و مراقبت‌های مرتبط با مرگ مغزی",
+  oral: "پوست و بیماری‌های مخاطی دهان",
 };
 
 function parseRoute(): Route {
