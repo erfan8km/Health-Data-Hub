@@ -59,10 +59,10 @@ for (const registry of registries) {
   for (const key of ["description", "targetPopulation", "center", "status", "lastReviewedAt", "startYear", "registryType", "dataSummary", "researchContact", "officialUrl"]) {
     if (typeof registry[key] !== "string") errors.push('registry "' + registry.slug + '": ' + key + " must be a string");
   }
-  if (registry.lastReviewedAt && !/^\\d{4}-\\d{2}-\\d{2}$/.test(registry.lastReviewedAt)) {
+  if (registry.lastReviewedAt && !/^\d{4}-\d{2}-\d{2}$/.test(registry.lastReviewedAt)) {
     errors.push('registry "' + registry.slug + '": lastReviewedAt must use YYYY-MM-DD or be empty');
   }
-  if (registry.startYear && !/^\\d{4}$/.test(registry.startYear)) {
+  if (registry.startYear && !/^\d{4}$/.test(registry.startYear)) {
     errors.push('registry "' + registry.slug + '": startYear must use four digits or be empty');
   }
   if (registry.officialUrl) {
