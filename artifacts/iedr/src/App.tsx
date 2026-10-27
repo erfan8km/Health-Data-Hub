@@ -10,7 +10,7 @@ import ProvinceMap from "./components/ProvinceMap";
 type Category = { id: string; fa: string; en: string };
 type Country = { id: string; iso3: string; fa: string; en: string; coordinates: { longitude: number; latitude: number; height: number } };
 type Province = { id: string; fa: string; en: string; active: boolean };
-type Registry = { slug: string; fa: string; en: string; country: string; province: string; city: string; categories: string[]; description: string; officialUrl: string };
+type Registry = { slug: string; fa: string; en: string; country: string; province: string; city: string; categories: string[]; description: string; officialUrl: string; targetPopulation: string; center: string; status: string; lastReviewedAt: string; startYear: string; registryType: string; dataSummary: string; researchContact: string; keyPublications: { title: string; url: string }[] };
 type View = "globe" | "provinces" | "categories" | "category" | "registry";
 type Route = { view: View; slug?: string; provinceId?: string };
 const ACTIVE_PROVINCE_ID = "razavi-khorasan";
@@ -131,6 +131,7 @@ function App() {
     return !text || [registry.fa, registry.en, registry.slug].some((value) => value.toLocaleLowerCase().includes(text));
   }), [visibleRegistries, query, route.view, route.slug]);
   const categoryBlurb = (id: string) => (english ? englishBlurbs[id] : persianBlurbs[id]) || "";
+  const missingMetadataText = english ? "Not completed yet" : "هنوز تکمیل نشده";
 
   return (
     <main className={"app-root" + ((route.view === "category" || route.view === "registry") ? " app-root-paper" : " app-root-space")}>
@@ -216,13 +217,42 @@ function App() {
           <div className="breadcrumb"><button type="button" onClick={() => navigate("categories/" + (route.provinceId || ACTIVE_PROVINCE_ID))}>{english ? "Clinical categories" : "دسته‌های بالینی"}</button><ChevronLeft size={14} /><button type="button" onClick={() => navigate("category/" + (selectedRegistry?.categories[0] || "gyn") + "/" + (route.provinceId || ACTIVE_PROVINCE_ID))}>{getText(categories.find((item) => item.id === selectedRegistry?.categories[0]), english)}</button><ChevronLeft size={14} /><span>{selectedRegistry ? (english ? selectedRegistry.en : selectedRegistry.fa) : (english ? "Registry" : "ریجستری")}</span></div>
           {!selectedRegistry ? <div className="empty-state"><h1>{english ? "Registry not found" : "ریجستری پیدا نشد"}</h1><button type="button" className="text-back" onClick={() => navigate("categories/" + (route.provinceId || ACTIVE_PROVINCE_ID))}>{english ? "Return to categories" : "بازگشت به دسته‌ها"} <ArrowLeft size={15} /></button></div> : <>
             <div className="detail-kicker"><span className="detail-kicker-icon"><Activity size={18} /></span><span>{english ? "REGISTRY PROFILE" : "شناسنامه‌ی ریجستری"}</span><span className="detail-id">RegistryHub / {selectedRegistry.slug.toUpperCase()}</span></div>
-            <div className="registry-detail-heading"><p className="section-kicker">{english ? "IRAN · RAZAVI KHORASAN · MASHHAD" : "ایران · خراسان رضوی · مشهد"}</p><h1>{english ? selectedRegistry.en : selectedRegistry.fa}</h1><p className="detail-english-title">{english ? selectedRegistry.fa : selectedRegistry.en}</p></div>
+            <div className="registry-detail-heading"><p className="section-kicker">{english ? "BILINGUAL REGISTRY TITLES" : "عنوان فارسی و انگلیسی"}</p><h1>{english ? selectedRegistry.en : selectedRegistry.fa}</h1><p className="detail-english-title">{english ? selectedRegistry.fa : selectedRegistry.en}</p></div>
             <div className="detail-content-grid">
               <article className="detail-main-card">
-                <h2>{english ? "Registry overview" : "معرفی ریجستری"}</h2>
-                {selectedRegistry.description.trim() ? <p>{selectedRegistry.description}</p> : null}
+                <h2>{english ? "Registry profile" : "مشخصات ریجستری"}</h2>
+                <h3>{english ? "Short description" : "توضیح کوتاه"}</h3>
+                <p>{selectedRegistry.description.trim() || missingMetadataText}</p>
                 <div className="detail-separator" />
-                <h3>{english ? "Clinical categories" : "دسته‌های بالینی"}</h3>
+                <h3>{english ? "Target population" : "جمعیت هدف"}</h3>
+                <p>{selectedRegistry.targetPopulation.trim() || missingMetadataText}</p>
+                <div className="detail-separator" />
+                <h3>{english ? "Center and city" : "مرکز و شهر"}</h3>
+                <div className="side-info"><small>{english ? "CENTER" : "مرکز"}</small><strong>{selectedRegistry.center.trim() || missingMetadataText}</strong></div>
+                <div className="side-info"><small>{english ? "CITY" : "شهر"}</small><strong>{selectedRegistry.city === "mashhad" ? (english ? "Mashhad" : "مشهد") : selectedRegistry.city || missingMetadataText}</strong></div>
+                <div className="detail-separator" />
+                <h3>{english ? "Status" : "وضعیت"}</h3>
+                <p>{selectedRegistry.status.trim() || missingMetadataText}</p>
+                <div className="detail-separator" />
+                <h3>{english ? "Last information review" : "تاریخ آخرین بررسی اطلاعات"}</h3>
+                <p>{selectedRegistry.lastReviewedAt.trim() || missingMetadataText}</p>
+                <div className="detail-separator" />
+                <h3>{english ? "Start year" : "سال شروع"}</h3>
+                <p>{selectedRegistry.startYear.trim() || missingMetadataText}</p>
+                <div className="detail-separator" />
+                <h3>{english ? "Registry type" : "نوع ریجستری"}</h3>
+                <p>{selectedRegistry.registryType.trim() || missingMetadataText}</p>
+                <div className="detail-separator" />
+                <h3>{english ? "Summary of collected data" : "خلاصه‌ی نوع داده‌هایی که جمع‌آوری می‌شود"}</h3>
+                <p>{selectedRegistry.dataSummary.trim() || missingMetadataText}</p>
+                <div className="detail-separator" />
+                <h3>{english ? "Research contact or collaboration" : "راه ارتباط یا همکاری پژوهشی"}</h3>
+                <p>{selectedRegistry.researchContact.trim() || missingMetadataText}</p>
+                <div className="detail-separator" />
+                <h3>{english ? "Key publications" : "مقالات اصلی با لینک"}</h3>
+                {selectedRegistry.keyPublications.length ? <ul>{selectedRegistry.keyPublications.map((publication, index) => <li key={index}>{publication.url.trim() ? <a href={publication.url} target="_blank" rel="noopener noreferrer">{publication.title || publication.url}</a> : (publication.title || missingMetadataText)}</li>)}</ul> : <p>{missingMetadataText}</p>}
+                <div className="detail-separator" />
+                <h3>{english ? "Clinical category" : "حیطه‌ی بالینی"}</h3>
                 <div className="detail-tags">{selectedRegistry.categories.map((id) => {
                   const category = categories.find((item) => item.id === id);
                   return <button key={id} type="button" className="detail-tag" onClick={() => navigate("category/" + id + "/" + (route.provinceId || ACTIVE_PROVINCE_ID))}>{getText(category, english)} <ArrowDownLeft size={13} /></button>;
