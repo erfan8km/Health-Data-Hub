@@ -115,14 +115,15 @@ async function handleChat(request, env, origin) {
   const message = body.message.trim();
   if (!message || message.length > MAX_MESSAGE_CHARS) return json({ error: "message_length_invalid", max_chars: MAX_MESSAGE_CHARS }, 400, origin);
 
-  let catalogue;
-  try { catalogue = await readCatalogue(env); }
-  catch { return json({ error: "catalogue_unavailable", message: "فعلاً دسترسی به کاتالوگ ممکن نیست. لطفاً بعداً تلاش کنید." }, 503, origin); }
-
+  // Apply quotas before any upstream catalogue fetch to reduce abuse and unnecessary work.
   let allowed;
   try { allowed = await checkLimits(request, env); }
   catch { return json({ error: "rate_limit_unavailable" }, 503, origin); }
   if (!allowed) return json({ error: "rate_limit_exceeded", message: "محدودیت درخواست اعمال شده است؛ کمی بعد دوباره تلاش کنید." }, 429, origin);
+
+  let catalogue;
+  try { catalogue = await readCatalogue(env); }
+  catch { return json({ error: "catalogue_unavailable", message: "فعلاً دسترسی به کاتالوگ ممکن نیست. لطفاً بعداً تلاش کنید." }, 503, origin); }
 
   const context = catalogue.map((r) => ({
     slug: r.slug, fa: r.fa || "", en: r.en || "", country: r.country || "",
