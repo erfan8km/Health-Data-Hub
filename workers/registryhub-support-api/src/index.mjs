@@ -89,7 +89,7 @@ async function checkLimits(request, env) {
   const minuteBucket = Math.floor(Date.now() / 60000);
   const ipOk = await consumeLimit(env.DB, `ip:${ipHash}:${minuteBucket}`, 10);
   if (!ipOk) return false;
-  const dailyOk = await consumeLimit(env.DB, "global:chat", Number(env.DAILY_MESSAGE_LIMIT || 1000));
+  const dailyOk = await consumeLimit(env.DB, "global:chat", Number(env.DAILY_MESSAGE_LIMIT || 50));
   return dailyOk;
 }
 
