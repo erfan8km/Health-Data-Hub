@@ -1,57 +1,67 @@
 [
   {
     "id": "gyn",
-    "fa": "زنان، زایمان و ناباروری",
-    "en": "Women, Obstetrics & Infertility"
+    "fa": "زنان و مامایی",
+    "en": "Obstetrics & Gynecology"
   },
+
   {
     "id": "onc",
-    "fa": "سرطان‌ها",
-    "en": "Cancers"
+    "fa": "سرطان‌شناسی",
+    "en": "Oncology"
   },
+
   {
     "id": "peds",
-    "fa": "کودکان",
-    "en": "Children"
+    "fa": "بیماری‌های کودکان",
+    "en": "Pediatrics"
   },
+
   {
     "id": "endo",
-    "fa": "غدد، متابولیسم و چاقی",
-    "en": "Endocrinology, Metabolism & Obesity"
+    "fa": "غدد درون‌ریز و بیماری‌های متابولیک",
+    "en": "Endocrinology & Metabolic Disorders"
   },
-  {
-    "id": "ent",
-    "fa": "گوش، حلق و بینی",
-    "en": "Ear, Nose & Throat"
-  },
-  {
-    "id": "eye",
-    "fa": "چشم",
-    "en": "Eye"
-  },
+
   {
     "id": "sleep",
-    "fa": "خواب",
-    "en": "Sleep"
+    "fa": "بیماری‌های تنفسی و اختلالات خواب",
+    "en": "Respiratory Medicine & Sleep Medicine"
   },
-  {
-    "id": "gi",
-    "fa": "گوارش و کبد",
-    "en": "Gastroenterology & Liver"
-  },
+
   {
     "id": "immun",
-    "fa": "ایمنی و عفونی",
-    "en": "Immunity & Infectious Diseases"
+    "fa": "بیماری‌های عفونی و ایمنی‌شناسی",
+    "en": "Infectious Diseases & Immunology"
   },
+
   {
-    "id": "neuro-icu",
-    "fa": "اعصاب و مراقبت‌های ویژه",
-    "en": "Neurology & Intensive Care"
+    "id": "gi",
+    "fa": "گوارش، کبد و پیوند",
+    "en": "Gastroenterology, Hepatology & Transplantation"
   },
+
+  {
+    "id": "ent",
+    "fa": "گوش، حلق و بینی و شنوایی‌شناسی",
+    "en": "Otolaryngology & Audiology"
+  },
+
+  {
+    "id": "eye",
+    "fa": "چشم‌پزشکی و علوم بینایی",
+    "en": "Ophthalmology & Vision Sciences"
+  },
+
   {
     "id": "oral",
-    "fa": "دهان و دندان",
-    "en": "Oral & Dental"
+    "fa": "پوست و بیماری‌های مخاطی دهان",
+    "en": "Dermatology & Oral Medicine"
+  },
+
+  {
+    "id": "neuro-icu",
+    "fa": "مغز و اعصاب و مراقبت‌های مرتبط با مرگ مغزی",
+    "en": "Neurology & Brain Death"
   }
 ]
