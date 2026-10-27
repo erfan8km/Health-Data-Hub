@@ -32,3 +32,6 @@ jobs:
       - name: Validate admin Worker bundle without deploying
         working-directory: workers/registryhub-admin-api
         run: npx --yes wrangler@4 deploy --dry-run
+      - name: Validate support Worker bundle without deploying
+        working-directory: workers/registryhub-support-api
+        run: npx --yes wrangler@4 deploy --dry-run
