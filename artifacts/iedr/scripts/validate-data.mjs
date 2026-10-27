@@ -83,7 +83,8 @@ for (const registry of registries) {
       }
     });
   }
-  
+  }
+}
 if (!Array.isArray(borders.features)) errors.push("borders.geojson: a FeatureCollection with a features array is required");
 for (const country of countries) {
   if (registries.some((registry) => registry.country === country.id)) {
