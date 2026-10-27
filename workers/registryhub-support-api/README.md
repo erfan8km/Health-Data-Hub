@@ -18,7 +18,7 @@ Independent catalogue-only support API. It must not connect to GitHub or `regist
 ## Safeguards
 - Catalogue URL is fixed in Worker configuration, never accepted from a request.
 - Catalogue cache TTL is 300 seconds.
-- Per-IP hashed rate limit: 10 chats/minute and 3 reports/hour; global chat cap defaults to 1000/day.
+- Per-IP hashed rate limit: 10 chats/minute and 3 reports/hour; global chat cap defaults to 1000/day. A daily scheduled task removes usage-limit counters older than two days.
 - Raw IPs are not stored in D1. Configure `RATE_LIMIT_SALT` as a secret before public deployment.
 - Chat messages are not persisted. Report text is stored in D1 for human follow-up.
 - Do not ask users for personal or confidential medical information.
