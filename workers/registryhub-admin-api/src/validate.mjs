@@ -42,14 +42,12 @@ export function validateRegistryPayload(registries, categories, countries) {
     if (typeof row.country === "string" && !countryIds.has(row.country)) {
       errors.push(`${label} references unknown country "${row.country}"`);
     }
-    if (!Array.isArray(row.categories) || row.categories.length === 0) {
-      errors.push(`${label}.categories must contain at least one category ID`);
+    if (!Array.isArray(row.categories) || row.categories.length !== 1) {
+      errors.push(`${label}.categories must contain exactly one category ID`);
     } else {
-      const seenCategories = new Set();
-      for (const id of row.categories) {
-        if (typeof id !== "string" || !categoryIds.has(id)) errors.push(`${label} references unknown category "${String(id)}"`);
-        if (seenCategories.has(id)) errors.push(`${label} has duplicate category "${String(id)}"`);
-        seenCategories.add(id);
+      const id = row.categories[0];
+      if (typeof id !== "string" || !categoryIds.has(id)) {
+        errors.push(`${label} references unknown category "${String(id)}"`);
       }
     }
     if (typeof row.officialUrl === "string" && row.officialUrl.trim()) {
