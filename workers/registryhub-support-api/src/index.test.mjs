@@ -105,3 +105,62 @@ test("catalogue fields are explicitly treated as untrusted data in the model pro
   assert.match(source, /JSON\.stringify\(context\)\.replace/);
   assert.ok(source.includes("<" + "/catalogue_data_json>"));
 });
+
+test("chat returns only catalogue-backed registry links and strips model-generated URLs", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalCaches = Object.getOwnPropertyDescriptor(globalThis, "caches");
+  const catalogue = [{
+    slug: "known-registry",
+    fa: "ریجستری معتبر",
+    en: "Known Registry",
+    officialUrl: "https://official.example/registry"
+  }];
+  globalThis.caches = {
+    default: {
+      match: async () => undefined,
+      put: async () => undefined
+    }
+  };
+  globalThis.fetch = async () => new Response(JSON.stringify(catalogue), {
+    status: 200,
+    headers: { "content-type": "application/json" }
+  });
+  const fakeEnv = {
+    ...env,
+    RATE_LIMIT_SALT: "test-only-salt",
+    DB: {
+      prepare() {
+        return {
+          bind() { return this; },
+          first: async () => ({ request_count: 1 })
+        };
+      }
+    },
+    AI: {
+      run: async () => ({
+        response: JSON.stringify({
+          answer: "اطلاعات اینجاست https://evil.example/fake",
+          registry_slugs: ["known-registry", "invented-registry"]
+        })
+      })
+    }
+  };
+  try {
+    const response = await worker.fetch(new Request("https://support.example/api/chat", {
+      method: "POST",
+      headers: { Origin: env.PUBLIC_ORIGIN, "content-type": "application/json", "CF-Connecting-IP": "192.0.2.1" },
+      body: JSON.stringify({ message: "این ریجستری چیست؟" })
+    }), fakeEnv);
+    assert.equal(response.status, 200);
+    const data = await response.json();
+    assert.equal(data.answer.includes("https://evil.example/fake"), false);
+    assert.equal(data.registries.length, 1);
+    assert.equal(data.registries[0].slug, "known-registry");
+    assert.equal(data.registries[0].official_url, "https://official.example/registry");
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalCaches) Object.defineProperty(globalThis, "caches", originalCaches);
+    else delete globalThis.caches;
+  }
+});
+
