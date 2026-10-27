@@ -142,7 +142,6 @@ function App() {
           <span className="brand-symbol"><Globe2 size={19} /></span>
           <span className="brand-words"><strong>RegistryHub</strong><small>HEALTH REGISTRY DIRECTORY</small></span>
         </a>
-        <div className="header-center"><span className="header-live-dot" /> {english ? "IRAN HEALTH REGISTRY ATLAS" : "اطلس ریجستری‌های سلامت ایران"}</div>
         <div className="header-actions">
           <button className="subtle-button language-button" type="button" onClick={() => setEnglish((value) => !value)}>{english ? "فارسی" : "EN"}</button>
           <button className="icon-button menu-button" type="button" aria-label="منو" onClick={() => setMobileMenu((value) => !value)}>{mobileMenu ? <X size={19} /> : <Menu size={19} />}</button>
