@@ -19,12 +19,12 @@ Independent catalogue-only support API. It must not connect to GitHub or `regist
 - Catalogue URL is fixed in Worker configuration, never accepted from a request.
 - Catalogue cache TTL is 300 seconds.
 - Request bodies are capped at 16 KiB before JSON parsing; chat messages at 1200 characters and reports at 2000 characters.
-- Per-IP hashed rate limit: 10 chats/minute and 3 reports/hour; global chat cap defaults to 50/day for the initial beta, then can be raised after observing actual usage and cost. A daily scheduled task removes usage-limit counters older than two days.
+- Per-IP hashed chat limits: 10 chats/minute and 10 chats/day by default, plus a site-wide cap of 50 chats/day for the initial beta. These are independent limits. Reports are limited to 3/hour/IP. Configure the chat limits with `PER_IP_MINUTE_LIMIT`, `PER_IP_DAILY_MESSAGE_LIMIT`, and `DAILY_MESSAGE_LIMIT`. A daily scheduled task removes usage-limit counters older than two days.
 - Raw IPs are not stored in D1. Configure `RATE_LIMIT_SALT` as a secret before public deployment.
 - Chat messages are not persisted. Report text is stored in D1 for human follow-up.
 - Do not ask users for personal or confidential medical information.
 - The model is instructed not to return URLs; registry links are returned only when the exact slug and HTTPS URL exist in the published catalogue.
-- Prompt-injection testing is required before launch; a prompt is not a complete security boundary.
+- All catalogue fields, including descriptions and data summaries, are treated as untrusted data; instructions embedded in records must be ignored. Prompt-injection testing is still required before launch; a prompt is not a complete security boundary.
 - D1 report states: `new`, `in_review`, `resolved`.
 - No public endpoint reads or updates reports. Add a separately authenticated management workflow only if needed.
 
