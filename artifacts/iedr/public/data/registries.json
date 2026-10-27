@@ -10,7 +10,16 @@
       "sleep"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "sleep-disorders",
@@ -23,7 +32,16 @@
       "sleep"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "trophoblastic-disease",
@@ -36,7 +54,16 @@
       "gyn"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "ovarian-cancer",
@@ -49,7 +76,16 @@
       "onc"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "recurrent-miscarriage",
@@ -62,7 +98,16 @@
       "gyn"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "oral-lichen-planus",
@@ -75,7 +120,16 @@
       "oral"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "infertility",
@@ -88,7 +142,16 @@
       "gyn"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "malignant-otitis-externa",
@@ -101,7 +164,16 @@
       "ent"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "obesity",
@@ -114,7 +186,16 @@
       "endo"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "chronic-rhinosinusitis",
@@ -127,7 +208,16 @@
       "sleep"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "esophageal-atresia",
@@ -140,7 +230,16 @@
       "peds"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "childhood-obesity",
@@ -153,7 +252,16 @@
       "endo"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "type1-diabetes-children",
@@ -166,7 +274,16 @@
       "endo"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "childhood-cancer",
@@ -179,7 +296,16 @@
       "onc"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "omid-hospital-cancer",
@@ -192,7 +318,16 @@
       "onc"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "cystic-fibrosis",
@@ -205,7 +340,16 @@
       "sleep"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "inborn-metabolic-disorders",
@@ -218,7 +362,16 @@
       "endo"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "primary-immunodeficiency",
@@ -231,7 +384,16 @@
       "immun"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "invasive-fungal-mucormycosis",
@@ -244,7 +406,16 @@
       "immun"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "colorectal-cancer",
@@ -257,7 +428,16 @@
       "onc"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "ssnhl",
@@ -270,7 +450,16 @@
       "ent"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "rop-screening",
@@ -283,7 +472,16 @@
       "eye"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "opportunistic-pathogens",
@@ -296,7 +494,16 @@
       "immun"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "endometriosis",
@@ -309,7 +516,16 @@
       "gyn"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "cornea-rna-biobank",
@@ -322,7 +538,16 @@
       "eye"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "liver-transplantation",
@@ -335,7 +560,16 @@
       "gi"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "endometrial-cancer",
@@ -348,7 +582,16 @@
       "onc"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "hepatic-hydatid-cyst",
@@ -361,7 +604,16 @@
       "gi"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "granulomatous-mastitis",
@@ -374,7 +626,16 @@
       "gyn"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "brain-death",
@@ -387,6 +648,15 @@
       "neuro-icu"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   }
 ]
