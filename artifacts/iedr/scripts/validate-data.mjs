@@ -50,10 +50,11 @@ for (const registry of registries) {
   if (!countryIds.has(registry.country)) errors.push(`registry "${registry.slug}": unknown country "${registry.country}"`);
   if (!provinceIds.has(registry.province)) errors.push(`registry "${registry.slug}": unknown province "${registry.province}"`);
   if (typeof registry.city !== "string" || !registry.city.trim()) errors.push(`registry "${registry.slug}": city must be provided`);
-  if (!Array.isArray(registry.categories) || registry.categories.length === 0) {
-    errors.push(`registry "${registry.slug}": at least one category is required`);
+  if (!Array.isArray(registry.categories) || registry.categories.length !== 1) {
+    errors.push(`registry "${registry.slug}": exactly one category is required`);
   } else {
-    for (const id of registry.categories) if (!categoryIds.has(id)) errors.push(`registry "${registry.slug}": unknown category "${id}"`);
+    const id = registry.categories[0];
+    if (!categoryIds.has(id)) errors.push(`registry "${registry.slug}": unknown category "${id}"`);
   }
   if (typeof registry.description !== "string") errors.push(`registry "${registry.slug}": description must be a string`);
   if (typeof registry.officialUrl !== "string") errors.push(`registry "${registry.slug}": officialUrl must be a string`);
