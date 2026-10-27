@@ -7,8 +7,7 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "sleep",
-      "ent"
+      "sleep"
     ],
     "description": "",
     "officialUrl": ""
@@ -34,8 +33,7 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "gyn",
-      "onc"
+      "gyn"
     ],
     "description": "",
     "officialUrl": ""
@@ -48,7 +46,6 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "gyn",
       "onc"
     ],
     "description": "",
@@ -101,8 +98,7 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "ent",
-      "immun"
+      "ent"
     ],
     "description": "",
     "officialUrl": ""
@@ -128,7 +124,7 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "ent"
+      "sleep"
     ],
     "description": "",
     "officialUrl": ""
@@ -141,8 +137,7 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "peds",
-      "gi"
+      "peds"
     ],
     "description": "",
     "officialUrl": ""
@@ -155,7 +150,6 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "peds",
       "endo"
     ],
     "description": "",
@@ -169,7 +163,6 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "peds",
       "endo"
     ],
     "description": "",
@@ -183,7 +176,6 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "peds",
       "onc"
     ],
     "description": "",
@@ -210,7 +202,7 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "peds"
+      "sleep"
     ],
     "description": "",
     "officialUrl": ""
@@ -223,7 +215,6 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "peds",
       "endo"
     ],
     "description": "",
@@ -263,8 +254,7 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "onc",
-      "gi"
+      "onc"
     ],
     "description": "",
     "officialUrl": ""
@@ -290,8 +280,7 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "eye",
-      "peds"
+      "eye"
     ],
     "description": "",
     "officialUrl": ""
@@ -356,7 +345,6 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "gyn",
       "onc"
     ],
     "description": "",
@@ -370,8 +358,7 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "gi",
-      "immun"
+      "gi"
     ],
     "description": "",
     "officialUrl": ""
