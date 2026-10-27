@@ -50,19 +50,38 @@ for (const registry of registries) {
   if (!countryIds.has(registry.country)) errors.push(`registry "${registry.slug}": unknown country "${registry.country}"`);
   if (!provinceIds.has(registry.province)) errors.push(`registry "${registry.slug}": unknown province "${registry.province}"`);
   if (typeof registry.city !== "string" || !registry.city.trim()) errors.push(`registry "${registry.slug}": city must be provided`);
-  if (!Array.isArray(registry.categories) || registry.categories.length === 0) {
-    errors.push(`registry "${registry.slug}": at least one category is required`);
+  if (!Array.isArray(registry.categories) || registry.categories.length !== 1) {
+    errors.push(`registry "${registry.slug}": exactly one category is required`);
   } else {
-    for (const id of registry.categories) if (!categoryIds.has(id)) errors.push(`registry "${registry.slug}": unknown category "${id}"`);
+    const id = registry.categories[0];
+    if (!categoryIds.has(id)) errors.push(`registry "${registry.slug}": unknown category "${id}"`);
   }
-  if (typeof registry.description !== "string") errors.push(`registry "${registry.slug}": description must be a string`);
-  if (typeof registry.officialUrl !== "string") errors.push(`registry "${registry.slug}": officialUrl must be a string`);
+  for (const key of ["description", "targetPopulation", "center", "status", "lastReviewedAt", "startYear", "registryType", "dataSummary", "researchContact", "officialUrl"]) {
+    if (typeof registry[key] !== "string") errors.push('registry "' + registry.slug + '": ' + key + " must be a string");
+  }
+  if (registry.lastReviewedAt && !/^\d{4}-\d{2}-\d{2}$/.test(registry.lastReviewedAt)) {
+    errors.push('registry "' + registry.slug + '": lastReviewedAt must use YYYY-MM-DD or be empty');
+  }
+  if (registry.startYear && !/^\d{4}$/.test(registry.startYear)) {
+    errors.push('registry "' + registry.slug + '": startYear must use four digits or be empty');
+  }
   if (registry.officialUrl) {
-    try {
-      if (new URL(registry.officialUrl).protocol !== "https:") throw new Error();
-    } catch {
-      errors.push(`registry "${registry.slug}": officialUrl must be a valid HTTPS URL`);
-    }
+    try { if (new URL(registry.officialUrl).protocol !== "https:") throw new Error(); }
+    catch { errors.push('registry "' + registry.slug + '": officialUrl must be a valid HTTPS URL'); }
+  }
+  if (!Array.isArray(registry.keyPublications)) {
+    errors.push('registry "' + registry.slug + '": keyPublications must be an array');
+  } else {
+    registry.keyPublications.forEach((publication, index) => {
+      if (!publication || typeof publication !== "object" || Array.isArray(publication)) {
+        errors.push('registry "' + registry.slug + '": keyPublications[' + index + '] must be an object');
+      } else if (typeof publication.title !== "string" || !publication.title.trim() || typeof publication.url !== "string" || !publication.url.trim()) {
+        errors.push('registry "' + registry.slug + '": each key publication needs a title and URL');
+      } else {
+        try { if (new URL(publication.url).protocol !== "https:") throw new Error(); }
+        catch { errors.push('registry "' + registry.slug + '": publication URLs must be valid HTTPS URLs'); }
+      }
+    });
   }
 }
 if (!Array.isArray(borders.features)) errors.push("borders.geojson: a FeatureCollection with a features array is required");

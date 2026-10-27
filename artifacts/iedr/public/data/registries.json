@@ -7,11 +7,19 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "sleep",
-      "ent"
+      "sleep"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "sleep-disorders",
@@ -24,7 +32,16 @@
       "sleep"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "trophoblastic-disease",
@@ -34,11 +51,19 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "gyn",
-      "onc"
+      "gyn"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "ovarian-cancer",
@@ -48,11 +73,19 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "gyn",
       "onc"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "recurrent-miscarriage",
@@ -65,7 +98,16 @@
       "gyn"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "oral-lichen-planus",
@@ -78,7 +120,16 @@
       "oral"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "infertility",
@@ -91,7 +142,16 @@
       "gyn"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "malignant-otitis-externa",
@@ -101,11 +161,19 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "ent",
-      "immun"
+      "ent"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "obesity",
@@ -118,7 +186,16 @@
       "endo"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "chronic-rhinosinusitis",
@@ -128,10 +205,19 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "ent"
+      "sleep"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "esophageal-atresia",
@@ -141,11 +227,19 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "peds",
-      "gi"
+      "peds"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "childhood-obesity",
@@ -155,11 +249,19 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "peds",
       "endo"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "type1-diabetes-children",
@@ -169,11 +271,19 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "peds",
       "endo"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "childhood-cancer",
@@ -183,11 +293,19 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "peds",
       "onc"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "omid-hospital-cancer",
@@ -200,7 +318,16 @@
       "onc"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "cystic-fibrosis",
@@ -210,10 +337,19 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "peds"
+      "sleep"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "inborn-metabolic-disorders",
@@ -223,11 +359,19 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "peds",
       "endo"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "primary-immunodeficiency",
@@ -240,7 +384,16 @@
       "immun"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "invasive-fungal-mucormycosis",
@@ -253,7 +406,16 @@
       "immun"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "colorectal-cancer",
@@ -263,11 +425,19 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "onc",
-      "gi"
+      "onc"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "ssnhl",
@@ -280,7 +450,16 @@
       "ent"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "rop-screening",
@@ -290,11 +469,19 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "eye",
-      "peds"
+      "eye"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "opportunistic-pathogens",
@@ -307,7 +494,16 @@
       "immun"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "endometriosis",
@@ -320,7 +516,16 @@
       "gyn"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "cornea-rna-biobank",
@@ -333,7 +538,16 @@
       "eye"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "liver-transplantation",
@@ -346,7 +560,16 @@
       "gi"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "endometrial-cancer",
@@ -356,11 +579,19 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "gyn",
       "onc"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "hepatic-hydatid-cyst",
@@ -370,11 +601,19 @@
     "province": "razavi-khorasan",
     "city": "mashhad",
     "categories": [
-      "gi",
-      "immun"
+      "gi"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "granulomatous-mastitis",
@@ -387,7 +626,16 @@
       "gyn"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   },
   {
     "slug": "brain-death",
@@ -400,6 +648,15 @@
       "neuro-icu"
     ],
     "description": "",
-    "officialUrl": ""
+    "officialUrl": "",
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": []
   }
 ]
