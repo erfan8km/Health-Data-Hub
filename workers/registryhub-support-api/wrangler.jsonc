@@ -7,7 +7,7 @@
   "vars": {
     "PUBLIC_ORIGIN": "https://registryhub.erfan8km.workers.dev",
     "CATALOG_URL": "https://registryhub.erfan8km.workers.dev/data/registries.json",
-    "DAILY_MESSAGE_LIMIT": "1000"
+    "DAILY_MESSAGE_LIMIT": "50"
   },
   "ai": { "binding": "AI" },
   "d1_databases": [{
