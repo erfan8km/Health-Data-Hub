@@ -265,3 +265,89 @@ test("catalogue prompt-injection delimiters are escaped before reaching the mode
     else delete globalThis.caches;
   }
 });
+
+
+test("chat per-IP daily quota rejects before catalogue fetch when minute quota passes", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalCaches = Object.getOwnPropertyDescriptor(globalThis, "caches");
+  let limitChecks = 0;
+  let fetchCalls = 0;
+  globalThis.fetch = async () => { fetchCalls++; throw new Error("should not fetch"); };
+  globalThis.caches = { default: { match: async () => undefined, put: async () => undefined } };
+  const fakeEnv = {
+    ...env, RATE_LIMIT_SALT: "test-only-salt",
+    DB: { prepare() { return { bind() { return this; }, first: async () => (++limitChecks === 1 ? { request_count: 1 } : null) }; } },
+    AI: { run: async () => { throw new Error("should not call AI"); } }
+  };
+  try {
+    const response = await worker.fetch(new Request("https://support.example/api/chat", {
+      method: "POST",
+      headers: { Origin: env.PUBLIC_ORIGIN, "content-type": "application/json", "CF-Connecting-IP": "192.0.2.23" },
+      body: JSON.stringify({ message: "Tell me about a registry" })
+    }), fakeEnv);
+    assert.equal(response.status, 429);
+    assert.equal((await response.json()).error, "rate_limit_exceeded");
+    assert.equal(limitChecks, 2, "minute bucket passes and daily IP bucket denies");
+    assert.equal(fetchCalls, 0);
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalCaches) Object.defineProperty(globalThis, "caches", originalCaches);
+    else delete globalThis.caches;
+  }
+});
+
+test("global daily chat quota rejects after per-IP quotas pass", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalCaches = Object.getOwnPropertyDescriptor(globalThis, "caches");
+  let limitChecks = 0;
+  let fetchCalls = 0;
+  globalThis.fetch = async () => { fetchCalls++; throw new Error("should not fetch"); };
+  globalThis.caches = { default: { match: async () => undefined, put: async () => undefined } };
+  const fakeEnv = {
+    ...env, RATE_LIMIT_SALT: "test-only-salt",
+    DB: { prepare() { return { bind() { return this; }, first: async () => (++limitChecks < 3 ? { request_count: 1 } : null) }; } },
+    AI: { run: async () => { throw new Error("should not call AI"); } }
+  };
+  try {
+    const response = await worker.fetch(new Request("https://support.example/api/chat", {
+      method: "POST",
+      headers: { Origin: env.PUBLIC_ORIGIN, "content-type": "application/json", "CF-Connecting-IP": "192.0.2.24" },
+      body: JSON.stringify({ message: "Tell me about a registry" })
+    }), fakeEnv);
+    assert.equal(response.status, 429);
+    assert.equal((await response.json()).error, "rate_limit_exceeded");
+    assert.equal(limitChecks, 3, "minute and IP daily buckets pass, global bucket denies");
+    assert.equal(fetchCalls, 0);
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalCaches) Object.defineProperty(globalThis, "caches", originalCaches);
+    else delete globalThis.caches;
+  }
+});
+
+test("report quota rejects the fourth report without persisting it", async () => {
+  let reportWrites = 0;
+  let quotaSql = "";
+  const fakeEnv = {
+    ...env, RATE_LIMIT_SALT: "test-only-salt",
+    DB: {
+      prepare(statement) {
+        quotaSql = statement;
+        return {
+          bind() { return this; },
+          first: async () => null,
+          run: async () => { reportWrites++; return { success: true }; }
+        };
+      }
+    }
+  };
+  const response = await worker.fetch(new Request("https://support.example/api/report", {
+    method: "POST",
+    headers: { Origin: env.PUBLIC_ORIGIN, "content-type": "application/json", "CF-Connecting-IP": "192.0.2.25" },
+    body: JSON.stringify({ message: "Another report to test the limit." })
+  }), fakeEnv);
+  assert.equal(response.status, 429);
+  assert.equal((await response.json()).error, "report_rate_limit");
+  assert.match(quotaSql, /INSERT INTO usage_limits/);
+  assert.equal(reportWrites, 0, "blocked report must not be inserted into support_reports");
+});
