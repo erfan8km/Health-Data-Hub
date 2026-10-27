@@ -67,3 +67,23 @@ test("scheduled cleanup removes old usage-limit counters", async () => {
   assert.equal(waited, true);
   assert.match(sql, /DELETE FROM usage_limits WHERE bucket_date < date\('now', '-2 days'\)/);
 });
+
+test("rejects oversized raw request bodies before JSON parsing", async () => {
+  const response = await worker.fetch(new Request("https://support.example/api/chat", {
+    method: "POST",
+    headers: { Origin: env.PUBLIC_ORIGIN, "content-type": "application/json" },
+    body: JSON.stringify({ message: "x".repeat(17000) })
+  }), env);
+  assert.equal(response.status, 413);
+  assert.equal((await response.json()).error, "body_too_large");
+});
+
+test("rejects malformed JSON with a client error", async () => {
+  const response = await worker.fetch(new Request("https://support.example/api/chat", {
+    method: "POST",
+    headers: { Origin: env.PUBLIC_ORIGIN, "content-type": "application/json" },
+    body: "{bad json"
+  }), env);
+  assert.equal(response.status, 400);
+  assert.equal((await response.json()).error, "invalid_json");
+});
