@@ -42,7 +42,7 @@ async function sha256(value) {
 async function readCatalogue(env) {
   if (!env.CATALOG_URL || !/^https:\/\//i.test(env.CATALOG_URL)) throw new Error("Catalogue URL is not configured");
   const cache = caches.default;
-  const cacheKey = new Request("https://registryhub-support-cache.invalid/catalogue-v1");
+  const cacheKey = new Request(env.CATALOG_URL);
   const cached = await cache.match(cacheKey);
   if (cached) return cached.json();
 
@@ -74,8 +74,9 @@ async function consumeLimit(db, key, limit) {
 }
 
 async function checkLimits(request, env) {
+  if (!env.RATE_LIMIT_SALT) throw new Error("RATE_LIMIT_SALT secret is required");
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
-  const ipHash = await sha256(ip + (env.RATE_LIMIT_SALT || "registryhub-support"));
+  const ipHash = await sha256(ip + env.RATE_LIMIT_SALT);
   const minuteBucket = Math.floor(Date.now() / 60000);
   const ipOk = await consumeLimit(env.DB, `ip:${ipHash}:${minuteBucket}`, 10);
   if (!ipOk) return false;
@@ -151,8 +152,9 @@ async function handleReport(request, env, origin) {
     return json({ error: "report_length_invalid", max_chars: MAX_REPORT_CHARS }, 400, origin);
   }
   try {
+    if (!env.RATE_LIMIT_SALT) throw new Error("RATE_LIMIT_SALT secret is required");
     const ip = request.headers.get("CF-Connecting-IP") || "unknown";
-    const ipHash = await sha256(ip + (env.RATE_LIMIT_SALT || "registryhub-support"));
+    const ipHash = await sha256(ip + env.RATE_LIMIT_SALT);
     const bucket = Math.floor(Date.now() / 3600000);
     const allowed = await consumeLimit(env.DB, `report:${ipHash}:${bucket}`, 3);
     if (!allowed) return json({ error: "report_rate_limit", message: "تعداد گزارش‌ها از حد مجاز بیشتر شده است." }, 429, origin);
