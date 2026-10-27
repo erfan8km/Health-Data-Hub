@@ -4,9 +4,8 @@ const MAX_REGISTRIES = 5000;
 const MAX_TEXT_LENGTH = 20000;
 
 /**
- * Validate proposed registry records against trusted catalogue metadata.
- * Province IDs must exist in provinces.json; inactive provinces remain valid
- * metadata values until the map enables them.
+ * Pure payload validation for the future server-side admin API.
+ * Returns { ok, errors }; does not mutate inputs or perform network/file access.
  */
 export function validateRegistryPayload(registries, categories, countries, provinces) {
   const errors = [];

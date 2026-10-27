@@ -1,15 +1,15 @@
-# RegistryHub Admin API validation
+# RegistryHub Admin API Worker
 
-This directory contains the province-aware registry validator and regression tests for the separately deployed `registryhub-admin-api` Worker.
+This directory contains the source modules for the Cloudflare Worker `registryhub-admin-api`.
 
-## Change
+## Province validation fix
 
-- Recognizes `province` as a valid registry field.
-- Requires `province` to be a non-empty string.
-- Checks the province ID against the trusted `provinces.json` list, while allowing IDs for currently inactive provinces.
-- Keeps existing country, category, URL, slug, and unsupported-field checks.
-- Adds regression tests and runs them from the root `pnpm test` command.
+- `province` is an allowed registry field.
+- Province IDs are validated against trusted `provinces.json` metadata.
+- IDs for inactive provinces remain acceptable as metadata so catalogues can be prepared before those provinces are enabled on the map.
+- OAuth/session checks, server-side authentication, request limits, GitHub write-path allowlisting, and manual Pull Request review remain in place.
+- The API creates a proposal branch and Pull Request; it does not merge or deploy catalogue changes.
 
-## Deployment limitation
+## Deployment
 
-The live admin API entrypoint is not currently version-controlled in this repository. The current GitHub Actions deploy workflow publishes the public site Worker only. Therefore, this PR prepares and tests the validator but does not itself fix the live Worker. Follow `integration.md` as part of a separate, controlled admin Worker deployment that preserves existing secrets and bindings.
+The root GitHub Actions deployment currently deploys the public static-site Worker only. The admin Worker has a separate version/deployment lifecycle in Cloudflare. Deploy it through a controlled Worker-version upload that inherits all existing bindings and secrets, and verify the binding set before routing traffic. Do not overwrite its live settings with a bare configuration.
