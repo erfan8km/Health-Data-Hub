@@ -51,3 +51,19 @@ test("rejects oversized reports before writing to D1", async () => {
   assert.equal(response.status, 400);
   assert.equal((await response.json()).error, "report_length_invalid");
 });
+
+test("scheduled cleanup removes old usage-limit counters", async () => {
+  let sql = "";
+  const fakeEnv = {
+    DB: {
+      prepare(statement) {
+        sql = statement;
+        return { run: async () => ({ success: true }) };
+      }
+    }
+  };
+  let waited = false;
+  await worker.scheduled({}, fakeEnv, { waitUntil(promise) { waited = true; return promise; } });
+  assert.equal(waited, true);
+  assert.match(sql, /DELETE FROM usage_limits WHERE bucket_date < date\('now', '-2 days'\)/);
+});
