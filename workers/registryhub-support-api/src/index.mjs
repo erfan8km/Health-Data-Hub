@@ -34,6 +34,15 @@ function allowedOrigin(request, env) {
   return origin === env.PUBLIC_ORIGIN ? origin : null;
 }
 
+async function readBoundedJson(request) {
+  const declaredLength = Number(request.headers.get("content-length") || 0);
+  if (declaredLength > 16384) return { error: "body_too_large" };
+  const raw = await request.text();
+  if (new TextEncoder().encode(raw).byteLength > 16384) return { error: "body_too_large" };
+  try { return { value: JSON.parse(raw) }; }
+  catch { return { error: "invalid_json" }; }
+}
+
 async function sha256(value) {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
@@ -96,8 +105,10 @@ function parseModelResult(raw) {
 }
 
 async function handleChat(request, env, origin) {
-  let body;
-  try { body = await request.json(); } catch { return json({ error: "invalid_json" }, 400, origin); }
+  const parsedBody = await readBoundedJson(request);
+  if (parsedBody.error === "body_too_large") return json({ error: "body_too_large", max_bytes: 16384 }, 413, origin);
+  if (parsedBody.error) return json({ error: "invalid_json" }, 400, origin);
+  const body = parsedBody.value;
   if (!body || typeof body.message !== "string") return json({ error: "message_required" }, 400, origin);
   const message = body.message.trim();
   if (!message || message.length > MAX_MESSAGE_CHARS) return json({ error: "message_length_invalid", max_chars: MAX_MESSAGE_CHARS }, 400, origin);
@@ -145,8 +156,10 @@ function makeTicket() {
 }
 
 async function handleReport(request, env, origin) {
-  let body;
-  try { body = await request.json(); } catch { return json({ error: "invalid_json" }, 400, origin); }
+  const parsedBody = await readBoundedJson(request);
+  if (parsedBody.error === "body_too_large") return json({ error: "body_too_large", max_bytes: 16384 }, 413, origin);
+  if (parsedBody.error) return json({ error: "invalid_json" }, 400, origin);
+  const body = parsedBody.value;
   const message = typeof body?.message === "string" ? body.message.trim() : "";
   if (message.length < 5 || message.length > MAX_REPORT_CHARS) {
     return json({ error: "report_length_invalid", max_chars: MAX_REPORT_CHARS }, 400, origin);
