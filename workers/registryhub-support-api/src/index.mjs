@@ -169,6 +169,12 @@ async function handleReport(request, env, origin) {
 }
 
 export default {
+  async scheduled(controller, env, ctx) {
+    // Keep the D1 usage-limit table bounded; reports are retained for human follow-up.
+    ctx.waitUntil(env.DB.prepare(
+      "DELETE FROM usage_limits WHERE bucket_date < date('now', '-2 days')"
+    ).run());
+  },
   async fetch(request, env) {
     const origin = allowedOrigin(request, env);
     if (request.method === "OPTIONS") {
