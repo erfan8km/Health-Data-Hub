@@ -12,6 +12,7 @@
     "DAILY_MESSAGE_LIMIT": "50"
   },
   "ai": { "binding": "AI" },
+  "services": [{ "binding": "CATALOG_SERVICE", "service": "registryhub" }],
   "d1_databases": [{
     "binding": "DB",
     "database_name": "registryhub-support",
