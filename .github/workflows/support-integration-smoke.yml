@@ -68,10 +68,22 @@ jobs:
           });
           assert.equal(missingOrigin.status, 403, "POST without Origin must be rejected");
 
+          const catalogueProbe = await fetch("https://registryhub.erfan8km.workers.dev/data/registries.json");
+          const catalogueText = await catalogueProbe.text();
+          let catalogueJson = null;
+          try { catalogueJson = JSON.parse(catalogueText); } catch {}
+          console.log(JSON.stringify({
+            catalogueStatus: catalogueProbe.status,
+            catalogueContentType: catalogueProbe.headers.get("content-type"),
+            catalogueIsArray: Array.isArray(catalogueJson),
+            catalogueRecordCount: Array.isArray(catalogueJson) ? catalogueJson.length : null
+          }));
+
           const normalChat = await request("/api/chat", {
             method: "POST",
             body: { message: "What is RegistryHub and how can I use its published registry catalogue?" }
           });
+          console.log(JSON.stringify({ordinaryChatStatus: normalChat.status, ordinaryChatError: normalChat.data?.error ?? null}));
           assert.equal(normalChat.status, 200, "ordinary in-scope chat must produce a valid response");
           assert.equal(typeof normalChat.data?.answer, "string", "chat response must contain an answer");
           assert.ok(Array.isArray(normalChat.data?.registries), "chat response must contain registry array");
