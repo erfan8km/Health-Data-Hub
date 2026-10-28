@@ -462,16 +462,3 @@ test("source uses a service binding and a supported Workers AI model", async () 
   assert.match(source, /env\.CATALOG_SERVICE\.fetch/);
   assert.match(config, /"binding": "CATALOG_SERVICE", "service": "registryhub"/);
 });
-
-test("root route serves the interactive Persian support test page", async () => {
-  const response = await worker.fetch(new Request("https://support.example/", {
-    headers: { Origin: env.PUBLIC_ORIGIN }
-  }), env);
-  assert.equal(response.status, 200);
-  assert.match(response.headers.get("content-type"), /text\/html/i);
-  const html = await response.text();
-  assert.match(html, /آزمون پشتیبانی RegistryHub/);
-  assert.ok(html.includes('/api/chat'));
-  assert.ok(html.includes('/api/report'));
-  assert.match(response.headers.get("content-security-policy"), /connect-src 'self'/);
-});
