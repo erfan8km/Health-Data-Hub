@@ -415,3 +415,50 @@ test("malformed model output is discarded without returning prompt-injection tex
     else delete globalThis.caches;
   }
 });
+
+
+test("chat parses object-shaped Workers AI responses", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalCaches = Object.getOwnPropertyDescriptor(globalThis, "caches");
+  const catalogue = [{ slug: "known-registry", fa: "رجیستری نمونه", en: "Known Registry", officialUrl: "https://official.example/registry" }];
+  let aiResult = { response: { answer: "Supported object response", registry_slugs: ["known-registry"] } };
+  globalThis.caches = { default: { match: async () => undefined, put: async () => undefined } };
+  globalThis.fetch = async () => new Response(JSON.stringify(catalogue), {
+    status: 200, headers: { "content-type": "application/json" }
+  });
+  const fakeEnv = {
+    ...env, RATE_LIMIT_SALT: "test-only-salt",
+    DB: { prepare() { return { bind() { return this; }, first: async () => ({ request_count: 1 }) }; } },
+    AI: { run: async () => aiResult }
+  };
+  try {
+    for (const result of [
+      { response: { answer: "Supported object response", registry_slugs: ["known-registry"] } },
+      { choices: [{ message: { content: JSON.stringify({ answer: "Choice content response", registry_slugs: ["known-registry"] }) } }] },
+      { response: JSON.stringify({ answer: "String response", registry_slugs: [] }) }
+    ]) {
+      aiResult = result;
+      const response = await worker.fetch(new Request("https://support.example/api/chat", {
+        method: "POST",
+        headers: { Origin: env.PUBLIC_ORIGIN, "content-type": "application/json", "CF-Connecting-IP": "192.0.2.30" },
+        body: JSON.stringify({ message: "Tell me about the test registry." })
+      }), fakeEnv);
+      assert.equal(response.status, 200);
+      const data = await response.json();
+      assert.equal(typeof data.answer, "string");
+      assert.ok(Array.isArray(data.registries));
+    }
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalCaches) Object.defineProperty(globalThis, "caches", originalCaches);
+    else delete globalThis.caches;
+  }
+});
+
+test("source uses a service binding and a supported Workers AI model", async () => {
+  const source = await readFile(new URL("./index.mjs", import.meta.url), "utf8");
+  const config = await readFile(new URL("../wrangler.jsonc", import.meta.url), "utf8");
+  assert.match(source, /@cf\/meta\/llama-3\.1-8b-instruct-fast/);
+  assert.match(source, /env\.CATALOG_SERVICE\.fetch/);
+  assert.match(config, /"binding": "CATALOG_SERVICE", "service": "registryhub"/);
+});
