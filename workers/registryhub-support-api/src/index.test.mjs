@@ -462,3 +462,55 @@ test("source uses a service binding and a supported Workers AI model", async () 
   assert.match(source, /env\.CATALOG_SERVICE\.fetch/);
   assert.match(config, /"binding": "CATALOG_SERVICE", "service": "registryhub"/);
 });
+
+test("cancer lookup supplies only relevant catalogue records and suppresses unrelated registry links", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalCaches = Object.getOwnPropertyDescriptor(globalThis, "caches");
+  const catalogue = [
+    { slug: "pediatric-cancer", fa: "سرطان کودکان", en: "Pediatric Cancer", categories: ["ثبت سرطان"] },
+    { slug: "hope-cancer", fa: "سرطان بیمارستان امید", en: "Cancer Registry Omid Hospital", categories: ["Cancer Registry"] },
+    { slug: "colorectal-cancer", fa: "سرطان کولورکتال", en: "Colorectal Cancer", categories: ["ثبت سرطان"] },
+    { slug: "sleep-disorders", fa: "اختلالات خواب", en: "Sleep Disorders", categories: ["بیماری‌های مزمن"] },
+    { slug: "obesity", fa: "چاقی", en: "Obesity", categories: ["بیماری‌های مزمن"] }
+  ];
+  let modelMessages;
+  globalThis.caches = { default: { match: async () => undefined, put: async () => undefined } };
+  globalThis.fetch = async () => new Response(JSON.stringify(catalogue), {
+    status: 200, headers: { "content-type": "application/json" }
+  });
+  const fakeEnv = {
+    ...env, RATE_LIMIT_SALT: "test-only-salt",
+    DB: { prepare() { return { bind() { return this; }, first: async () => ({ request_count: 1 }) }; } },
+    AI: { run: async (_model, input) => {
+      modelMessages = input.messages;
+      return { response: JSON.stringify({
+        answer: "بله، چند مورد مرتبط در کاتالوگ وجود دارد.",
+        registry_slugs: catalogue.map((record) => record.slug)
+      }) };
+    } }
+  };
+  try {
+    const response = await worker.fetch(new Request("https://support.example/api/chat", {
+      method: "POST",
+      headers: { Origin: env.PUBLIC_ORIGIN, "content-type": "application/json", "CF-Connecting-IP": "192.0.2.41" },
+      body: JSON.stringify({ message: "ریجستری سرطان موجوده؟" })
+    }), fakeEnv);
+    assert.equal(response.status, 200);
+    const data = await response.json();
+    assert.deepEqual(data.registries.map((record) => record.slug), [
+      "pediatric-cancer", "hope-cancer", "colorectal-cancer"
+    ]);
+    const user = modelMessages.find((message) => message.role === "user").content;
+    const match = user.match(/<catalogue_data_json>\\n([\\s\\S]*?)\\n<\\/catalogue_data_json>/);
+    assert.ok(match, "expected catalogue data JSON in the model prompt");
+    const suppliedCatalogue = JSON.parse(match[1]);
+    assert.deepEqual(suppliedCatalogue.map((record) => record.slug), [
+      "pediatric-cancer", "hope-cancer", "colorectal-cancer"
+    ]);
+    assert.match((await readFile(new URL("./index.mjs", import.meta.url), "utf8")), /Never enumerate unrelated registries/);
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalCaches) Object.defineProperty(globalThis, "caches", originalCaches);
+    else delete globalThis.caches;
+  }
+});
