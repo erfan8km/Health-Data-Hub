@@ -4,11 +4,12 @@ Independent catalogue-only support API. It must not connect to GitHub or `regist
 
 ## Setup
 1. Create a Cloudflare D1 database named `registryhub-support`.
-2. Replace the placeholder `database_id` in `wrangler.jsonc` with its real ID.
-3. Verify the fixed `PUBLIC_ORIGIN` and `CATALOG_URL` values.
-4. Apply schema: `npx wrangler d1 migrations apply registryhub-support --remote`.
-5. Test locally with `npx wrangler dev`; Workers AI uses `@cf/meta/llama-3.1-8b-instruct`.
-6. Deploy only after security and quality tests: `npx wrangler deploy`.
+2. Configure `CATALOG_SERVICE` as a service binding to the existing `registryhub` Worker. Same-account Worker calls on `workers.dev` require a service binding.
+3. Replace the placeholder `database_id` in `wrangler.jsonc` with its real ID.
+4. Verify the fixed `PUBLIC_ORIGIN` and `CATALOG_URL` values.
+5. Apply schema: `npx wrangler d1 migrations apply registryhub-support --remote`.
+6. Test locally with `npx wrangler dev`; Workers AI uses `@cf/meta/llama-3.1-8b-instruct-fast`.
+7. Deploy only after security and quality tests: `npx wrangler deploy`.
 
 ## Endpoints
 - `GET /health`
