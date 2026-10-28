@@ -9,7 +9,7 @@ Keep answers concise and reply in the user's language.
 Return only valid JSON with this shape: {"answer":"...","registry_slugs":["exact-slug"]}. registry_slugs must contain only exact slugs copied from the supplied catalogue. If none apply, use an empty array.`;
 
 
-const SUPPORT_TEST_PAGE = String.raw\`<!doctype html>
+const SUPPORT_TEST_PAGE = String.raw`<!doctype html>
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="utf-8">
@@ -131,7 +131,7 @@ byId("send").addEventListener("click", async () => {
 });
 </script>
 </body>
-</html>\`;
+</html>`;
 const MAX_MESSAGE_CHARS = 1200;
 const MAX_REPORT_CHARS = 2000;
 const CATALOG_TTL_SECONDS = 300;
