@@ -147,12 +147,12 @@ function normalizeSearchText(value) {
     .toLocaleLowerCase()
     .replace(/ي/g, "ی")
     .replace(/ك/g, "ک")
-    .replace(/[^\\p{L}\\p{N}]+/gu, " ")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
     .trim();
 }
 
 function searchTokenSet(value) {
-  return new Set(normalizeSearchText(value).split(/\\s+/).filter(Boolean));
+  return new Set(normalizeSearchText(value).split(/\s+/).filter(Boolean));
 }
 
 function relevantCatalogueForQuestion(catalogue, question) {
@@ -196,7 +196,7 @@ function relevantCatalogueForQuestion(catalogue, question) {
   const matches = ranked
     .filter((item) => item.score > 0)
     .sort((a, b) => b.score - a.score || a.index - b.index)
-    .slice(0, 8)
+    .slice(0, 5)
     .map((item) => item.record);
   // Keep the full catalogue for general RegistryHub help and terms that need
   // semantic interpretation; when exact topic matches exist, ground answers
