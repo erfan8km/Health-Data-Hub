@@ -83,7 +83,7 @@ jobs:
             method: "POST",
             body: { message: "What is RegistryHub and how can I use its published registry catalogue?" }
           });
-          console.log(JSON.stringify({ordinaryChatStatus: normalChat.status, ordinaryChatError: normalChat.data?.error ?? null}));
+          console.log(JSON.stringify({ordinaryChatStatus: normalChat.status, ordinaryChatError: normalChat.data?.error ?? null, diagnostic: normalChat.data?.diagnostic ?? null}));
           assert.equal(normalChat.status, 200, "ordinary in-scope chat must produce a valid response");
           assert.equal(typeof normalChat.data?.answer, "string", "chat response must contain an answer");
           assert.ok(Array.isArray(normalChat.data?.registries), "chat response must contain registry array");
