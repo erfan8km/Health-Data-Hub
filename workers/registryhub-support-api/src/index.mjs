@@ -141,12 +141,15 @@ async function handleChat(request, env, origin) {
       temperature: 0.1
     });
     const parsed = parseModelResult(result);
+    const answer = parsed.answer.replace(/https?:\/\/\S+/gi, "").trim().slice(0, 3000);
+    // A fallback answer means the catalogue did not support a reliable result;
+    // suppress any model-selected registry slugs to avoid unrelated links.
+    const informationUnavailable = /(?:this information is not available in RegistryHub|این اطلاعات در RegistryHub موجود نیست)/i.test(answer);
     const bySlug = new Map(catalogue.map((r) => [r.slug, r]));
-    const linked = [...new Set(parsed.registry_slugs)].map((slug) => bySlug.get(slug)).filter(Boolean).map((r) => ({
+    const linked = informationUnavailable ? [] : [...new Set(parsed.registry_slugs)].map((slug) => bySlug.get(slug)).filter(Boolean).map((r) => ({
       slug: r.slug, name_fa: r.fa || r.en, name_en: r.en, official_url: /^https:\/\//i.test(r.officialUrl || "") ? r.officialUrl : ""
     }));
     // Never allow model-generated URLs to pass through to the user.
-    const answer = parsed.answer.replace(/https?:\/\/\S+/gi, "").trim().slice(0, 3000);
     return json({ answer, registries: linked, report_available: true }, 200, origin);
   } catch {
     return json({ error: "model_unavailable", message: "پاسخ‌گویی هوشمند موقتاً در دسترس نیست. می‌توانید گزارش ثبت کنید." }, 503, origin);
