@@ -11,7 +11,7 @@ Return only valid JSON with this shape: {"answer":"...","registry_slugs":["exact
 const MAX_MESSAGE_CHARS = 1200;
 const MAX_REPORT_CHARS = 2000;
 const CATALOG_TTL_SECONDS = 300;
-const MODEL = "@cf/meta/llama-3.1-8b-instruct";
+const MODEL = "@cf/meta/llama-3.1-8b-instruct-fast";
 
 function json(data, status = 200, origin = "*") {
   return new Response(JSON.stringify(data), {
@@ -55,10 +55,12 @@ async function readCatalogue(env) {
   const cached = await cache.match(cacheKey);
   if (cached) return cached.json();
 
-  const response = await fetch(env.CATALOG_URL, {
-    headers: { accept: "application/json" },
-    cf: { cacheTtl: CATALOG_TTL_SECONDS, cacheEverything: true }
-  });
+  const catalogueRequest = new Request(env.CATALOG_URL, { headers: { accept: "application/json" } });
+  // Service bindings are required for same-account Worker-to-Worker calls on workers.dev.
+  // Keep the HTTP fallback for isolated unit tests and local callers without the binding.
+  const response = env.CATALOG_SERVICE
+    ? await env.CATALOG_SERVICE.fetch(catalogueRequest)
+    : await fetch(env.CATALOG_URL, { headers: { accept: "application/json" } });
   if (!response.ok) throw new Error("Catalogue fetch failed");
   const data = await response.json();
   if (!Array.isArray(data) || data.length > 500) throw new Error("Catalogue format invalid");
@@ -95,14 +97,28 @@ async function checkLimits(request, env) {
   return globalDailyOk;
 }
 
+function isModelPayload(value) {
+  return Boolean(value && typeof value === "object"
+    && typeof value.answer === "string"
+    && Array.isArray(value.registry_slugs));
+}
+
 function parseModelResult(raw) {
-  const text = typeof raw === "string" ? raw : raw?.response;
-  if (typeof text !== "string") throw new Error("Model returned no text");
+  // Workers AI can expose structured JSON as an object, a JSON string in response,
+  // or as text content in a chat-completion choice.
+  if (isModelPayload(raw)) return raw;
+  if (isModelPayload(raw?.response)) return raw.response;
+  const text = typeof raw === "string"
+    ? raw
+    : typeof raw?.response === "string"
+      ? raw.response
+      : typeof raw?.choices?.[0]?.message?.content === "string"
+        ? raw.choices[0].message.content
+        : null;
+  if (typeof text !== "string") throw new Error("Model returned no supported text or JSON payload");
   const cleaned = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
   const parsed = JSON.parse(cleaned);
-  if (!parsed || typeof parsed.answer !== "string" || !Array.isArray(parsed.registry_slugs)) {
-    throw new Error("Model response schema invalid");
-  }
+  if (!isModelPayload(parsed)) throw new Error("Model response schema invalid");
   return parsed;
 }
 
