@@ -501,7 +501,7 @@ test("cancer lookup supplies only relevant catalogue records and suppresses unre
       "pediatric-cancer", "hope-cancer", "colorectal-cancer"
     ]);
     const user = modelMessages.find((message) => message.role === "user").content;
-    const match = user.match(/<catalogue_data_json>\\n([\\s\\S]*?)\\n<\\/catalogue_data_json>/);
+    const match = user.match(/<catalogue_data_json>\n([\s\S]*?)\n<\/catalogue_data_json>/);
     assert.ok(match, "expected catalogue data JSON in the model prompt");
     const suppliedCatalogue = JSON.parse(match[1]);
     assert.deepEqual(suppliedCatalogue.map((record) => record.slug), [
