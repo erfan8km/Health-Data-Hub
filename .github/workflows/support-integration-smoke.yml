@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Test the isolated live Worker
+      - name: Test the clean isolated live Worker
         env:
           SUPPORT_URL: https://registryhub-support-test.erfan8km.workers.dev
           TEST_ORIGIN: https://registryhub-support-test.invalid
