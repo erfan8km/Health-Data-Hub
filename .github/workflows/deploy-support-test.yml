@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches: [feat/registryhub-catalogue-support]
-    paths: [workers/registryhub-support-api/src/index.mjs]
+    paths: [workers/registryhub-support-api/src/index.mjs, .github/workflows/deploy-support-test.yml]
 
 permissions:
   contents: read
@@ -58,6 +58,21 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Smoke test cancer query relevance against live test API
+        shell: bash
+        run: |
+          set -euo pipefail
+          payload=$(jq -n --arg message 'ریجستری سرطان موجوده؟' '{message: $message}')
+          status=$(curl --silent --show-error --max-time 60 --output /tmp/chat-response.json --write-out '%{http_code}' \
+            -X POST \
+            -H 'Origin: https://registryhub-support-playground.erfan8km.workers.dev' \
+            -H 'Content-Type: application/json' \
+            --data "$payload" \
+            https://registryhub-support-test.erfan8km.workers.dev/api/chat)
+          cat /tmp/chat-response.json
+          test "$status" = "200"
+          jq -e '.answer and (.registries | type == "array" and length > 0 and length <= 5)' /tmp/chat-response.json >/dev/null
+          jq -e 'all(.registries[]; (.slug | test("cancer|oncology"; "i")))' /tmp/chat-response.json >/dev/null
       - name: Verify test Worker health and origin restrictions
         shell: bash
         run: |
