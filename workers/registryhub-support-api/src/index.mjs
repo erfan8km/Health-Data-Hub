@@ -155,6 +155,41 @@ function searchTokenSet(value) {
   return new Set(normalizeSearchText(value).split(/\s+/).filter(Boolean));
 }
 
+const SCOPE_REGISTRY_TERMS = new Set([
+  "registry", "registries", "registryhub", "register", "catalogue", "catalog", "database",
+  "رجیستری", "ریجستری", "ثبت", "کاتالوگ", "فهرست", "سامانه", "رجیستریها", "رجیستری‌های"
+]);
+const SCOPE_HELP_TERMS = new Set([
+  "website", "site", "help", "support", "use", "using", "access", "request", "report",
+  "سایت", "راهنما", "پشتیبانی", "استفاده", "دسترسی", "درخواست", "گزارش"
+]);
+const SCOPE_AVAILABILITY_TERMS = new Set([
+  "available", "availability", "have", "exists", "exist", "find", "looking", "search",
+  "موجود", "دارید", "داریم", "هست", "هستش", "وجود", "پیدا", "بگرد", "سرطان", "چاقی",
+  "دیابت", "خواب", "ناباروری", "سقط", "بیماری", "رجیستری"
+]);
+
+function isInRegistryHubScope(question) {
+  const tokens = searchTokenSet(question);
+  if ([...tokens].some((token) => SCOPE_REGISTRY_TERMS.has(token))) return true;
+  if ([...tokens].some((token) => SCOPE_HELP_TERMS.has(token))) return true;
+  // A clinical topic alone is not enough: require a clear availability/search intent.
+  const hasAvailabilityIntent = [...tokens].some((token) => SCOPE_AVAILABILITY_TERMS.has(token));
+  const hasCatalogueTopic = [...tokens].some((token) =>
+    SEARCH_SYNONYM_GROUPS.some((group) => group.includes(token))
+  );
+  return hasAvailabilityIntent && hasCatalogueTopic;
+}
+
+function outOfScopeResponse(origin) {
+  return json({
+    answer: "من دستیار RegistryHub هستم و فقط درباره رجیستری‌های سلامت موجود در سامانه، اطلاعات آن‌ها و نحوه استفاده از سایت راهنمایی می‌کنم. این سؤال خارج از حوزه کاری من است.",
+    registries: [],
+    report_available: true,
+    out_of_scope: true
+  }, 200, origin);
+}
+
 function relevantCatalogueForQuestion(catalogue, question) {
   const questionTokens = [...searchTokenSet(question)].filter((token) => (
     token.length > 1 && !SEARCH_STOP_WORDS.has(token)
@@ -213,6 +248,10 @@ async function handleChat(request, env, origin) {
   if (!body || typeof body.message !== "string") return json({ error: "message_required" }, 400, origin);
   const message = body.message.trim();
   if (!message || message.length > MAX_MESSAGE_CHARS) return json({ error: "message_length_invalid", max_chars: MAX_MESSAGE_CHARS }, 400, origin);
+
+  // Deterministically reject unrelated questions before invoking the model.
+  // This prevents general-knowledge prompts (e.g. name meanings) being hallucinated as registry answers.
+  if (!isInRegistryHubScope(message)) return outOfScopeResponse(origin);
 
   // Apply quotas before any upstream catalogue fetch to reduce abuse and unnecessary work.
   let allowed;
