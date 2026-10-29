@@ -479,7 +479,7 @@ test("out-of-scope questions are rejected without calling the model or returning
   const data = await response.json();
   assert.equal(data.out_of_scope, true);
   assert.deepEqual(data.registries, []);
-  assert.match(data.answer, /فقط درباره رجیستری‌های سلامت/);
+  assert.match(data.answer, /متأسفم، من دستیار پشتیبانی RegistryHub هستم/);
   assert.equal(aiCalls, 0);
 });
 
