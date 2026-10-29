@@ -106,6 +106,46 @@ test("catalogue fields are explicitly treated as untrusted data in the model pro
   assert.ok(source.includes("<" + "/catalogue_data_json>"));
 });
 
+test("each chat reads the latest published catalogue after registry updates", async () => {
+  let published = [{ slug: "registry-before-update", fa: "رجیستری پیش از تغییر", en: "Registry Before Update" }];
+  let catalogueReads = 0;
+  const fakeEnv = {
+    ...env,
+    RATE_LIMIT_SALT: "test-only-salt",
+    CATALOG_SERVICE: {
+      fetch: async () => {
+        catalogueReads++;
+        return new Response(JSON.stringify(published), {
+          status: 200, headers: { "content-type": "application/json" }
+        });
+      }
+    },
+    DB: { prepare() { return { bind() { return this; }, first: async () => ({ request_count: 1 }) }; } },
+    AI: { run: async (_model, input) => {
+      const user = input.messages.find((message) => message.role === "user").content;
+      const match = user.match(/<catalogue_data_json>\n([\s\S]*?)\n<\/catalogue_data_json>/);
+      assert.ok(match, "model input should include the current catalogue");
+      const rows = JSON.parse(match[1]);
+      return { response: JSON.stringify({ answer: "I found a matching registry.", registry_slugs: [rows[0].slug] }) };
+    } }
+  };
+  const ask = () => worker.fetch(new Request("https://support.example/api/chat", {
+    method: "POST",
+    headers: { Origin: env.PUBLIC_ORIGIN, "content-type": "application/json", "CF-Connecting-IP": "192.0.2.44" },
+    body: JSON.stringify({ message: "Tell me about a registry" })
+  }), fakeEnv);
+
+  const first = await ask();
+  assert.equal(first.status, 200);
+  assert.equal((await first.json()).registries[0].slug, "registry-before-update");
+
+  published = [{ slug: "registry-after-update", fa: "رجیستری پس از تغییر", en: "Registry After Update" }];
+  const second = await ask();
+  assert.equal(second.status, 200);
+  assert.equal((await second.json()).registries[0].slug, "registry-after-update");
+  assert.equal(catalogueReads, 2, "each chat should fetch the currently published catalogue");
+});
+
 test("chat returns only catalogue-backed registry links and strips model-generated URLs", async () => {
   const originalFetch = globalThis.fetch;
   const originalCaches = Object.getOwnPropertyDescriptor(globalThis, "caches");
