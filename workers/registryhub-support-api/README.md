@@ -18,7 +18,7 @@ Independent catalogue-only support API. It must not connect to GitHub or `regist
 
 ## Safeguards
 - Catalogue URL is fixed in Worker configuration, never accepted from a request.
-- Catalogue cache TTL is 300 seconds.
+- The published catalogue is fetched from the main `registryhub` Worker for every eligible chat request; no separate catalogue copy or application cache is maintained, so approved catalogue updates are reflected on the next request.
 - Request bodies are capped at 16 KiB before JSON parsing; chat messages at 1200 characters and reports at 2000 characters.
 - Per-IP hashed chat limits: 10 chats/minute and 10 chats/day by default, plus a site-wide cap of 50 chats/day for the initial beta. These are independent limits. Reports are limited to 3/hour/IP. Configure the chat limits with `PER_IP_MINUTE_LIMIT`, `PER_IP_DAILY_MESSAGE_LIMIT`, and `DAILY_MESSAGE_LIMIT`. A daily scheduled task removes usage-limit counters older than two days.
 - Raw IPs are not stored in D1. Configure `RATE_LIMIT_SALT` as a secret before public deployment.
