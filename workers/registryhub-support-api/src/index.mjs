@@ -290,7 +290,7 @@ async function handleChat(request, env, origin) {
       temperature: 0.1
     });
     const parsed = parseModelResult(result);
-    const answer = parsed.answer.replace(/https?:\/\/\S+/gi, "").trim().slice(0, 3000);
+    let answer = parsed.answer.replace(/https?:\/\/\S+/gi, "").trim().slice(0, 3000);
     // A fallback answer means the catalogue did not support a reliable result;
     // suppress any model-selected registry slugs to avoid unrelated links.
     const informationUnavailable = /(?:this information is not available in RegistryHub|این اطلاعات در RegistryHub موجود نیست)/i.test(answer);
@@ -298,6 +298,17 @@ async function handleChat(request, env, origin) {
     const linked = informationUnavailable ? [] : [...new Set(parsed.registry_slugs)].map((slug) => bySlug.get(slug)).filter(Boolean).map((r) => ({
       slug: r.slug, name_fa: r.fa || r.en, name_en: r.en, official_url: /^https:\/\//i.test(r.officialUrl || "") ? r.officialUrl : ""
     }));
+    // Enforce language consistency if the model ignores the language instruction.
+    // This deterministic fallback is grounded in the already-filtered catalogue results.
+    if (!isPersianText(message) && isPersianText(answer)) {
+      if (linked.length > 0) {
+        answer = /\b(available|exist|is there|do you have|can i find|are there)\b/i.test(message)
+          ? "Yes, the catalogue includes relevant health registries. Here are the closest matches:"
+          : "I found these relevant registries in the RegistryHub catalogue:";
+      } else {
+        answer = "I'm sorry, I couldn't find a relevant registry in the current catalogue. You can submit a report for review.";
+      }
+    }
     // Never allow model-generated URLs to pass through to the user.
     return json({ answer, registries: linked, report_available: true }, 200, origin);
   } catch {
