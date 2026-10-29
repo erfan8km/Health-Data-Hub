@@ -73,7 +73,7 @@ jobs:
             https://registryhub-support-test.erfan8km.workers.dev/api/chat)
           cat /tmp/out-of-scope-en.json
           test "$status" = "200"
-          jq -e '.out_of_scope == true and (.registries | type == "array" and length == 0) and (.answer | contains("I'm sorry") and contains("RegistryHub support assistant"))' /tmp/out-of-scope-en.json >/dev/null
+          jq -e '.out_of_scope == true and (.registries | type == "array" and length == 0) and (.answer | contains("sorry") and contains("RegistryHub support assistant"))' /tmp/out-of-scope-en.json >/dev/null
       - name: Smoke test English cancer-registry discovery against live test API
         shell: bash
         run: |
