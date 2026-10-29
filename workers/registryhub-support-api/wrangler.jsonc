@@ -16,7 +16,7 @@
   "d1_databases": [{
     "binding": "DB",
     "database_name": "registryhub-support",
-    "database_id": "00000000-0000-0000-0000-000000000000",
+    "database_id": "31822536-ff8f-4e2f-8b37-341d4dffae30",
     "migrations_dir": "migrations"
   }]
 }
