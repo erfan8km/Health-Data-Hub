@@ -1,4 +1,5 @@
-import { FormEvent, useState } from "react";
+import { useState } from "react";
+import type { FormEvent } from "react";
 import { MessageCircle, Send, X, ExternalLink, LoaderCircle, Flag } from "lucide-react";
 
 type RegistryLink = { slug: string; name_fa: string; name_en: string; official_url?: string };
