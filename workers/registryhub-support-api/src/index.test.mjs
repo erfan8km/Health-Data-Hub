@@ -534,3 +534,32 @@ test("cancer lookup supplies only relevant catalogue records and suppresses unre
     else delete globalThis.caches;
   }
 });
+
+
+test("out-of-scope English questions receive a polite English response without calling the model", async () => {
+  let aiCalls = 0;
+  const fakeEnv = {
+    ...env,
+    AI: { run: async () => { aiCalls++; throw new Error("model must not be called"); } }
+  };
+  const response = await worker.fetch(new Request("https://support.example/api/chat", {
+    method: "POST",
+    headers: { Origin: env.PUBLIC_ORIGIN, "content-type": "application/json" },
+    body: JSON.stringify({ message: "What is the capital of Italy?" })
+  }), fakeEnv);
+  assert.equal(response.status, 200);
+  const data = await response.json();
+  assert.equal(data.out_of_scope, true);
+  assert.deepEqual(data.registries, []);
+  assert.match(data.answer, /I'm sorry/);
+  assert.match(data.answer, /RegistryHub support assistant/);
+  assert.equal(/[\\u0600-\\u06FF]/.test(data.answer), false);
+  assert.equal(aiCalls, 0);
+});
+
+test("system prompt requires language matching and a courteous professional tone", async () => {
+  const source = await readFile(new URL("./index.mjs", import.meta.url), "utf8");
+  assert.match(source, /Support both Persian and English/);
+  assert.match(source, /entire answer must be natural English/);
+  assert.match(source, /professional, warm, courteous, and respectful tone/);
+});
