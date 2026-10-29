@@ -47,10 +47,15 @@ jobs:
         env:
           SITE_URL: https://registryhub.erfan8km.workers.dev/
           VITE_CESIUM_ION_TOKEN: ${{ secrets.CESIUM_ION_TOKEN }}
-      # Support API and D1 are provisioned separately; the current CI token lacks D1 API access.
-      - name: Deploy static assets to Cloudflare Workers
+      - name: Deploy public RegistryHub site
         shell: bash
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: npx --yes wrangler@4 deploy
+      - name: Deploy RegistryHub admin API
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx --yes wrangler@4 deploy --config workers/registryhub-admin-api/wrangler.jsonc
