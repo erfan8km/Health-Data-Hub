@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import GlobeScene from "./components/GlobeScene";
 import ProvinceMap from "./components/ProvinceMap";
+import SupportChat from "./components/SupportChat";
 
 type Category = { id: string; fa: string; en: string };
 type Country = { id: string; iso3: string; fa: string; en: string; coordinates: { longitude: number; latitude: number; height: number } };
@@ -271,6 +272,7 @@ function App() {
           </>}
         </section>}
       </div>}
+      <SupportChat english={english} />
     </main>
   );
 }
