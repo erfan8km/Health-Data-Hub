@@ -57,3 +57,36 @@
 .province-map-attribution a{color:#9db8c8;text-decoration:underline;text-underline-offset:2px}
 @media(max-width:850px){.province-overlay{inset:78px 12px 12px}.provinces-panel{width:100%;padding:16px}.province-map-svg{max-height:340px}.province-map-raster{max-height:340px}.province-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.province-overlay{inset:74px 8px 8px}.provinces-panel{padding:12px;border-radius:12px}.province-map-frame,.province-map-raster-wrap{min-height:210px}.province-map-svg{min-height:210px;max-height:280px}.province-map-raster{max-height:280px}.province-choice{padding:9px 8px;font-size:10px}.province-map-key{font-size:9px}.province-map-attribution{font-size:8px}}
+
+/* RegistryHub catalogue support panel */
+.rh-support{position:fixed;z-index:1000;right:22px;bottom:22px;font-family:inherit;color:#172b3d}
+.rh-support-en{right:auto;left:22px}
+.rh-support-launcher{display:flex;align-items:center;justify-content:center;gap:9px;min-height:52px;padding:0 18px;border:1px solid #75e7d2;border-radius:999px;background:#0e3340;color:#eafffb;box-shadow:0 10px 34px #071b2a40;font:600 13px inherit;cursor:pointer}
+.rh-support-launcher:hover{background:#164755}
+.rh-support-panel{position:absolute;right:0;bottom:64px;display:flex;flex-direction:column;width:min(390px,calc(100vw - 28px));max-height:min(690px,calc(100dvh - 112px));overflow:hidden;border:1px solid #d6e3e9;border-radius:18px;background:#fff;box-shadow:0 22px 70px #071b2a38}
+.rh-support-en .rh-support-panel{right:auto;left:0}
+.rh-support-header{display:flex;align-items:center;gap:10px;padding:15px;background:#102f3c;color:#f3fffd}
+.rh-support-avatar{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:#1b5962;color:#8df1de}
+.rh-support-heading{display:flex;flex:1;flex-direction:column;gap:3px;min-width:0}
+.rh-support-heading strong{font-size:13px}.rh-support-heading small{font-size:10px;color:#b4ced5}
+.rh-support-close{display:grid;place-items:center;width:32px;height:32px;border:0;border-radius:9px;background:#ffffff12;color:white;cursor:pointer}
+.rh-support-tabs{display:flex;gap:6px;padding:10px 12px 0;background:#f7fafb}
+.rh-support-tabs button{display:flex;align-items:center;justify-content:center;gap:5px;flex:1;padding:9px 5px;border:1px solid #e1e9ec;border-radius:9px;background:#fff;color:#526878;font-size:11px;cursor:pointer}
+.rh-support-tabs button.active{border-color:#80cfc5;background:#e8f8f5;color:#15505a}
+.rh-support-form{overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:9px}
+.rh-support-hint{margin:0;padding:10px;border-radius:9px;background:#f2f7f8;color:#617783;font-size:10px;line-height:1.8}
+.rh-support-form label{font-size:11px;font-weight:700;color:#274351}
+.rh-support-form textarea{box-sizing:border-box;width:100%;min-height:86px;resize:vertical;padding:10px;border:1px solid #d6e1e5;border-radius:10px;background:#fff;color:#173340;font:12px/1.8 inherit;outline:none}
+.rh-support-form textarea:focus{border-color:#51b9ad;box-shadow:0 0 0 3px #51b9ad20}
+.rh-support-submit{display:flex;align-items:center;justify-content:center;gap:8px;min-height:39px;padding:8px 12px;border:0;border-radius:10px;background:#16515b;color:#fff;font:600 11px inherit;cursor:pointer}
+.rh-support-submit:disabled{opacity:.5;cursor:not-allowed}
+.rh-support-answer{padding:12px;border:1px solid #dce9e8;border-radius:11px;background:#fbfefd;color:#294651;font-size:12px;line-height:1.9;overflow-wrap:anywhere}
+.rh-support-answer p{margin:0 0 8px}
+.rh-support-result{display:flex;flex-direction:column;gap:3px;margin-top:7px;padding:9px;border:1px solid #e2ebed;border-radius:8px;background:white}
+.rh-support-result strong{font-size:11px}.rh-support-result small{font-size:10px;color:#637c86}
+.rh-support-result a{display:inline-flex;align-items:center;gap:4px;margin-top:3px;color:#087a77;font-size:10px;text-decoration:none}
+.rh-support-error{margin:0 12px 12px;padding:9px;border-radius:8px;background:#fff0ef;color:#a3332d;font-size:11px;line-height:1.7}
+.rh-support-ticket{margin:0;padding:10px;border-radius:8px;background:#e9f8f0;color:#1d6547;font-size:11px;line-height:1.8}
+.rh-support-spin{animation:rh-support-spin 1s linear infinite}
+@keyframes rh-support-spin{to{transform:rotate(360deg)}}
+@media(max-width:520px){.rh-support{right:12px;bottom:12px}.rh-support-en{right:auto;left:12px}.rh-support-panel{bottom:60px;max-height:calc(100dvh - 90px)}.rh-support-launcher{min-height:48px;padding:0 15px}}
