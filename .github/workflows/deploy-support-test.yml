@@ -2,6 +2,9 @@ name: Deploy RegistryHub support test API
 
 on:
   workflow_dispatch:
+  push:
+    branches: [feat/registryhub-catalogue-support]
+    paths: [workers/registryhub-support-api/src/index.mjs]
 
 permissions:
   contents: read
