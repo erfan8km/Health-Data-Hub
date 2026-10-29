@@ -17,6 +17,13 @@
     "GITHUB_OAUTH_CLIENT_ID": "Ov23li6wUJfsVoWDePLf",
     "GITHUB_REPOSITORY": "erfan8km/Health-Data-Hub"
   },
+  "d1_databases": [
+    {
+      "binding": "SUPPORT_DB",
+      "database_name": "registryhub-support",
+      "database_id": "31822536-ff8f-4e2f-8b37-341d4dffae30"
+    }
+  ],
   "durable_objects": {
     "bindings": [
       {
