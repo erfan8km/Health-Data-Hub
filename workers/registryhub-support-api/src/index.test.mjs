@@ -553,7 +553,7 @@ test("out-of-scope English questions receive a polite English response without c
   assert.deepEqual(data.registries, []);
   assert.match(data.answer, /I'm sorry/);
   assert.match(data.answer, /RegistryHub support assistant/);
-  assert.equal(/[\\u0600-\\u06FF]/.test(data.answer), false);
+  assert.equal(/[\u0600-\u06FF]/.test(data.answer), false);
   assert.equal(aiCalls, 0);
 });
 
