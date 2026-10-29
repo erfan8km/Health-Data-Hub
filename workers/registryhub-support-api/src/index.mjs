@@ -133,7 +133,7 @@ const SEARCH_STOP_WORDS = new Set([
   "what", "which", "about", "tell", "me", "of", "in", "for", "a", "an"
 ]);
 const SEARCH_SYNONYM_GROUPS = [
-  ["سرطان", "cancer", "cancers", "oncology"],
+  ["سرطان", "cancer", "cancers", "oncology", "onc"],
   ["چاقی", "obesity"],
   ["دیابت", "diabetes"],
   ["خواب", "sleep"],
