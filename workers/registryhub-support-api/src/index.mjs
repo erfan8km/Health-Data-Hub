@@ -200,7 +200,8 @@ function relevantCatalogueForQuestion(catalogue, question) {
     .map((item) => item.record);
   // Keep the full catalogue for general RegistryHub help and terms that need
   // semantic interpretation; when exact topic matches exist, ground answers
-  // in that smaller subset to reduce unrelated results.
+  // in that smaller subset to reduce unrelated results. The oncology category
+  // code is also indexed as a synonym for cancer-related queries.
   return matches.length ? matches : catalogue;
 }
 
