@@ -184,7 +184,7 @@ function isInRegistryHubScope(question) {
 }
 
 function isPersianText(value) {
-  return /[\\u0600-\\u06FF]/.test(String(value || ""));
+  return /[\u0600-\u06FF]/.test(String(value || ""));
 }
 
 function outOfScopeResponse(origin, question) {
