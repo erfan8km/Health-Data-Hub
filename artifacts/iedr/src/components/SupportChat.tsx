@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import type { FormEvent } from "react";
 import { MessageCircle, Send, X, ExternalLink, LoaderCircle, Flag } from "lucide-react";
 
@@ -56,7 +57,7 @@ export default function SupportChat({ english }: Props) {
     } finally { setBusy(false); }
   }
 
-  return <div className={`rh-support ${english ? "rh-support-en" : "rh-support-fa"}`} dir={english ? "ltr" : "rtl"}>
+  return createPortal(<div className={`rh-support ${english ? "rh-support-en" : "rh-support-fa"}`} dir={english ? "ltr" : "rtl"}>
     {open && <section className="rh-support-panel" aria-label={english ? "RegistryHub support" : "پشتیبانی RegistryHub"}>
       <header className="rh-support-header">
         <span className="rh-support-avatar"><MessageCircle size={18} /></span>
@@ -85,5 +86,5 @@ export default function SupportChat({ english }: Props) {
     <button type="button" className="rh-support-launcher" onClick={() => setOpen(v => !v)} aria-label={open ? (english ? "Close support" : "بستن پشتیبانی") : (english ? "Open RegistryHub support" : "بازکردن پشتیبانی RegistryHub")}>
       {open ? <X size={22} /> : <><MessageCircle size={21} /><span>{english ? "Support" : "پشتیبانی"}</span></>}
     </button>
-  </div>;
+  </div>, document.body);
 }
