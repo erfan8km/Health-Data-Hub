@@ -300,7 +300,7 @@ async function handleChat(request, env, origin) {
     }));
     // Enforce language consistency if the model ignores the language instruction.
     // This deterministic fallback is grounded in the already-filtered catalogue results.
-    if (!isPersianText(message) && isPersianText(answer)) {
+    if (!isPersianText(message)) {
       if (linked.length > 0) {
         answer = /\b(available|exist|is there|do you have|can i find|are there)\b/i.test(message)
           ? "Yes, the catalogue includes relevant health registries. Here are the closest matches:"
