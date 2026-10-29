@@ -87,6 +87,10 @@ jobs:
             https://registryhub-support-test.erfan8km.workers.dev/api/chat)
           cat /tmp/cancer-en.json
           test "$status" = "200"
+          if jq -r '.answer' /tmp/cancer-en.json | grep -qP '[\x{0600}-\x{06FF}]'; then
+            echo "English query received a non-English answer"
+            exit 1
+          fi
           jq -e '.out_of_scope != true and .answer and (.registries | type == "array" and length > 0 and length <= 5)' /tmp/cancer-en.json >/dev/null
           jq -e 'all(.registries[]; (.slug | test("cancer|oncology"; "i")))' /tmp/cancer-en.json >/dev/null
       - name: Verify test Worker health and origin restrictions
