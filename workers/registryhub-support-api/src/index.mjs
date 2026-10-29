@@ -13,7 +13,6 @@ Return only valid JSON with this shape: {"answer":"...","registry_slugs":["exact
 
 const MAX_MESSAGE_CHARS = 1200;
 const MAX_REPORT_CHARS = 2000;
-const CATALOG_TTL_SECONDS = 300;
 const MODEL = "@cf/meta/llama-3.1-8b-instruct-fast";
 
 function json(data, status = 200, origin = "*") {
@@ -53,14 +52,10 @@ async function sha256(value) {
 
 async function readCatalogue(env) {
   if (!env.CATALOG_URL || !/^https:\/\//i.test(env.CATALOG_URL)) throw new Error("Catalogue URL is not configured");
-  const cache = caches.default;
-  const cacheKey = new Request(env.CATALOG_URL);
-  const cached = await cache.match(cacheKey);
-  if (cached) return cached.json();
-
   const catalogueRequest = new Request(env.CATALOG_URL, { headers: { accept: "application/json" } });
-  // Service bindings are required for same-account Worker-to-Worker calls on workers.dev.
-  // Keep the HTTP fallback for isolated unit tests and local callers without the binding.
+  // Read the published catalogue for every eligible chat request so approved updates
+  // are reflected immediately; the service binding avoids cross-Worker workers.dev fetch issues.
+  // HTTP fallback is retained for isolated unit tests and local callers without the binding.
   const response = env.CATALOG_SERVICE
     ? await env.CATALOG_SERVICE.fetch(catalogueRequest)
     : await fetch(env.CATALOG_URL, { headers: { accept: "application/json" } });
@@ -69,9 +64,6 @@ async function readCatalogue(env) {
   if (!Array.isArray(data) || data.length > 500) throw new Error("Catalogue format invalid");
   const valid = data.every((item) => item && typeof item.slug === "string" && typeof item.en === "string");
   if (!valid) throw new Error("Catalogue records invalid");
-  await cache.put(cacheKey, new Response(JSON.stringify(data), {
-    headers: { "content-type": "application/json", "cache-control": `public, max-age=${CATALOG_TTL_SECONDS}` }
-  }));
   return data;
 }
 
