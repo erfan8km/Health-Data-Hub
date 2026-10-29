@@ -56,6 +56,24 @@ for (const registry of registries) {
     const id = registry.categories[0];
     if (!categoryIds.has(id)) errors.push(`registry "${registry.slug}": unknown category "${id}"`);
   }
+  if (registry.publishedArticleReviews === undefined || !Array.isArray(registry.publishedArticleReviews)) {
+    errors.push('registry "' + registry.slug + '": publishedArticleReviews must be an array');
+  } else {
+    registry.publishedArticleReviews.forEach((article, index) => {
+      if (!article || typeof article !== "object" || Array.isArray(article)) {
+        errors.push('registry "' + registry.slug + '": publishedArticleReviews[' + index + '] must be an object');
+      } else {
+        for (const key of ["title", "year", "journal", "summary", "url"]) {
+          if (typeof article[key] !== "string") errors.push('registry "' + registry.slug + '": publishedArticleReviews[' + index + '].' + key + ' must be a string');
+        }
+        if (typeof article.title === "string" && !article.title.trim()) errors.push('registry "' + registry.slug + '": publishedArticleReviews[' + index + '].title is required');
+        if (article.url) {
+          try { if (new URL(article.url).protocol !== "https:") throw new Error(); }
+          catch { errors.push('registry "' + registry.slug + '": publishedArticleReviews URLs must be valid HTTPS URLs'); }
+        }
+      }
+    });
+  }
   for (const key of ["description", "targetPopulation", "center", "status", "lastReviewedAt", "startYear", "registryType", "dataSummary", "researchContact", "officialUrl"]) {
     if (typeof registry[key] !== "string") errors.push('registry "' + registry.slug + '": ' + key + " must be a string");
   }

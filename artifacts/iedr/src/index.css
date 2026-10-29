@@ -90,3 +90,15 @@
 .rh-support-spin{animation:rh-support-spin 1s linear infinite}
 @keyframes rh-support-spin{to{transform:rotate(360deg)}}
 @media(max-width:520px){.rh-support{right:12px;bottom:12px}.rh-support-en{right:auto;left:12px}.rh-support-panel{bottom:60px;max-height:calc(100dvh - 90px)}.rh-support-launcher{min-height:48px;padding:0 15px}}
+
+/* Published-article review section */
+.published-article-reviews{margin-top:4px}
+.article-review-intro{margin:0 0 16px;color:#6d7885;font-size:13px;line-height:1.9}
+.article-review-list{display:grid;gap:12px}
+.article-review-card{padding:16px 18px;border:1px solid #e1e8ec;border-radius:12px;background:#fff}
+.article-review-meta{margin-bottom:7px;color:#168b7a;font-size:11px;font-weight:700}
+.article-review-card h4{margin:0 0 8px;font-size:15px;line-height:1.8;color:#172b37}
+.article-review-card h4 a:hover,.article-review-link:hover{text-decoration:underline}
+.article-review-card p{margin:0;color:#53616b;font-size:13px;line-height:1.95}
+.article-review-link{display:inline-flex;align-items:center;gap:6px;margin-top:11px;color:#137d70;font-size:12px;font-weight:700}
+.article-review-empty{margin:0;color:#7a8790;font-size:13px}

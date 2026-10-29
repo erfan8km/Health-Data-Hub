@@ -11,7 +11,7 @@ import SupportChat from "./components/SupportChat";
 type Category = { id: string; fa: string; en: string };
 type Country = { id: string; iso3: string; fa: string; en: string; coordinates: { longitude: number; latitude: number; height: number } };
 type Province = { id: string; fa: string; en: string; active: boolean };
-type Registry = { slug: string; fa: string; en: string; country: string; province: string; city: string; categories: string[]; description: string; officialUrl: string; targetPopulation: string; center: string; status: string; lastReviewedAt: string; startYear: string; registryType: string; dataSummary: string; researchContact: string; keyPublications: { title: string; url: string }[] };
+type Registry = { slug: string; fa: string; en: string; country: string; province: string; city: string; categories: string[]; description: string; officialUrl: string; targetPopulation: string; center: string; status: string; lastReviewedAt: string; startYear: string; registryType: string; dataSummary: string; researchContact: string; keyPublications: { title: string; url: string }[]; publishedArticleReviews: { title: string; year: string; journal: string; summary: string; url: string }[] };
 type View = "globe" | "provinces" | "categories" | "category" | "registry";
 type Route = { view: View; slug?: string; provinceId?: string };
 const ACTIVE_PROVINCE_ID = "razavi-khorasan";
@@ -251,6 +251,19 @@ function App() {
                 <div className="detail-separator" />
                 <h3>{english ? "Key publications" : "مقالات اصلی با لینک"}</h3>
                 {selectedRegistry.keyPublications.length ? <ul>{selectedRegistry.keyPublications.map((publication, index) => <li key={index}>{publication.url.trim() ? <a href={publication.url} target="_blank" rel="noopener noreferrer">{publication.title || publication.url}</a> : (publication.title || missingMetadataText)}</li>)}</ul> : <p>{missingMetadataText}</p>}
+                <div className="detail-separator" />
+                <section className="published-article-reviews" aria-labelledby="published-article-reviews-title">
+                  <h3 id="published-article-reviews-title">{english ? "Review of Published Articles" : "مروری بر مقالات چاپ شده"}</h3>
+                  <p className="article-review-intro">{english ? "Selected published papers related to this registry, with brief summaries and links to the original sources." : "منتخبی از مقالات منتشرشده مرتبط با این ریجستری، همراه با خلاصه‌ای کوتاه و لینک منبع اصلی."}</p>
+                  {selectedRegistry.publishedArticleReviews?.length ? <div className="article-review-list">
+                    {selectedRegistry.publishedArticleReviews.map((article, index) => <article className="article-review-card" key={index}>
+                      <div className="article-review-meta">{[article.year, article.journal].filter((item) => item?.trim()).join(" · ")}</div>
+                      <h4>{article.url?.trim() ? <a href={article.url} target="_blank" rel="noopener noreferrer">{article.title}</a> : article.title}</h4>
+                      {article.summary?.trim() && <p>{article.summary}</p>}
+                      {article.url?.trim() && <a className="article-review-link" href={article.url} target="_blank" rel="noopener noreferrer">{english ? "Read original article" : "مشاهده مقاله اصلی"} <ExternalLink size={13} /></a>}
+                    </article>)}
+                  </div> : <p className="article-review-empty">{english ? "No article reviews have been added yet." : "هنوز مقاله‌ای برای این بخش ثبت نشده است."}</p>}
+                </section>
                 <div className="detail-separator" />
                 <h3>{english ? "Clinical category" : "حیطه‌ی بالینی"}</h3>
                 <div className="detail-tags">{selectedRegistry.categories.map((id) => {
