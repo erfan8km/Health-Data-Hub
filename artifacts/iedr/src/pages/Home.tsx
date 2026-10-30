@@ -9,7 +9,7 @@ export default function Home() {
   const { language, t } = useLanguage();
   const [, setLocation] = useLocation();
   const [query, setQuery] = useState("");
-  const title = t("Iran Medical Registry Catalogue | IEDR", "کاتالوگ ثبت‌های پزشکی ایران | IEDR");
+  const title = t("Iran Medical Registry Catalogue | RegistryHub", "کاتالوگ ثبت‌های پزشکی ایران | RegistryHub");
   const description = t(
     "Browse a bilingual metadata catalogue of medical registries in Iran.",
     "کاتالوگی دوزبانه برای مرور فراداده ثبت‌های پزشکی ایران."
