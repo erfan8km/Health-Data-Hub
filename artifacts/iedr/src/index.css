@@ -90,3 +90,22 @@
 .rh-support-spin{animation:rh-support-spin 1s linear infinite}
 @keyframes rh-support-spin{to{transform:rotate(360deg)}}
 @media(max-width:520px){.rh-support{right:12px;bottom:12px}.rh-support-en{right:auto;left:12px}.rh-support-panel{bottom:60px;max-height:calc(100dvh - 90px)}.rh-support-launcher{min-height:48px;padding:0 15px}}
+
+
+/* Published-article review disclosure on registry profiles */
+.publication-review{margin:18px 0 4px;border:1px solid #dce7eb;border-radius:12px;background:#fbfdfd;overflow:hidden}
+.publication-review-toggle{display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;padding:15px 16px;border:0;background:transparent;color:#193747;text-align:inherit;cursor:pointer}
+.publication-review-toggle:hover{background:#f2f8f8}
+.publication-review-copy{display:flex;flex-direction:column;gap:5px;min-width:0}
+.publication-review-copy strong{font-size:13px;font-weight:750}
+.publication-review-copy small{color:#71848e;font-size:10px;line-height:1.6}
+.publication-review-meta{display:flex;align-items:center;gap:10px;flex:0 0 auto;color:#53717d;font-size:10px}
+.publication-review-chevron{transform:rotate(-90deg);transition:transform .2s ease}
+.publication-review-chevron.is-expanded{transform:rotate(90deg)}
+.publication-review-content{padding:0 16px 15px;border-top:1px solid #e7eef0;color:#526a75;font-size:12px;line-height:1.9}
+.publication-review-content ol{display:flex;flex-direction:column;gap:9px;margin:12px 0 0;padding-inline-start:22px}
+.publication-review-content li{padding-inline-start:3px}
+.publication-review-content a{display:inline-flex;align-items:center;gap:6px;color:#087b78;text-decoration:none}
+.publication-review-content a:hover{text-decoration:underline;text-underline-offset:3px}
+.publication-review-content p{margin:12px 0 0}
+@media(max-width:520px){.publication-review-toggle{padding:13px}.publication-review-copy strong{font-size:12px}.publication-review-copy small{font-size:9px}.publication-review-meta{gap:6px;font-size:9px}.publication-review-content{padding:0 13px 13px}}

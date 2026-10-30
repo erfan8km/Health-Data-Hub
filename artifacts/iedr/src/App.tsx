@@ -76,9 +76,10 @@ function App() {
   const [query, setQuery] = useState("");
   const [mobileMenu, setMobileMenu] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
+  const [publicationsExpanded, setPublicationsExpanded] = useState(false);
 
   useEffect(() => {
-    const update = () => { setRoute(parseRoute()); setQuery(""); setMobileMenu(false); };
+    const update = () => { setRoute(parseRoute()); setQuery(""); setMobileMenu(false); setPublicationsExpanded(false); };
     window.addEventListener("hashchange", update);
     window.addEventListener("popstate", update);
     return () => {
@@ -252,8 +253,40 @@ function App() {
                 <h3>{english ? "Research contact or collaboration" : "راه ارتباط یا همکاری پژوهشی"}</h3>
                 <p>{selectedRegistry.researchContact.trim() || missingMetadataText}</p>
                 <div className="detail-separator" />
-                <h3>{english ? "Key publications" : "مقالات اصلی با لینک"}</h3>
-                {selectedRegistry.keyPublications.length ? <ul>{selectedRegistry.keyPublications.map((publication, index) => <li key={index}>{publication.url.trim() ? <a href={publication.url} target="_blank" rel="noopener noreferrer">{publication.title || publication.url}</a> : (publication.title || missingMetadataText)}</li>)}</ul> : <p>{missingMetadataText}</p>}
+                <div className="publication-review">
+                  <button
+                    type="button"
+                    className="publication-review-toggle"
+                    aria-expanded={publicationsExpanded}
+                    onClick={() => setPublicationsExpanded((value) => !value)}
+                  >
+                    <span className="publication-review-copy">
+                      <strong>{english ? "Review published articles" : "مروری بر مقالات چاپ شده"}</strong>
+                      <small>{english ? "Published research related to this registry" : "مقالات و پژوهش‌های منتشرشده مرتبط با این ریجستری"}</small>
+                    </span>
+                    <span className="publication-review-meta">
+                      <span>{selectedRegistry.keyPublications.length} {english ? "articles" : "مقاله"}</span>
+                      <ChevronLeft className={publicationsExpanded ? "publication-review-chevron is-expanded" : "publication-review-chevron"} size={17} />
+                    </span>
+                  </button>
+                  {publicationsExpanded && (
+                    <div className="publication-review-content">
+                      {selectedRegistry.keyPublications.length ? (
+                        <ol>{selectedRegistry.keyPublications.map((publication, index) => (
+                          <li key={index}>
+                            {publication.url.trim()
+                              ? <a href={publication.url} target="_blank" rel="noopener noreferrer">{publication.title || publication.url}<ExternalLink size={13} /></a>
+                              : (publication.title || missingMetadataText)}
+                          </li>
+                        ))}</ol>
+                      ) : (
+                        <p>{english
+                          ? "No published articles have been added for this registry yet."
+                          : "هنوز مقاله‌ای برای این ریجستری ثبت نشده است."}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
                 <div className="detail-separator" />
                 <h3>{english ? "Clinical category" : "حیطه‌ی بالینی"}</h3>
                 <div className="detail-tags">{selectedRegistry.categories.map((id) => {
