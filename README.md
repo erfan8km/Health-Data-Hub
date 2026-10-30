@@ -1,6 +1,6 @@
-# Iran Epidemiology Data Repository (IEDR)
+# RegistryHub
 
-IEDR / RegistryHub is a static, bilingual Persian/English catalogue of Iranian medical and clinical registry metadata. It does not host individual-level health data and has no public catalogue database or API server.
+RegistryHub is a static, bilingual Persian/English catalogue of Iranian medical and clinical registry metadata. It does not host individual-level health data and has no public catalogue database or API server.
 
 ## Run locally
 
