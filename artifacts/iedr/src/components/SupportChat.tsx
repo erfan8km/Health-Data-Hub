@@ -9,7 +9,6 @@ type Props = { english: boolean; open: boolean; onClose: () => void };
 const API = "https://registryhub-support.erfan8km.workers.dev";
 
 export default function SupportChat({ english, open, onClose }: Props) {
-  const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<"chat" | "report">("chat");
   const [question, setQuestion] = useState("");
   const [report, setReport] = useState("");
