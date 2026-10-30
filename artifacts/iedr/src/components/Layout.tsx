@@ -15,9 +15,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <div className={`app-shell ${isRtl ? "rtl" : "ltr"}`}>
       <header className="site-header">
         <div className="header-inner">
-          <Link href="/" className="brand" aria-label="IEDR home">
+          <Link href="/" className="brand" aria-label="RegistryHub home">
             <span className="brand-mark">I</span>
-            <span>IEDR</span>
+            <span>RegistryHub</span>
           </Link>
           <nav className="site-nav" aria-label={t("Main navigation", "ناوبری اصلی")}>
             {navLinks.map((link) => (
@@ -45,7 +45,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <Link href="/about">{t("About", "درباره")}</Link>
             <Link href="/registries">{t("Browse registries", "مرور ثبت‌ها")}</Link>
           </div>
-          <span>IEDR</span>
+          <span>RegistryHub</span>
         </div>
       </footer>
     </div>
