@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-  Activity, ArrowDownLeft, ArrowLeft, ArrowRight, Baby, Brain, ChevronLeft,
+  Activity, ArrowDownLeft, ArrowLeft, ArrowRight, Baby, BookOpen, Brain, ChevronLeft,
   CircleDot, ExternalLink, Eye, Globe2, HeartPulse, MapPin, Menu, Moon,
   Search, ShieldCheck, Sparkles, Stethoscope, X, Ear,
 } from "lucide-react";
@@ -218,6 +218,7 @@ function App() {
           {!selectedRegistry ? <div className="empty-state"><h1>{english ? "Registry not found" : "ریجستری پیدا نشد"}</h1><button type="button" className="text-back" onClick={() => navigate("categories/" + (route.provinceId || ACTIVE_PROVINCE_ID))}>{english ? "Return to categories" : "بازگشت به دسته‌ها"} <ArrowLeft size={15} /></button></div> : <>
             <div className="detail-kicker"><span className="detail-kicker-icon"><Activity size={18} /></span><span>{english ? "REGISTRY PROFILE" : "شناسنامه‌ی ریجستری"}</span><span className="detail-id">RegistryHub / {selectedRegistry.slug.toUpperCase()}</span></div>
             <div className="registry-detail-heading"><p className="section-kicker">{english ? "BILINGUAL REGISTRY TITLES" : "عنوان فارسی و انگلیسی"}</p><h1>{english ? selectedRegistry.en : selectedRegistry.fa}</h1><p className="detail-english-title">{english ? selectedRegistry.fa : selectedRegistry.en}</p></div>
+            <button type="button" className="official-link-button" onClick={() => document.getElementById("published-articles")?.scrollIntoView({ behavior: "smooth", block: "start" })}><BookOpen size={17} />{english ? "Published articles overview" : "مروری بر مقالات چاپ شده"}<ArrowLeft size={15} /></button>
             <div className="detail-content-grid">
               <article className="detail-main-card">
                 <h2>{english ? "Registry profile" : "مشخصات ریجستری"}</h2>
@@ -249,8 +250,8 @@ function App() {
                 <h3>{english ? "Research contact or collaboration" : "راه ارتباط یا همکاری پژوهشی"}</h3>
                 <p>{selectedRegistry.researchContact.trim() || missingMetadataText}</p>
                 <div className="detail-separator" />
-                <h3>{english ? "Key publications" : "مقالات اصلی با لینک"}</h3>
-                {selectedRegistry.keyPublications.length ? <ul>{selectedRegistry.keyPublications.map((publication, index) => <li key={index}>{publication.url.trim() ? <a href={publication.url} target="_blank" rel="noopener noreferrer">{publication.title || publication.url}</a> : (publication.title || missingMetadataText)}</li>)}</ul> : <p>{missingMetadataText}</p>}
+                <h3 id="published-articles">{english ? "Published articles overview" : "مروری بر مقالات چاپ شده"}</h3>
+                {selectedRegistry.keyPublications.length ? <ul>{selectedRegistry.keyPublications.map((publication, index) => <li key={index}>{publication.url.trim() ? <a href={publication.url} target="_blank" rel="noopener noreferrer">{publication.title || publication.url}</a> : (publication.title || missingMetadataText)}</li>)}</ul> : <p>{english ? "No published articles have been added for this registry yet." : "هنوز مقاله‌ای برای این ریجستری ثبت نشده است."}</p>}
                 <div className="detail-separator" />
                 <h3>{english ? "Clinical category" : "حیطه‌ی بالینی"}</h3>
                 <div className="detail-tags">{selectedRegistry.categories.map((id) => {
