@@ -4,7 +4,7 @@ import type { FormEvent } from "react";
 import { MessageCircle, Send, X, ExternalLink, LoaderCircle, Flag } from "lucide-react";
 
 type RegistryLink = { slug: string; name_fa: string; name_en: string; official_url?: string };
-type Props = { english: boolean };
+type Props = { english: boolean; open: boolean; onClose: () => void };
 
 const API = "https://registryhub-support.erfan8km.workers.dev";
 
@@ -57,12 +57,12 @@ export default function SupportChat({ english }: Props) {
     } finally { setBusy(false); }
   }
 
-  return createPortal(<div className={`rh-support ${english ? "rh-support-en" : "rh-support-fa"}`} dir={english ? "ltr" : "rtl"}>
+  return createPortal(open ? <div className={`rh-support ${english ? "rh-support-en" : "rh-support-fa"}`} dir={english ? "ltr" : "rtl"}>
     {open && <section className="rh-support-panel" aria-label={english ? "RegistryHub support" : "پشتیبانی RegistryHub"}>
       <header className="rh-support-header">
         <span className="rh-support-avatar"><MessageCircle size={18} /></span>
         <span className="rh-support-heading"><strong>{english ? "RegistryHub support" : "پشتیبانی RegistryHub"}</strong><small>{english ? "Ask about published registries" : "پرسش درباره ریجستری‌های منتشرشده"}</small></span>
-        <button type="button" className="rh-support-close" onClick={() => setOpen(false)} aria-label={english ? "Close support" : "بستن پشتیبانی"}><X size={18} /></button>
+        <button type="button" className="rh-support-close" onClick={onClose} aria-label={english ? "Close support" : "بستن پشتیبانی"}><X size={18} /></button>
       </header>
       <nav className="rh-support-tabs">
         <button type="button" className={mode === "chat" ? "active" : ""} onClick={() => {setMode("chat");setError("");}}>{english ? "Ask a question" : "پرسش از کاتالوگ"}</button>
@@ -83,8 +83,5 @@ export default function SupportChat({ english }: Props) {
       </form>}
       {error && <p className="rh-support-error" role="alert">{error}</p>}
     </section>}
-    <button type="button" className="rh-support-launcher" onClick={() => setOpen(v => !v)} aria-label={open ? (english ? "Close support" : "بستن پشتیبانی") : (english ? "Open RegistryHub support" : "بازکردن پشتیبانی RegistryHub")}>
-      {open ? <X size={22} /> : <><MessageCircle size={21} /><span>{english ? "Support" : "پشتیبانی"}</span></>}
-    </button>
-  </div>, document.body);
+  </div> : null, document.body);
 }
