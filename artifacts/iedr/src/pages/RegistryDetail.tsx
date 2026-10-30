@@ -11,7 +11,7 @@ export default function RegistryDetail() {
   const { t, isRtl } = useLanguage();
 
   usePageMeta(
-    registry ? `${registry.title_fa} | ${registry.title_en} — IEDR` : t("Registry not found | IEDR", "ثبت پیدا نشد | IEDR"),
+    registry ? `${registry.title_fa} | ${registry.title_en} — RegistryHub` : t("Registry not found | RegistryHub", "ثبت پیدا نشد | RegistryHub"),
     registry
       ? t(`Registry listing for ${registry.title_en}.`, `اطلاعات ثبت‌شده برای ${registry.title_fa}.`)
       : t("The requested registry listing could not be found.", "ثبت درخواستی پیدا نشد."),
@@ -66,8 +66,8 @@ export default function RegistryDetail() {
             </button>
           )}
           <p>{t(
-            "IEDR is a metadata catalogue. Registry content is not hosted or copied here; use the official source for information about the original registry.",
-            "IEDR کاتالوگی برای فراداده است. محتوای ثبت در اینجا میزبانی یا کپی نمی‌شود؛ برای اطلاعات درباره ثبت اصلی به منبع رسمی مراجعه کنید."
+            "RegistryHub is a metadata catalogue. Registry content is not hosted or copied here; use the official source for information about the original registry.",
+            "RegistryHub کاتالوگی برای فراداده است. محتوای ثبت در اینجا میزبانی یا کپی نمی‌شود؛ برای اطلاعات درباره ثبت اصلی به منبع رسمی مراجعه کنید."
           )}</p>
         </div>
       </article>
