@@ -74,7 +74,8 @@ function App() {
   const [categoriesReady, setCategoriesReady] = useState(false);
   const [english, setEnglish] = useState(false);
   const [query, setQuery] = useState("");
-  const [mobileMenu, setMobileMenu] = useState(false);\n  const [supportOpen, setSupportOpen] = useState(false);
+  const [mobileMenu, setMobileMenu] = useState(false);
+  const [supportOpen, setSupportOpen] = useState(false);
 
   useEffect(() => {
     const update = () => { setRoute(parseRoute()); setQuery(""); setMobileMenu(false); };
@@ -149,7 +150,8 @@ function App() {
         </div>
         {mobileMenu && <nav className="mobile-menu">
           <button type="button" onClick={() => navigate("")}>{english ? "Back to globe" : "بازگشت به کره"}</button>
-          <button type="button" onClick={() => navigate("provinces")}>{english ? "Choose province" : "انتخاب استان"}</button>\n          <button type="button" onClick={() => { setMobileMenu(false); setSupportOpen(true); }}>{english ? "Support" : "پشتیبانی"}</button>
+          <button type="button" onClick={() => navigate("provinces")}>{english ? "Choose province" : "انتخاب استان"}</button>
+          <button type="button" onClick={() => { setMobileMenu(false); setSupportOpen(true); }}>{english ? "Support" : "پشتیبانی"}</button>
           <button type="button" onClick={() => setEnglish((value) => !value)}>{english ? "فارسی" : "English"}</button>
         </nav>}
       </header>}
@@ -198,7 +200,8 @@ function App() {
       {(route.view === "category" || route.view === "registry") && <div className="paper-shell" dir={english ? "ltr" : "rtl"}>
         <header className="paper-header">
           <a href="#/" className="paper-brand"><span className="paper-brand-mark"><Globe2 size={19} /></span><span><strong>RegistryHub</strong><small>HEALTH REGISTRY DIRECTORY</small></span></a>
-          <div className="paper-header-actions"><button type="button" className="subtle-button" onClick={() => setEnglish((value) => !value)}>{english ? "فارسی" : "EN"}</button><button type="button" className="icon-button menu-button" aria-label={english ? "Open menu" : "بازکردن منو"} onClick={() => setMobileMenu((value) => !value)}>{mobileMenu ? <X size={19} /> : <Menu size={19} />}</button><button type="button" className="paper-back" onClick={() => navigate("categories/" + (route.provinceId || ACTIVE_PROVINCE_ID))}><ArrowRight size={16} /> {english ? "Clinical categories" : "دسته‌های بالینی"}</button></div>\n        {mobileMenu && <nav className="mobile-menu"><button type="button" onClick={() => { setMobileMenu(false); setSupportOpen(true); }}>{english ? "Support" : "پشتیبانی"}</button><button type="button" onClick={() => navigate("categories/" + (route.provinceId || ACTIVE_PROVINCE_ID))}>{english ? "Clinical categories" : "دسته‌های بالینی"}</button></nav>}
+          <div className="paper-header-actions"><button type="button" className="subtle-button" onClick={() => setEnglish((value) => !value)}>{english ? "فارسی" : "EN"}</button><button type="button" className="icon-button menu-button" aria-label={english ? "Open menu" : "بازکردن منو"} onClick={() => setMobileMenu((value) => !value)}>{mobileMenu ? <X size={19} /> : <Menu size={19} />}</button><button type="button" className="paper-back" onClick={() => navigate("categories/" + (route.provinceId || ACTIVE_PROVINCE_ID))}><ArrowRight size={16} /> {english ? "Clinical categories" : "دسته‌های بالینی"}</button></div>
+        {mobileMenu && <nav className="mobile-menu"><button type="button" onClick={() => { setMobileMenu(false); setSupportOpen(true); }}>{english ? "Support" : "پشتیبانی"}</button><button type="button" onClick={() => navigate("categories/" + (route.provinceId || ACTIVE_PROVINCE_ID))}>{english ? "Clinical categories" : "دسته‌های بالینی"}</button></nav>}
         </header>
         {route.view === "category" && <section className="catalogue-page">
           <div className="breadcrumb"><button type="button" onClick={() => navigate("categories/" + (route.provinceId || ACTIVE_PROVINCE_ID))}>{english ? "Clinical categories" : "دسته‌های بالینی"}</button><ChevronLeft size={14} /><span>{getText(selectedCategory, english)}</span></div>
