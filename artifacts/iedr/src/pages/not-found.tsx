@@ -5,7 +5,7 @@ import { usePageMeta } from "@/lib/use-page-meta";
 
 export default function NotFound() {
   const { t } = useLanguage();
-  const title = t("Page not found | IEDR", "صفحه پیدا نشد | IEDR");
+  const title = t("Page not found | RegistryHub", "صفحه پیدا نشد | RegistryHub");
   usePageMeta(title, t("This page does not exist.", "این صفحه وجود ندارد."));
   return (
     <section className="page-section narrow-page">
