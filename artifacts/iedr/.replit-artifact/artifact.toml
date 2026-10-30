@@ -1,6 +1,6 @@
 kind = "web"
 previewPath = "/"
-title = "Iran Epidemiology Data Repository"
+title = "RegistryHub"
 version = "1.0.0"
 id = "artifacts/iedr"
 router = "path"
