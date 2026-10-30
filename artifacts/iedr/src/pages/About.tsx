@@ -5,7 +5,7 @@ import { usePageMeta } from "@/lib/use-page-meta";
 
 export default function About() {
   const { t } = useLanguage();
-  const title = t("About the catalogue | IEDR", "درباره کاتالوگ | IEDR");
+  const title = t("About the catalogue | RegistryHub", "درباره کاتالوگ | RegistryHub");
   const description = t(
     "Learn about the purpose and scope of this medical registry metadata catalogue.",
     "درباره هدف و دامنه این کاتالوگ فراداده ثبت‌های پزشکی بخوانید."
@@ -15,7 +15,7 @@ export default function About() {
   return (
     <section className="page-section narrow-page">
       <div className="page-heading">
-        <span className="section-kicker">{t("ABOUT IEDR", "درباره IEDR")}</span>
+        <span className="section-kicker">{t("ABOUT RegistryHub", "درباره RegistryHub")}</span>
         <h1>{t("A directory, not a data repository.", "یک فهرست، نه مخزن داده.")}</h1>
         <p>{t("A bilingual catalogue to help people find information about medical registries.", "کاتالوگی دوزبانه برای کمک به یافتن اطلاعات درباره ثبت‌های پزشکی.")}</p>
       </div>
@@ -24,8 +24,8 @@ export default function About() {
           <BookOpenCheck size={23} aria-hidden="true" />
           <h2>{t("What this site does", "کار این وب‌سایت")}</h2>
           <p>{t(
-            "IEDR lists descriptive information about medical registries, including their titles, categories, and recorded institutional context. The catalogue is currently seeded with registry listings associated with Mashhad.",
-            "IEDR اطلاعات توصیفی ثبت‌های پزشکی، از جمله عنوان، دسته‌بندی و زمینه سازمانی ثبت‌شده را فهرست می‌کند. در حال حاضر، کاتالوگ شامل ثبت‌های مرتبط با مشهد است."
+            "RegistryHub lists descriptive information about medical registries, including their titles, categories, and recorded institutional context. The catalogue is currently seeded with registry listings associated with Mashhad.",
+            "RegistryHub اطلاعات توصیفی ثبت‌های پزشکی، از جمله عنوان، دسته‌بندی و زمینه سازمانی ثبت‌شده را فهرست می‌کند. در حال حاضر، کاتالوگ شامل ثبت‌های مرتبط با مشهد است."
           )}</p>
         </article>
         <article className="about-card">
