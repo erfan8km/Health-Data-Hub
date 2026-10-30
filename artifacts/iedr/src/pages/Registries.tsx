@@ -23,7 +23,7 @@ function readFilters(search: string): Filters {
 export default function Registries() {
   const { language, t } = useLanguage();
   const [filters, setFilters] = useState(() => readFilters(window.location.search));
-  const title = t("Registry Catalogue | IEDR", "فهرست ثبت‌ها | IEDR");
+  const title = t("Registry Catalogue | RegistryHub", "فهرست ثبت‌ها | RegistryHub");
   usePageMeta(title, t("Search and filter medical registry listings by place and category.", "جستجو و فیلتر ثبت‌های پزشکی بر اساس مکان و دسته‌بندی."));
 
   useEffect(() => {
