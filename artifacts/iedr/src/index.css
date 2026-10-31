@@ -127,16 +127,14 @@
 /* Structured scientific publication cards */
 .publication-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:13px}
 .publication-card{min-width:0;border:1px solid #dfe9ec;border-radius:12px;background:#fff;padding:15px 16px;box-shadow:0 5px 16px rgb(24 55 69 / 4%)}
-.publication-card-meta{display:flex;align-items:center;flex-wrap:wrap;gap:6px 9px;margin-bottom:9px}
+.publication-card-meta{display:flex;align-items:center;flex-wrap:wrap;gap:6px 9px;margin-top:9px}
 .publication-journal{color:#24766f;font-size:10px;font-weight:800;line-height:1.6;letter-spacing:.015em}
 .publication-year,.publication-type{display:inline-flex;align-items:center;border:1px solid #e2e9ed;border-radius:999px;padding:3px 8px;color:#60737b;font-size:9px}
 .publication-card h4{margin:0;color:#1d3540;font-size:13px;font-weight:750;line-height:1.8;overflow-wrap:anywhere}
-.publication-authors{margin:7px 0 0;color:#71818a;font-size:10px;line-height:1.8;overflow-wrap:anywhere}
 .publication-abstract{margin-top:9px;color:#536a74;font-size:10px;line-height:1.8}
 .publication-abstract summary{cursor:pointer;color:#287b75;font-weight:750}
 .publication-abstract p{margin:6px 0 0;white-space:pre-wrap}
-.publication-card-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:9px;border-top:1px solid #edf1f2}
-.publication-id{color:#8a989e;font-size:9px;font-variant-numeric:tabular-nums}
+.publication-card-footer{display:flex;align-items:center;justify-content:flex-start;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:9px;border-top:1px solid #edf1f2}
 .publication-card-links{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .publication-card-links a{display:inline-flex;align-items:center;gap:4px;color:#087b78;font-size:10px;font-weight:750;text-decoration:none}
 .publication-card-links a:hover{text-decoration:underline;text-underline-offset:3px}
