@@ -305,7 +305,6 @@ function App() {
                             );
                           })}
                         </div>
-                        </div>
                       ) : (
                         <p>{english
                           ? "No published articles have been added for this registry yet."
