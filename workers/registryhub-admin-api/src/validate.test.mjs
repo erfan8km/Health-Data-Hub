@@ -94,6 +94,8 @@ test("structured publication records accept bibliographic metadata", () => {
     doi: "10.1234/example.2025.1",
     url: "https://example.org/article",
     abstract: "A short abstract.",
+    abstractFa: "چکیده فارسی",
+    abstractEn: "English abstract",
     publicationType: "Original research",
   }];
   assert.deepEqual(validateRegistryPayload(candidate, categories, countries, provinces), { ok: true, errors: [] });
