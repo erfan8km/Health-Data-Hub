@@ -50,6 +50,23 @@ test("separate Persian and English selected-variable summaries are accepted", ()
   assert.deepEqual(validateRegistryPayload(candidate, categories, countries, provinces), { ok: true, errors: [] });
 });
 
+test("separate Persian and English registry metadata fields are accepted", () => {
+  const candidate = structuredClone(registries);
+  candidate[0].descriptionFa = "شرح فارسی";
+  candidate[0].descriptionEn = "English description";
+  candidate[0].targetPopulationFa = "جمعیت هدف";
+  candidate[0].targetPopulationEn = "Target population";
+  candidate[0].centerFa = "مرکز";
+  candidate[0].centerEn = "Center";
+  candidate[0].statusFa = "فعال";
+  candidate[0].statusEn = "Active";
+  candidate[0].registryTypeFa = "بیماری‌محور";
+  candidate[0].registryTypeEn = "Disease-based";
+  candidate[0].researchContactFa = "تماس پژوهشی";
+  candidate[0].researchContactEn = "Research contact";
+  assert.deepEqual(validateRegistryPayload(candidate, categories, countries, provinces), { ok: true, errors: [] });
+});
+
 test("legacy dataSummary remains accepted as a Persian compatibility field", () => {
   const candidate = structuredClone(registries);
   delete candidate[0].dataSummaryFa;
