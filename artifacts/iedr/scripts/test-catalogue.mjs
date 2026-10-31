@@ -116,3 +116,11 @@ test("province directory includes all 31 provinces but enables only Razavi Khora
   const provinceIds = new Set(provinces.map((province) => province.id));
   for (const registry of registries) assert.ok(provinceIds.has(registry.province));
 });
+
+
+test("publication metadata arrays remain present and start empty", () => {
+  for (const registry of registries) {
+    assert.ok(Array.isArray(registry.keyPublications), registry.slug + ": keyPublications must be an array");
+    assert.deepEqual(registry.keyPublications, [], registry.slug + ": no publication information should be invented");
+  }
+});
