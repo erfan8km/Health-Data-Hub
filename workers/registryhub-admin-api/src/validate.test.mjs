@@ -43,6 +43,29 @@ test("a missing province is rejected", () => {
 });
 
 
+test("separate Persian and English selected-variable summaries are accepted", () => {
+  const candidate = structuredClone(registries);
+  candidate[0].dataSummaryFa = "متغیرهای ثبت‌شده";
+  candidate[0].dataSummaryEn = "Selected registry variables";
+  assert.deepEqual(validateRegistryPayload(candidate, categories, countries, provinces), { ok: true, errors: [] });
+});
+
+test("legacy dataSummary remains accepted as a Persian compatibility field", () => {
+  const candidate = structuredClone(registries);
+  delete candidate[0].dataSummaryFa;
+  delete candidate[0].dataSummaryEn;
+  candidate[0].dataSummary = "Legacy Persian summary";
+  assert.deepEqual(validateRegistryPayload(candidate, categories, countries, provinces), { ok: true, errors: [] });
+});
+
+test("non-string English selected-variable summaries are rejected", () => {
+  const candidate = structuredClone(registries);
+  candidate[0].dataSummaryEn = 42;
+  const result = validateRegistryPayload(candidate, categories, countries, provinces);
+  assert.equal(result.ok, false);
+  assert.ok(result.errors.some((error) => error.includes(".dataSummaryEn must be a string")));
+});
+
 test("structured publication records accept bibliographic metadata", () => {
   const candidate = structuredClone(registries);
   candidate[0].keyPublications = [{

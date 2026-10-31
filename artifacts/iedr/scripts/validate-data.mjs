@@ -56,7 +56,7 @@ for (const registry of registries) {
     const id = registry.categories[0];
     if (!categoryIds.has(id)) errors.push(`registry "${registry.slug}": unknown category "${id}"`);
   }
-  for (const key of ["description", "targetPopulation", "center", "status", "lastReviewedAt", "startYear", "registryType", "dataSummary", "researchContact", "officialUrl"]) {
+  for (const key of ["description", "targetPopulation", "center", "status", "lastReviewedAt", "startYear", "registryType", "dataSummaryFa", "dataSummaryEn", "researchContact", "officialUrl"]) {
     if (typeof registry[key] !== "string") errors.push('registry "' + registry.slug + '": ' + key + " must be a string");
   }
   if (registry.lastReviewedAt && !/^\d{4}-\d{2}-\d{2}$/.test(registry.lastReviewedAt)) {

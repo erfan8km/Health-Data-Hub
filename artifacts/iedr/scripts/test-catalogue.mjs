@@ -87,16 +87,22 @@ test("the SSNHL and ROP identifiers remain unchanged and are in their intended c
   assert.equal(registries.find((registry) => registry.slug === "rop-screening")?.categories[0], "eye");
 });
 
-test("all registry metadata fields exist with empty placeholders until entered in the admin panel", () => {
-  const textFields = ["description", "targetPopulation", "center", "status", "lastReviewedAt", "startYear", "registryType", "dataSummary", "researchContact"];
+test("registry metadata includes separate Persian and English selected-variable summaries", () => {
+  const textFields = ["description", "targetPopulation", "center", "status", "lastReviewedAt", "startYear", "registryType", "dataSummaryFa", "dataSummaryEn", "researchContact"];
   for (const registry of registries) {
     for (const field of textFields) {
       assert.equal(typeof registry[field], "string", registry.slug + ": " + field + " should be a string");
-      assert.equal(registry[field], "", registry.slug + ": " + field + " should remain blank until verified");
+      if (registry.slug !== "brain-death") {
+        assert.equal(registry[field], "", registry.slug + ": " + field + " should remain blank until verified");
+      }
     }
     assert.ok(Array.isArray(registry.keyPublications), registry.slug + ": keyPublications should be an array");
     assert.equal(registry.officialUrl, "");
   }
+  const brainDeath = registries.find((registry) => registry.slug === "brain-death");
+  assert.ok(brainDeath.dataSummaryFa.trim(), "the Persian summary entered for brain-death must be preserved");
+  assert.equal(brainDeath.dataSummaryEn, "", "the English summary remains blank until translated and reviewed");
+  assert.deepEqual(brainDeath.keyPublications.map((publication) => publication.code), ["4003490", "4003007", "4002911", "983655"]);
 });
 
 test("the active Iran country has a boundary and geographic coordinates", () => {

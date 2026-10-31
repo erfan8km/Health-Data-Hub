@@ -1,4 +1,4 @@
-const REGISTRY_KEYS = new Set(["slug", "fa", "en", "country", "province", "city", "categories", "description", "officialUrl", "targetPopulation", "center", "status", "lastReviewedAt", "startYear", "registryType", "dataSummary", "researchContact", "keyPublications"]);
+const REGISTRY_KEYS = new Set(["slug", "fa", "en", "country", "province", "city", "categories", "description", "officialUrl", "targetPopulation", "center", "status", "lastReviewedAt", "startYear", "registryType", "dataSummary", "dataSummaryFa", "dataSummaryEn", "researchContact", "keyPublications"]);
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const MAX_REGISTRIES = 5000;
 const MAX_TEXT_LENGTH = 20000;
@@ -29,10 +29,17 @@ export function validateRegistryPayload(registries, categories, countries, provi
     for (const key of Object.keys(row)) {
       if (!REGISTRY_KEYS.has(key)) errors.push(`${label} has unsupported field "${key}"`);
     }
-    for (const key of ["slug", "fa", "en", "country", "province", "city", "description", "officialUrl", "targetPopulation", "center", "status", "lastReviewedAt", "startYear", "registryType", "dataSummary", "researchContact"]) {
+    for (const key of ["slug", "fa", "en", "country", "province", "city", "description", "officialUrl", "targetPopulation", "center", "status", "lastReviewedAt", "startYear", "registryType", "researchContact"]) {
       if (typeof row[key] !== "string") errors.push(`${label}.${key} must be a string`);
       else if (row[key].length > MAX_TEXT_LENGTH) errors.push(`${label}.${key} is too long`);
     }
+    const legacySummary = row.dataSummary;
+    const persianSummary = row.dataSummaryFa ?? legacySummary;
+    if (typeof persianSummary !== "string") errors.push(`${label}.dataSummaryFa or legacy dataSummary must be a string`);
+    else if (persianSummary.length > MAX_TEXT_LENGTH) errors.push(`${label}.dataSummaryFa is too long`);
+    if (legacySummary !== undefined && typeof legacySummary !== "string") errors.push(`${label}.dataSummary must be a string when provided`);
+    if (row.dataSummaryEn !== undefined && typeof row.dataSummaryEn !== "string") errors.push(`${label}.dataSummaryEn must be a string`);
+    else if (typeof row.dataSummaryEn === "string" && row.dataSummaryEn.length > MAX_TEXT_LENGTH) errors.push(`${label}.dataSummaryEn is too long`);
     if (typeof row.slug === "string") {
       if (!SLUG.test(row.slug)) errors.push(`${label}.slug must use lowercase kebab-case`);
       if (slugs.has(row.slug)) errors.push(`duplicate slug "${row.slug}"`);
