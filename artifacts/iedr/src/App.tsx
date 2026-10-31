@@ -12,7 +12,9 @@ type Category = { id: string; fa: string; en: string };
 type Country = { id: string; iso3: string; fa: string; en: string; coordinates: { longitude: number; latitude: number; height: number } };
 type Province = { id: string; fa: string; en: string; active: boolean };
 type Publication = { code?: string; title: string; journal?: string; authors?: string[]; year?: string; doi?: string; url?: string; abstract?: string; publicationType?: string };
-type Registry = { slug: string; fa: string; en: string; country: string; province: string; city: string; categories: string[]; description: string; officialUrl: string; targetPopulation: string; center: string; status: string; lastReviewedAt: string; startYear: string; registryType: string; dataSummary?: string; dataSummaryFa?: string; dataSummaryEn?: string; researchContact: string; keyPublications: Publication[] };
+type LocalizedRegistryField = "description" | "targetPopulation" | "center" | "status" | "registryType" | "researchContact";
+type LocalizedRegistryKey = `${LocalizedRegistryField}Fa` | `${LocalizedRegistryField}En`;
+type Registry = { slug: string; fa: string; en: string; country: string; province: string; city: string; categories: string[]; description: string; officialUrl: string; targetPopulation: string; center: string; status: string; lastReviewedAt: string; startYear: string; registryType: string; dataSummary?: string; dataSummaryFa?: string; dataSummaryEn?: string; researchContact: string; keyPublications: Publication[] } & Partial<Record<LocalizedRegistryKey, string>>;
 type View = "globe" | "provinces" | "categories" | "category" | "registry";
 type Route = { view: View; slug?: string; provinceId?: string };
 const ACTIVE_PROVINCE_ID = "razavi-khorasan";
@@ -63,6 +65,11 @@ function navigate(path: string) {
 }
 function getText(category: Category | undefined, english: boolean) {
   return category ? (english ? category.en : category.fa) : "";
+}
+function registryMetadataText(registry: Registry, field: LocalizedRegistryField, english: boolean, missingText: string) {
+  const key = (field + (english ? "En" : "Fa")) as LocalizedRegistryKey;
+  const value = english ? registry[key] : (registry[key] ?? registry[field]);
+  return value?.trim() || missingText;
 }
 function App() {
   const [route, setRoute] = useState<Route>(() => parseRoute());
@@ -231,17 +238,17 @@ function App() {
               <article className="detail-main-card">
                 <h2>{english ? "Registry profile" : "مشخصات ریجستری"}</h2>
                 <h3>{english ? "Short description" : "توضیح کوتاه"}</h3>
-                <p>{selectedRegistry.description.trim() || missingMetadataText}</p>
+                <p>{registryMetadataText(selectedRegistry, "description", english, missingMetadataText)}</p>
                 <div className="detail-separator" />
                 <h3>{english ? "Target population" : "جمعیت هدف"}</h3>
-                <p>{selectedRegistry.targetPopulation.trim() || missingMetadataText}</p>
+                <p>{registryMetadataText(selectedRegistry, "targetPopulation", english, missingMetadataText)}</p>
                 <div className="detail-separator" />
                 <h3>{english ? "Center and city" : "مرکز و شهر"}</h3>
-                <div className="side-info"><small>{english ? "CENTER" : "مرکز"}</small><strong>{selectedRegistry.center.trim() || missingMetadataText}</strong></div>
+                <div className="side-info"><small>{english ? "CENTER" : "مرکز"}</small><strong>{registryMetadataText(selectedRegistry, "center", english, missingMetadataText)}</strong></div>
                 <div className="side-info"><small>{english ? "CITY" : "شهر"}</small><strong>{selectedRegistry.city === "mashhad" ? (english ? "Mashhad" : "مشهد") : selectedRegistry.city || missingMetadataText}</strong></div>
                 <div className="detail-separator" />
                 <h3>{english ? "Status" : "وضعیت"}</h3>
-                <p>{selectedRegistry.status.trim() || missingMetadataText}</p>
+                <p>{registryMetadataText(selectedRegistry, "status", english, missingMetadataText)}</p>
                 <div className="detail-separator" />
                 <h3>{english ? "Last information review" : "تاریخ آخرین بررسی اطلاعات"}</h3>
                 <p>{selectedRegistry.lastReviewedAt.trim() || missingMetadataText}</p>
@@ -250,13 +257,13 @@ function App() {
                 <p>{selectedRegistry.startYear.trim() || missingMetadataText}</p>
                 <div className="detail-separator" />
                 <h3>{english ? "Registry type" : "نوع ریجستری"}</h3>
-                <p>{selectedRegistry.registryType.trim() || missingMetadataText}</p>
+                <p>{registryMetadataText(selectedRegistry, "registryType", english, missingMetadataText)}</p>
                 <div className="detail-separator" />
                 <h3>{english ? "Selected Registry Variables" : "قسمتی از متغیرهای رجیستری"}</h3>
                 <p>{((english ? selectedRegistry.dataSummaryEn : (selectedRegistry.dataSummaryFa ?? selectedRegistry.dataSummary)) || "").trim() || missingMetadataText}</p>
                 <div className="detail-separator" />
                 <h3>{english ? "Research contact or collaboration" : "راه ارتباط یا همکاری پژوهشی"}</h3>
-                <p>{selectedRegistry.researchContact.trim() || missingMetadataText}</p>
+                <p>{registryMetadataText(selectedRegistry, "researchContact", english, missingMetadataText)}</p>
                 <div className="detail-separator" />
                 <div className="publication-review">
                   <button
