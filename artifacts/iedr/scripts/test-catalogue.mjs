@@ -88,7 +88,7 @@ test("the SSNHL and ROP identifiers remain unchanged and are in their intended c
 });
 
 test("registry metadata includes separate Persian and English selected-variable summaries", () => {
-  const textFields = ["description", "targetPopulation", "center", "status", "lastReviewedAt", "startYear", "registryType", "dataSummaryFa", "dataSummaryEn", "researchContact"];
+  const textFields = ["description", "descriptionFa", "descriptionEn", "targetPopulation", "targetPopulationFa", "targetPopulationEn", "center", "centerFa", "centerEn", "status", "statusFa", "statusEn", "lastReviewedAt", "startYear", "registryType", "registryTypeFa", "registryTypeEn", "dataSummaryFa", "dataSummaryEn", "researchContact", "researchContactFa", "researchContactEn"];
   for (const registry of registries) {
     for (const field of textFields) {
       assert.equal(typeof registry[field], "string", registry.slug + ": " + field + " should be a string");
@@ -100,7 +100,12 @@ test("registry metadata includes separate Persian and English selected-variable 
     assert.equal(registry.officialUrl, "");
   }
   const brainDeath = registries.find((registry) => registry.slug === "brain-death");
+  assert.ok(brainDeath.descriptionFa.trim(), "the Persian description must be preserved");
+  assert.ok(brainDeath.targetPopulationFa.trim(), "the Persian target population must be preserved");
+  assert.ok(brainDeath.centerFa.trim(), "the Persian center must be preserved");
+  assert.ok(brainDeath.statusFa.trim(), "the Persian status must be preserved");
   assert.ok(brainDeath.dataSummaryFa.trim(), "the Persian summary entered for brain-death must be preserved");
+  assert.equal(brainDeath.descriptionEn, "", "English descriptions must remain blank until translated and reviewed");
   assert.equal(brainDeath.dataSummaryEn, "", "the English summary remains blank until translated and reviewed");
   assert.deepEqual(brainDeath.keyPublications.map((publication) => publication.code), ["4003490", "4003007", "4002911", "983655"]);
 });
