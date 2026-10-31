@@ -76,6 +76,7 @@ function App() {
   const [query, setQuery] = useState("");
   const [mobileMenu, setMobileMenu] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const [publicationsExpanded, setPublicationsExpanded] = useState(false);
 
   useEffect(() => {
@@ -149,12 +150,10 @@ function App() {
           <button className="subtle-button language-button" type="button" onClick={() => setEnglish((value) => !value)}>{english ? "فارسی" : "EN"}</button>
           <button className="icon-button menu-button" type="button" aria-label="منو" onClick={() => setMobileMenu((value) => !value)}>{mobileMenu ? <X size={19} /> : <Menu size={19} />}</button>
         </div>
-        {mobileMenu && <nav className="mobile-menu">
-          <button type="button" onClick={() => navigate("")}>{english ? "Back to globe" : "بازگشت به کره"}</button>
-          <button type="button" onClick={() => navigate("provinces")}>{english ? "Choose province" : "انتخاب استان"}</button>
+        {mobileMenu && <nav className="mobile-menu" aria-label={english ? "Main menu" : "منوی اصلی"} dir={english ? "ltr" : "rtl"}>
+          <button type="button" onClick={() => { setMobileMenu(false); setAboutOpen(true); }}>{english ? "About us" : "درباره ما"}</button>
           <button type="button" onClick={() => { setMobileMenu(false); setSupportOpen(true); }}>{english ? "Support" : "پشتیبانی"}</button>
           <a href="mailto:registryhub.support@gmail.com" onClick={() => setMobileMenu(false)}>{english ? "Contact" : "ارتباط"}</a>
-          <button type="button" onClick={() => setEnglish((value) => !value)}>{english ? "فارسی" : "English"}</button>
         </nav>}
       </header>}
 
@@ -203,7 +202,11 @@ function App() {
         <header className="paper-header">
           <a href="#/" className="paper-brand"><span className="paper-brand-mark"><Globe2 size={19} /></span><span><strong>RegistryHub</strong><small>HEALTH REGISTRY DIRECTORY</small></span></a>
           <div className="paper-header-actions"><button type="button" className="subtle-button" onClick={() => setEnglish((value) => !value)}>{english ? "فارسی" : "EN"}</button><button type="button" className="icon-button menu-button" aria-label={english ? "Open menu" : "بازکردن منو"} onClick={() => setMobileMenu((value) => !value)}>{mobileMenu ? <X size={19} /> : <Menu size={19} />}</button><button type="button" className="paper-back" onClick={() => navigate("categories/" + (route.provinceId || ACTIVE_PROVINCE_ID))}><ArrowRight size={16} /> {english ? "Clinical categories" : "دسته‌های بالینی"}</button></div>
-        {mobileMenu && <nav className="mobile-menu"><button type="button" onClick={() => { setMobileMenu(false); setSupportOpen(true); }}>{english ? "Support" : "پشتیبانی"}</button><a href="mailto:registryhub.support@gmail.com" onClick={() => setMobileMenu(false)}>{english ? "Contact" : "ارتباط"}</a><button type="button" onClick={() => navigate("categories/" + (route.provinceId || ACTIVE_PROVINCE_ID))}>{english ? "Clinical categories" : "دسته‌های بالینی"}</button></nav>}
+        {mobileMenu && <nav className="mobile-menu" aria-label={english ? "Main menu" : "منوی اصلی"} dir={english ? "ltr" : "rtl"}>
+          <button type="button" onClick={() => { setMobileMenu(false); setAboutOpen(true); }}>{english ? "About us" : "درباره ما"}</button>
+          <button type="button" onClick={() => { setMobileMenu(false); setSupportOpen(true); }}>{english ? "Support" : "پشتیبانی"}</button>
+          <a href="mailto:registryhub.support@gmail.com" onClick={() => setMobileMenu(false)}>{english ? "Contact" : "ارتباط"}</a>
+        </nav>}
         </header>
         {route.view === "category" && <section className="catalogue-page">
           <div className="breadcrumb"><button type="button" onClick={() => navigate("categories/" + (route.provinceId || ACTIVE_PROVINCE_ID))}>{english ? "Clinical categories" : "دسته‌های بالینی"}</button><ChevronLeft size={14} /><span>{getText(selectedCategory, english)}</span></div>
@@ -308,6 +311,24 @@ function App() {
             <button type="button" className="bottom-back-link" onClick={() => navigate("category/" + (selectedRegistry.categories[0] || "gyn") + "/" + (route.provinceId || ACTIVE_PROVINCE_ID))}><ArrowRight size={16} /> {english ? "Back to category" : "بازگشت به دسته‌ی مربوطه"}</button>
           </>}
         </section>}
+      </div>}
+      {aboutOpen && <div className="about-backdrop" onClick={() => setAboutOpen(false)}>
+        <section className="about-dialog" dir={english ? "ltr" : "rtl"} role="dialog" aria-modal="true" aria-labelledby="about-heading" onClick={(event) => event.stopPropagation()}>
+          <header className="about-dialog-header">
+            <div><p className="about-dialog-kicker">{english ? "ABOUT THE PROJECT" : "درباره سامانه"}</p><h2 id="about-heading">RegistryHub</h2><span>Iran Epidemiology Data Repository (IEDR)</span></div>
+            <button type="button" className="about-dialog-close" onClick={() => setAboutOpen(false)} aria-label={english ? "Close" : "بستن"}><X size={19} /></button>
+          </header>
+          {english ? <>
+            <p>RegistryHub (IEDR) is a bilingual directory for discovering Iranian medical and clinical registries and exploring their descriptive metadata.</p>
+            <p>It aims to make registry information easier to find and to support research connections and collaboration. The catalogue describes registries; it does not host individual-level health records or patient data.</p>
+            <p>The current directory is being developed progressively. Iran is listed as the active country, and Razavi Khorasan is the currently active province.</p>
+          </> : <>
+            <p>RegistryHub یا مخزن داده‌های اپیدمیولوژی ایران (IEDR)، یک فهرست دوزبانه برای شناسایی رجیستری‌های پزشکی و بالینی ایران و مشاهده اطلاعات توصیفی آن‌هاست.</p>
+            <p>هدف سامانه، دسترس‌پذیرتر کردن اطلاعات رجیستری‌ها و کمک به شکل‌گیری ارتباط‌ها و همکاری‌های پژوهشی است. این سامانه اطلاعات معرفی و فراداده رجیستری‌ها را ارائه می‌کند و میزبان داده‌های فردی سلامت یا پرونده بیماران نیست.</p>
+            <p>کاتالوگ به‌تدریج توسعه می‌یابد. در نسخه فعلی، ایران کشور فعال و خراسان رضوی استان فعال سامانه است.</p>
+          </>}
+          <div className="about-dialog-footer"><span>{english ? "Bilingual registry directory" : "فهرست دوزبانه رجیستری‌ها"}</span><span>IEDR</span></div>
+        </section>
       </div>}
       <SupportChat english={english} open={supportOpen} onClose={() => setSupportOpen(false)} />
     </main>
