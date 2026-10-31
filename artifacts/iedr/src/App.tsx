@@ -11,7 +11,7 @@ import SupportChat from "./components/SupportChat";
 type Category = { id: string; fa: string; en: string };
 type Country = { id: string; iso3: string; fa: string; en: string; coordinates: { longitude: number; latitude: number; height: number } };
 type Province = { id: string; fa: string; en: string; active: boolean };
-type Publication = { code?: string; title: string; journal?: string; authors?: string[]; year?: string; doi?: string; url?: string; abstract?: string; publicationType?: string };
+type Publication = { code?: string; title: string; journal?: string; authors?: string[]; year?: string; doi?: string; url?: string; abstract?: string; abstractFa?: string; abstractEn?: string; publicationType?: string };
 type LocalizedRegistryField = "description" | "targetPopulation" | "center" | "status" | "registryType" | "researchContact";
 type LocalizedRegistryKey = `${LocalizedRegistryField}Fa` | `${LocalizedRegistryField}En`;
 type Registry = { slug: string; fa: string; en: string; country: string; province: string; city: string; categories: string[]; description: string; officialUrl: string; targetPopulation: string; center: string; status: string; lastReviewedAt: string; startYear: string; registryType: string; dataSummary?: string; dataSummaryFa?: string; dataSummaryEn?: string; researchContact: string; keyPublications: Publication[] } & Partial<Record<LocalizedRegistryKey, string>>;
@@ -287,6 +287,7 @@ function App() {
                         <div className="publication-card-grid">
                           {selectedRegistry.keyPublications.map((publication, index) => {
                             const doi = (publication.doi || "").trim().replace(/^https?:\/\/(dx\.)?doi\.org\//i, "");
+                            const abstract = english ? (publication.abstractEn || "") : (publication.abstractFa ?? publication.abstract ?? "");
                             const doiLink = doi ? "https://doi.org/" + doi : "";
                             return (
                               <article className="publication-card" key={publication.doi || index}>
@@ -295,10 +296,10 @@ function App() {
                                   {publication.journal && <span className="publication-journal">{publication.journal}</span>}
                                   {publication.year && <span className="publication-year">{publication.year}</span>}
                                 </div>
-                                {publication.abstract && (
+                                {(abstract.trim() || english) && (
                                   <details className="publication-abstract">
                                     <summary>{english ? "Abstract" : "چکیده"}</summary>
-                                    <p>{publication.abstract}</p>
+                                    <p>{abstract.trim() || missingMetadataText}</p>
                                   </details>
                                 )}
                                 {doiLink && (
