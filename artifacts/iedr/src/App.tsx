@@ -279,34 +279,32 @@ function App() {
                       {selectedRegistry.keyPublications.length ? (
                         <div className="publication-card-grid">
                           {selectedRegistry.keyPublications.map((publication, index) => {
-                            const authors = Array.isArray(publication.authors) ? publication.authors.filter(Boolean) : [];
                             const doi = (publication.doi || "").trim().replace(/^https?:\/\/(dx\.)?doi\.org\//i, "");
                             const doiLink = doi ? "https://doi.org/" + doi : "";
                             return (
                               <article className="publication-card" key={publication.code || publication.doi || index}>
+                                <h4>{publication.title}</h4>
                                 <div className="publication-card-meta">
                                   {publication.journal && <span className="publication-journal">{publication.journal}</span>}
                                   {publication.year && <span className="publication-year">{publication.year}</span>}
-                                  {publication.publicationType && <span className="publication-type">{publication.publicationType}</span>}
                                 </div>
-                                <h4>{publication.title}</h4>
-                                {authors.length > 0 && <p className="publication-authors">{authors.join("; ")}</p>}
                                 {publication.abstract && (
                                   <details className="publication-abstract">
                                     <summary>{english ? "Abstract" : "چکیده"}</summary>
                                     <p>{publication.abstract}</p>
                                   </details>
                                 )}
-                                <div className="publication-card-footer">
-                                  {publication.code && <span className="publication-id">ID: {publication.code}</span>}
-                                  <span className="publication-card-links">
-                                    {doiLink && <a href={doiLink} target="_blank" rel="noopener noreferrer">DOI <ExternalLink size={12} /></a>}
-                                    {publication.url && <a href={publication.url} target="_blank" rel="noopener noreferrer">{english ? "View article" : "مشاهده مقاله"} <ExternalLink size={12} /></a>}
-                                  </span>
-                                </div>
+                                {doiLink && (
+                                  <div className="publication-card-footer">
+                                    <span className="publication-card-links">
+                                      <a href={doiLink} target="_blank" rel="noopener noreferrer">DOI <ExternalLink size={12} /></a>
+                                    </span>
+                                  </div>
+                                )}
                               </article>
                             );
                           })}
+                        </div>
                         </div>
                       ) : (
                         <p>{english
