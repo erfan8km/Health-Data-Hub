@@ -107,7 +107,7 @@ test("registry metadata includes separate Persian and English selected-variable 
   assert.ok(brainDeath.dataSummaryFa.trim(), "the Persian summary entered for brain-death must be preserved");
   assert.equal(brainDeath.descriptionEn, "", "English descriptions must remain blank until translated and reviewed");
   assert.equal(brainDeath.dataSummaryEn, "", "the English summary remains blank until translated and reviewed");
-  assert.deepEqual(brainDeath.keyPublications.map((publication) => publication.code), ["4003490", "4003007", "4002911", "983655"]);
+  for (const publication of brainDeath.keyPublications) {\n    assert.equal(publication.abstractFa, publication.abstract, "legacy Persian abstracts should be preserved");\n    assert.equal(publication.abstractEn, "", "English abstracts remain blank until translated and reviewed");\n  }\n  assert.deepEqual(brainDeath.keyPublications.map((publication) => publication.code), ["4003490", "4003007", "4002911", "983655"]);
 });
 
 test("the active Iran country has a boundary and geographic coordinates", () => {
