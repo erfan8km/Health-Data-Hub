@@ -315,19 +315,21 @@ function App() {
       {aboutOpen && <div className="about-backdrop" onClick={() => setAboutOpen(false)}>
         <section className="about-dialog" dir={english ? "ltr" : "rtl"} role="dialog" aria-modal="true" aria-labelledby="about-heading" onClick={(event) => event.stopPropagation()}>
           <header className="about-dialog-header">
-            <div><p className="about-dialog-kicker">{english ? "ABOUT THE PROJECT" : "درباره سامانه"}</p><h2 id="about-heading">RegistryHub</h2><span>Iran Epidemiology Data Repository (IEDR)</span></div>
+            <div><p className="about-dialog-kicker">{english ? "ABOUT REGISTRYHUB" : "درباره RegistryHub"}</p><h2 id="about-heading">RegistryHub</h2></div>
             <button type="button" className="about-dialog-close" onClick={() => setAboutOpen(false)} aria-label={english ? "Close" : "بستن"}><X size={19} /></button>
           </header>
           {english ? <>
-            <p>RegistryHub (IEDR) is a bilingual directory for discovering Iranian medical and clinical registries and exploring their descriptive metadata.</p>
-            <p>It aims to make registry information easier to find and to support research connections and collaboration. The catalogue describes registries; it does not host individual-level health records or patient data.</p>
-            <p>The current directory is being developed progressively. Iran is listed as the active country, and Razavi Khorasan is the currently active province.</p>
+            <p>RegistryHub is a bilingual platform for identifying, introducing, and facilitating access to information about medical and clinical registries in Iran.</p>
+            <p>By collecting and organizing descriptive information and registry metadata, the platform helps researchers explore existing capacities, build academic connections, and develop research collaborations.</p>
+            <p>RegistryHub only introduces registries and provides descriptive information about them; it does not host individual-level health data or patient records.</p>
+            <p>The catalogue is being developed progressively. In the current version, Iran is the active country and Razavi Khorasan is the first active province available in the platform.</p>
           </> : <>
-            <p>RegistryHub یا مخزن داده‌های اپیدمیولوژی ایران (IEDR)، یک فهرست دوزبانه برای شناسایی رجیستری‌های پزشکی و بالینی ایران و مشاهده اطلاعات توصیفی آن‌هاست.</p>
-            <p>هدف سامانه، دسترس‌پذیرتر کردن اطلاعات رجیستری‌ها و کمک به شکل‌گیری ارتباط‌ها و همکاری‌های پژوهشی است. این سامانه اطلاعات معرفی و فراداده رجیستری‌ها را ارائه می‌کند و میزبان داده‌های فردی سلامت یا پرونده بیماران نیست.</p>
-            <p>کاتالوگ به‌تدریج توسعه می‌یابد. در نسخه فعلی، ایران کشور فعال و خراسان رضوی استان فعال سامانه است.</p>
+            <p>RegistryHub، یک پلتفرم دوزبانه با هدف شناسایی، معرفی و تسهیل دسترسی به اطلاعات رجیستری‌های پزشکی و بالینی ایران است.</p>
+            <p>این پلتفرم با گردآوری و سازمان‌دهی اطلاعات توصیفی و فراداده رجیستری‌ها، تلاش می‌کند بستری برای آشنایی پژوهشگران با ظرفیت‌های موجود، توسعه ارتباطات علمی و تسهیل همکاری‌های پژوهشی فراهم کند.</p>
+            <p>RegistryHub صرفاً به معرفی رجیستری‌ها و ارائه اطلاعات توصیفی آن‌ها می‌پردازد و هیچ‌گونه داده فردی سلامت یا پرونده بیماران را میزبانی نمی‌کند.</p>
+            <p>این کاتالوگ به‌صورت تدریجی توسعه خواهد یافت. در نسخه فعلی، ایران به‌عنوان کشور فعال و استان خراسان رضوی به‌عنوان نخستین استان فعال در سامانه در دسترس هستند.</p>
           </>}
-          <div className="about-dialog-footer"><span>{english ? "Bilingual registry directory" : "فهرست دوزبانه رجیستری‌ها"}</span><span>IEDR</span></div>
+          <div className="about-dialog-footer"><span>{english ? "Bilingual registry directory" : "فهرست دوزبانه رجیستری‌ها"}</span></div>
         </section>
       </div>}
       <SupportChat english={english} open={supportOpen} onClose={() => setSupportOpen(false)} />
