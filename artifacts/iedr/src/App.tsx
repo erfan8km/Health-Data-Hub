@@ -280,7 +280,7 @@ function App() {
                         <div className="publication-card-grid">
                           {selectedRegistry.keyPublications.map((publication, index) => {
                             const authors = Array.isArray(publication.authors) ? publication.authors.filter(Boolean) : [];
-                            const doi = (publication.doi || "").trim().replace(/^https?:\\/\\/(dx\\.)?doi\\.org\\//i, "");
+                            const doi = (publication.doi || "").trim().replace(/^https?:\/\/(dx\.)?doi\.org\//i, "");
                             const doiLink = doi ? "https://doi.org/" + doi : "";
                             return (
                               <article className="publication-card" key={publication.code || publication.doi || index}>
