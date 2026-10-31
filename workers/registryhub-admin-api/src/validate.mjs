@@ -86,17 +86,17 @@ export function validateRegistryPayload(registries, categories, countries, provi
           errors.push(publicationLabel + " must be an object");
           return;
         }
-        const allowedKeys = new Set(["code", "title", "journal", "authors", "year", "doi", "url", "abstract", "publicationType"]);
+        const allowedKeys = new Set(["code", "title", "journal", "authors", "year", "doi", "url", "abstract", "abstractFa", "abstractEn", "publicationType"]);
         for (const key of Object.keys(publication)) {
           if (!allowedKeys.has(key)) errors.push(publicationLabel + " has unsupported field \"" + key + "\"");
         }
-        for (const key of ["code", "title", "journal", "year", "doi", "url", "abstract", "publicationType"]) {
+        for (const key of ["code", "title", "journal", "year", "doi", "url", "abstract", "abstractFa", "abstractEn", "publicationType"]) {
           if (publication[key] !== undefined && typeof publication[key] !== "string") errors.push(publicationLabel + "." + key + " must be a string");
           if (typeof publication[key] === "string" && publication[key].length > MAX_TEXT_LENGTH) errors.push(publicationLabel + "." + key + " is too long");
         }
         const structured = Boolean(
           publication.code || publication.journal || publication.year || publication.doi ||
-          publication.abstract || publication.publicationType ||
+          publication.abstract || publication.abstractFa || publication.abstractEn || publication.publicationType ||
           (Array.isArray(publication.authors) && publication.authors.length)
         );
         if (!structured) {
