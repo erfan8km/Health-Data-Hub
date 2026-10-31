@@ -12,7 +12,7 @@ type Category = { id: string; fa: string; en: string };
 type Country = { id: string; iso3: string; fa: string; en: string; coordinates: { longitude: number; latitude: number; height: number } };
 type Province = { id: string; fa: string; en: string; active: boolean };
 type Publication = { code?: string; title: string; journal?: string; authors?: string[]; year?: string; doi?: string; url?: string; abstract?: string; publicationType?: string };
-type Registry = { slug: string; fa: string; en: string; country: string; province: string; city: string; categories: string[]; description: string; officialUrl: string; targetPopulation: string; center: string; status: string; lastReviewedAt: string; startYear: string; registryType: string; dataSummary: string; researchContact: string; keyPublications: Publication[] };
+type Registry = { slug: string; fa: string; en: string; country: string; province: string; city: string; categories: string[]; description: string; officialUrl: string; targetPopulation: string; center: string; status: string; lastReviewedAt: string; startYear: string; registryType: string; dataSummary?: string; dataSummaryFa?: string; dataSummaryEn?: string; researchContact: string; keyPublications: Publication[] };
 type View = "globe" | "provinces" | "categories" | "category" | "registry";
 type Route = { view: View; slug?: string; provinceId?: string };
 const ACTIVE_PROVINCE_ID = "razavi-khorasan";
@@ -252,8 +252,8 @@ function App() {
                 <h3>{english ? "Registry type" : "نوع ریجستری"}</h3>
                 <p>{selectedRegistry.registryType.trim() || missingMetadataText}</p>
                 <div className="detail-separator" />
-                <h3>{english ? "Summary of collected data" : "خلاصه‌ی نوع داده‌هایی که جمع‌آوری می‌شود"}</h3>
-                <p>{selectedRegistry.dataSummary.trim() || missingMetadataText}</p>
+                <h3>{english ? "Selected Registry Variables" : "قسمتی از متغیرهای رجیستری"}</h3>
+                <p>{((english ? selectedRegistry.dataSummaryEn : (selectedRegistry.dataSummaryFa ?? selectedRegistry.dataSummary)) || "").trim() || missingMetadataText}</p>
                 <div className="detail-separator" />
                 <h3>{english ? "Research contact or collaboration" : "راه ارتباط یا همکاری پژوهشی"}</h3>
                 <p>{selectedRegistry.researchContact.trim() || missingMetadataText}</p>
