@@ -41,3 +41,49 @@ test("a missing province is rejected", () => {
   assert.equal(result.ok, false);
   assert.ok(result.errors.some((error) => error === "registry[0].province must be a string"));
 });
+
+
+test("structured publication records accept bibliographic metadata", () => {
+  const candidate = structuredClone(registries);
+  candidate[0].keyPublications = [{
+    code: "4041521",
+    title: "Example transplant cohort article",
+    journal: "Archives of Clinical Infectious Diseases",
+    authors: ["First Author", "Second Author"],
+    year: "2025",
+    doi: "10.1234/example.2025.1",
+    url: "https://example.org/article",
+    abstract: "A short abstract.",
+    publicationType: "Original research",
+  }];
+  assert.deepEqual(validateRegistryPayload(candidate, categories, countries, provinces), { ok: true, errors: [] });
+});
+
+test("structured publications require code, title and journal", () => {
+  const candidate = structuredClone(registries);
+  candidate[0].keyPublications = [{ code: "", title: "Incomplete article", journal: "" , year: "2025" }];
+  const result = validateRegistryPayload(candidate, categories, countries, provinces);
+  assert.equal(result.ok, false);
+  assert.ok(result.errors.some((error) => error.includes(".code is required")));
+  assert.ok(result.errors.some((error) => error.includes(".journal is required")));
+});
+
+test("invalid DOI, year, URL, and duplicate article identifiers are rejected", () => {
+  const candidate = structuredClone(registries);
+  candidate[0].keyPublications = [
+    { code: "A1", title: "Article one", journal: "Journal", year: "25", doi: "not-a-doi", url: "http://example.org" },
+    { code: "A1", title: "Article two", journal: "Journal", doi: "10.1234/valid" },
+  ];
+  const result = validateRegistryPayload(candidate, categories, countries, provinces);
+  assert.equal(result.ok, false);
+  assert.ok(result.errors.some((error) => error.includes(".year must use four digits")));
+  assert.ok(result.errors.some((error) => error.includes(".doi must be a valid DOI")));
+  assert.ok(result.errors.some((error) => error.includes(".url must be a valid HTTPS URL")));
+  assert.ok(result.errors.some((error) => error.includes("duplicate article code")));
+});
+
+test("legacy title and HTTPS URL publication records remain compatible", () => {
+  const candidate = structuredClone(registries);
+  candidate[0].keyPublications = [{ title: "Legacy article", url: "https://example.org/article" }];
+  assert.deepEqual(validateRegistryPayload(candidate, categories, countries, provinces), { ok: true, errors: [] });
+});

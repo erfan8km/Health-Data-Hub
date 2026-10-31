@@ -71,23 +71,48 @@ export function validateRegistryPayload(registries, categories, countries, provi
     if (!Array.isArray(row.keyPublications)) {
       errors.push(`${label}.keyPublications must be an array`);
     } else {
+      const publicationCodes = new Set();
+      const publicationDois = new Set();
       row.keyPublications.forEach((publication, publicationIndex) => {
         const publicationLabel = label + ".keyPublications[" + publicationIndex + "]";
         if (!publication || typeof publication !== "object" || Array.isArray(publication)) {
           errors.push(publicationLabel + " must be an object");
           return;
         }
+        const allowedKeys = new Set(["code", "title", "journal", "authors", "year", "doi", "url", "abstract", "publicationType"]);
         for (const key of Object.keys(publication)) {
-          if (key !== "title" && key !== "url") errors.push(publicationLabel + " has unsupported field \"" + key + "\"");
+          if (!allowedKeys.has(key)) errors.push(publicationLabel + " has unsupported field \"" + key + "\"");
         }
-        if (typeof publication.title !== "string" || !publication.title.trim()) {
-          errors.push(publicationLabel + ".title is required");
-        } else if (publication.title.length > MAX_TEXT_LENGTH) {
-          errors.push(publicationLabel + ".title is too long");
+        for (const key of ["code", "title", "journal", "year", "doi", "url", "abstract", "publicationType"]) {
+          if (publication[key] !== undefined && typeof publication[key] !== "string") errors.push(publicationLabel + "." + key + " must be a string");
+          if (typeof publication[key] === "string" && publication[key].length > MAX_TEXT_LENGTH) errors.push(publicationLabel + "." + key + " is too long");
         }
-        if (typeof publication.url !== "string" || !publication.url.trim()) {
-          errors.push(publicationLabel + ".url is required");
+        const structured = Boolean(
+          publication.code || publication.journal || publication.year || publication.doi ||
+          publication.abstract || publication.publicationType ||
+          (Array.isArray(publication.authors) && publication.authors.length)
+        );
+        if (!structured) {
+          if (typeof publication.title !== "string" || !publication.title.trim() ||
+              typeof publication.url !== "string" || !publication.url.trim()) {
+            errors.push(publicationLabel + " legacy records require a title and URL");
+          }
         } else {
+          if (typeof publication.code !== "string" || !publication.code.trim()) errors.push(publicationLabel + ".code is required for structured articles");
+          if (typeof publication.title !== "string" || !publication.title.trim()) errors.push(publicationLabel + ".title is required");
+          if (typeof publication.journal !== "string" || !publication.journal.trim()) errors.push(publicationLabel + ".journal is required for structured articles");
+          if (publication.year && !/^\d{4}$/.test(publication.year)) errors.push(publicationLabel + ".year must use four digits or be empty");
+          if (publication.doi && !/^10\.\d{4,9}\/\S+$/i.test(publication.doi)) errors.push(publicationLabel + ".doi must be a valid DOI");
+          if (publication.authors !== undefined && (!Array.isArray(publication.authors) || publication.authors.length > 100 ||
+              publication.authors.some((author) => typeof author !== "string" || !author.trim() || author.length > 300))) {
+            errors.push(publicationLabel + ".authors must be an array of non-empty author names");
+          }
+          if (publication.code && publicationCodes.has(publication.code)) errors.push(publicationLabel + " has a duplicate article code");
+          if (publication.code) publicationCodes.add(publication.code);
+          if (publication.doi && publicationDois.has(publication.doi.toLowerCase())) errors.push(publicationLabel + " has a duplicate DOI");
+          if (publication.doi) publicationDois.add(publication.doi.toLowerCase());
+        }
+        if (publication.url) {
           try {
             if (new URL(publication.url).protocol !== "https:") throw new Error();
           } catch {

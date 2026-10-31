@@ -72,15 +72,48 @@ for (const registry of registries) {
   if (!Array.isArray(registry.keyPublications)) {
     errors.push('registry "' + registry.slug + '": keyPublications must be an array');
   } else {
+    const publicationCodes = new Set();
+    const publicationDois = new Set();
     registry.keyPublications.forEach((publication, index) => {
+      const label = 'registry "' + registry.slug + '": keyPublications[' + index + ']';
       if (!publication || typeof publication !== "object" || Array.isArray(publication)) {
-        errors.push('registry "' + registry.slug + '": keyPublications[' + index + '] must be an object');
-      } else if (typeof publication.title !== "string" || !publication.title.trim() || typeof publication.url !== "string" || !publication.url.trim()) {
-        errors.push('registry "' + registry.slug + '": each key publication needs a title and URL');
-      } else {
-        try { if (new URL(publication.url).protocol !== "https:") throw new Error(); }
-        catch { errors.push('registry "' + registry.slug + '": publication URLs must be valid HTTPS URLs'); }
+        errors.push(label + " must be an object");
+        return;
       }
+      const textKeys = ["code", "title", "journal", "year", "doi", "url", "abstract", "publicationType"];
+      for (const key of textKeys) {
+        if (publication[key] !== undefined && typeof publication[key] !== "string") errors.push(label + "." + key + " must be a string");
+      }
+      const structured = Boolean(
+        publication.code || publication.journal || publication.year || publication.doi ||
+        publication.abstract || publication.publicationType ||
+        (Array.isArray(publication.authors) && publication.authors.length)
+      );
+      if (!structured) {
+        if (typeof publication.title !== "string" || !publication.title.trim() ||
+            typeof publication.url !== "string" || !publication.url.trim()) {
+          errors.push(label + " legacy records require a title and HTTPS URL");
+        }
+      } else {
+        if (typeof publication.code !== "string" || !publication.code.trim()) errors.push(label + ".code is required for structured articles");
+        if (typeof publication.title !== "string" || !publication.title.trim()) errors.push(label + ".title is required");
+        if (typeof publication.journal !== "string" || !publication.journal.trim()) errors.push(label + ".journal is required for structured articles");
+        if (publication.year && !/^\d{4}$/.test(publication.year)) errors.push(label + ".year must use four digits or be empty");
+        if (publication.doi && !/^10\.\d{4,9}\/\S+$/i.test(publication.doi)) errors.push(label + ".doi must be a DOI such as 10.1234/example");
+        if (publication.authors !== undefined && (!Array.isArray(publication.authors) ||
+            publication.authors.length > 100 || publication.authors.some((author) => typeof author !== "string" || !author.trim() || author.length > 300))) {
+          errors.push(label + ".authors must be an array of non-empty author names");
+        }
+        if (publication.code && publicationCodes.has(publication.code)) errors.push(label + " has a duplicate article code");
+        if (publication.code) publicationCodes.add(publication.code);
+        if (publication.doi && publicationDois.has(publication.doi.toLowerCase())) errors.push(label + " has a duplicate DOI");
+        if (publication.doi) publicationDois.add(publication.doi.toLowerCase());
+      }
+      if (publication.url) {
+        try { if (new URL(publication.url).protocol !== "https:") throw new Error(); }
+        catch { errors.push(label + ".url must be a valid HTTPS URL"); }
+      }
+      if (typeof publication.abstract === "string" && publication.abstract.length > 20000) errors.push(label + ".abstract is too long");
     });
   }
 }

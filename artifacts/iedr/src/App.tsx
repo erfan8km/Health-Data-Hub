@@ -11,7 +11,8 @@ import SupportChat from "./components/SupportChat";
 type Category = { id: string; fa: string; en: string };
 type Country = { id: string; iso3: string; fa: string; en: string; coordinates: { longitude: number; latitude: number; height: number } };
 type Province = { id: string; fa: string; en: string; active: boolean };
-type Registry = { slug: string; fa: string; en: string; country: string; province: string; city: string; categories: string[]; description: string; officialUrl: string; targetPopulation: string; center: string; status: string; lastReviewedAt: string; startYear: string; registryType: string; dataSummary: string; researchContact: string; keyPublications: { title: string; url: string }[] };
+type Publication = { code?: string; title: string; journal?: string; authors?: string[]; year?: string; doi?: string; url?: string; abstract?: string; publicationType?: string };
+type Registry = { slug: string; fa: string; en: string; country: string; province: string; city: string; categories: string[]; description: string; officialUrl: string; targetPopulation: string; center: string; status: string; lastReviewedAt: string; startYear: string; registryType: string; dataSummary: string; researchContact: string; keyPublications: Publication[] };
 type View = "globe" | "provinces" | "categories" | "category" | "registry";
 type Route = { view: View; slug?: string; provinceId?: string };
 const ACTIVE_PROVINCE_ID = "razavi-khorasan";
@@ -276,13 +277,34 @@ function App() {
                   {publicationsExpanded && (
                     <div className="publication-review-content">
                       {selectedRegistry.keyPublications.length ? (
-                        <ol>{selectedRegistry.keyPublications.map((publication, index) => (
-                          <li key={index}>
-                            {publication.url.trim()
-                              ? <a href={publication.url} target="_blank" rel="noopener noreferrer">{publication.title || publication.url}<ExternalLink size={13} /></a>
-                              : (publication.title || missingMetadataText)}
-                          </li>
-                        ))}</ol>
+                        <div className="publication-card-grid">
+                          {selectedRegistry.keyPublications.map((publication, index) => {
+                            const doi = (publication.doi || "").trim().replace(/^https?:\/\/(dx\.)?doi\.org\//i, "");
+                            const doiLink = doi ? "https://doi.org/" + doi : "";
+                            return (
+                              <article className="publication-card" key={publication.doi || index}>
+                                <h4>{publication.title}</h4>
+                                <div className="publication-card-meta">
+                                  {publication.journal && <span className="publication-journal">{publication.journal}</span>}
+                                  {publication.year && <span className="publication-year">{publication.year}</span>}
+                                </div>
+                                {publication.abstract && (
+                                  <details className="publication-abstract">
+                                    <summary>{english ? "Abstract" : "چکیده"}</summary>
+                                    <p>{publication.abstract}</p>
+                                  </details>
+                                )}
+                                {doiLink && (
+                                  <div className="publication-card-footer">
+                                    <span className="publication-card-links">
+                                      <a href={doiLink} target="_blank" rel="noopener noreferrer">DOI <ExternalLink size={12} /></a>
+                                    </span>
+                                  </div>
+                                )}
+                              </article>
+                            );
+                          })}
+                        </div>
                       ) : (
                         <p>{english
                           ? "No published articles have been added for this registry yet."
