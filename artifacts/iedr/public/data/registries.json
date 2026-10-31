@@ -1,5 +1,14 @@
 [
   {
+    "targetPopulation": "",
+    "center": "",
+    "status": "",
+    "lastReviewedAt": "",
+    "startYear": "",
+    "registryType": "",
+    "dataSummary": "",
+    "researchContact": "",
+    "keyPublications": [],
     "slug": "obstructive-sleep-apnea",
     "fa": "آپنه انسدادی خواب",
     "en": "Obstructive Sleep Apnea",
@@ -10,7 +19,9 @@
       "sleep"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -19,9 +30,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "sleep-disorders",
     "fa": "اختلالات خواب",
     "en": "Sleep Disorders",
@@ -32,7 +41,9 @@
       "sleep"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -41,9 +52,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "trophoblastic-disease",
     "fa": "بیماری تروفوبلاستیک حاملگی (مول)",
     "en": "Trophoblastic Disease (Molar Pregnancy)",
@@ -54,7 +63,9 @@
       "gyn"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -63,9 +74,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "ovarian-cancer",
     "fa": "سرطان تخمدان",
     "en": "Ovarian Cancer",
@@ -76,7 +85,9 @@
       "onc"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -85,9 +96,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "recurrent-miscarriage",
     "fa": "سقط مکرر",
     "en": "Recurrent Miscarriage",
@@ -98,7 +107,9 @@
       "gyn"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -107,9 +118,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "oral-lichen-planus",
     "fa": "لیکن پلان دهانی",
     "en": "Oral Lichen Planus",
@@ -120,7 +129,9 @@
       "oral"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -129,9 +140,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "infertility",
     "fa": "ناباروری",
     "en": "Infertility",
@@ -142,7 +151,9 @@
       "gyn"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -151,9 +162,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "malignant-otitis-externa",
     "fa": "اوتیت خارجی بدخیم",
     "en": "Malignant Otitis External",
@@ -164,7 +173,9 @@
       "ent"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -173,9 +184,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "obesity",
     "fa": "چاقی و درمان چاقی",
     "en": "Obesity and Obesity Treatment",
@@ -186,7 +195,9 @@
       "endo"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -195,9 +206,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "chronic-rhinosinusitis",
     "fa": "رینوسینوزیت مزمن",
     "en": "Chronic Rhinosinusitis",
@@ -208,7 +217,9 @@
       "sleep"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -217,9 +228,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "esophageal-atresia",
     "fa": "آترزی مری کودکان",
     "en": "Esophageal Atresia in Children",
@@ -230,7 +239,9 @@
       "peds"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -239,9 +250,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "childhood-obesity",
     "fa": "چاقی کودکان",
     "en": "Childhood Obesity",
@@ -252,7 +261,9 @@
       "endo"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -261,9 +272,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "type1-diabetes-children",
     "fa": "دیابت نوع ۱ کودکان",
     "en": "Type 1 Diabetes in Children",
@@ -274,7 +283,9 @@
       "endo"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -283,9 +294,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "childhood-cancer",
     "fa": "سرطان کودکان",
     "en": "Childhood Cancer",
@@ -296,7 +305,9 @@
       "onc"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -305,9 +316,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "omid-hospital-cancer",
     "fa": "بیماران سرطانی بیمارستان امید",
     "en": "Cancer Patients at Omid Hospital",
@@ -318,7 +327,9 @@
       "onc"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -327,9 +338,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "cystic-fibrosis",
     "fa": "فیبروز کیستیک",
     "en": "Cystic Fibrosis",
@@ -340,7 +349,9 @@
       "sleep"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -349,9 +360,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "inborn-metabolic-disorders",
     "fa": "اختلالات متابولیک مادرزادی کودکان",
     "en": "Inborn Metabolic Disorders in Children",
@@ -362,7 +371,9 @@
       "endo"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -371,9 +382,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "primary-immunodeficiency",
     "fa": "نقص ایمنی اولیه",
     "en": "Primary Immunodeficiency",
@@ -384,7 +393,9 @@
       "immun"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -393,9 +404,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "invasive-fungal-mucormycosis",
     "fa": "عفونت‌های قارچی مهاجم (موکور)",
     "en": "Invasive Fungal Infections (Mucormycosis)",
@@ -406,7 +415,9 @@
       "immun"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -415,9 +426,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "colorectal-cancer",
     "fa": "سرطان کولورکتال",
     "en": "Colorectal Cancer",
@@ -428,7 +437,9 @@
       "onc"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -437,9 +448,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "ssnhl",
     "fa": "کاهش شنوایی حسی عصبی ناگهانی (سادن)",
     "en": "Sudden Sensorineural Hearing Loss (SSNHL)",
@@ -450,7 +459,9 @@
       "ent"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -459,9 +470,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "rop-screening",
     "fa": "معاینه چشمی نوزادان زودرس (ROP)",
     "en": "Eye Examination of Premature Infants (ROP)",
@@ -472,7 +481,9 @@
       "eye"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -481,9 +492,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "opportunistic-pathogens",
     "fa": "پاتوژن‌های فرصت‌طلب در بیماران نقص ایمنی",
     "en": "Opportunistic Pathogens in Immunocompromised Patients",
@@ -494,7 +503,9 @@
       "immun"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -503,9 +514,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "endometriosis",
     "fa": "اندومتریوز",
     "en": "Endometriosis",
@@ -516,7 +525,9 @@
       "gyn"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -525,9 +536,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "cornea-rna-biobank",
     "fa": "بیوبانک RNA از بافت قرنیه",
     "en": "RNA Biobank from Corneal Tissue",
@@ -538,7 +547,9 @@
       "eye"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -547,9 +558,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "liver-transplantation",
     "fa": "پیوند کبد",
     "en": "Liver Transplantation",
@@ -560,7 +569,9 @@
       "gi"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -569,9 +580,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "endometrial-cancer",
     "fa": "سرطان اندومتر",
     "en": "Endometrial Cancer",
@@ -582,7 +591,9 @@
       "onc"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -591,9 +602,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "hepatic-hydatid-cyst",
     "fa": "کیست هیداتید کبدی",
     "en": "Hepatic Hydatid Cyst",
@@ -604,7 +613,9 @@
       "gi"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -613,9 +624,7 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [],
     "slug": "granulomatous-mastitis",
     "fa": "ماستیت گرانولوماتوز",
     "en": "Granulomatous Mastitis",
@@ -626,7 +635,9 @@
       "gyn"
     ],
     "description": "",
-    "officialUrl": "",
+    "officialUrl": ""
+  },
+  {
     "targetPopulation": "",
     "center": "",
     "status": "",
@@ -635,9 +646,80 @@
     "registryType": "",
     "dataSummary": "",
     "researchContact": "",
-    "keyPublications": []
-  },
-  {
+    "keyPublications": [
+      {
+        "code": "4003490",
+        "title": "Outcomes of Liver Transplantation from Deceased Donors with Coronavirus disease 2019 and Late Complications of Infection",
+        "journal": "Current Respiratory Medicine Reviews",
+        "authors": [
+          "Mohsen Aliakbarian",
+          "Rozita Khodashahi",
+          "Kambiz Akhavan Rezayat",
+          "Seyed Mousal-Reza Hosseini",
+          "Ebrahim Khaleghi",
+          "Soheila Milani"
+        ],
+        "year": "2022",
+        "doi": "10.2174/1573398X17666211209153335",
+        "url": "",
+        "abstract": "این مطالعه توصیفی بررسی کرد که آیا پیوند کبد از اهداکننده‌ای که عارضه دیررس کووید-۱۹ داشته، می‌تواند بیماری را به گیرنده منتقل کند. در ۳۶ پیوند کبد، PCR همه اهداکنندگان دو بار منفی بود، اما HRCT درگیری ریوی قبلی را نشان می‌داد. نتیجه این بود که ادامه فرایند اهدا و پیوند حتی از اهداکننده‌ای که قبلاً کووید گرفته، ایمن به نظر می‌رسد.",
+        "publicationType": ""
+      },
+      {
+        "code": "4003007",
+        "title": "Prevalence of Coronavirus Disease 2019 in the Brain-Dead Candidates for Transplantation and Uncommon Manifestations of the Infection",
+        "journal": "Current Respiratory Medicine Reviews",
+        "authors": [
+          "Mohsen Aliakbarian",
+          "Rozita Khodashahi",
+          "Atefe Vakilian",
+          "Hamid Reza Naderi",
+          "Mandana Khodashahi",
+          "Ebrahim Khaleghi",
+          "Maliheh Dadgar Moghaddam"
+        ],
+        "year": "2021",
+        "doi": "10.2174/1573398X17666211201115653",
+        "url": "",
+        "abstract": "مطالعه گذشته‌نگر روی ۷۰ بیمار مرگ مغزی در بیمارستان‌های مشهد (فوریه تا اکتبر ۲۰۲۰). PCR کووید در ۵۴٪ بیماران مثبت بود. سنکوپ در ۱۶٫۱٪ دیده شد و ۵۲٫۹٪ تظاهرات خونریزی‌دهنده CNS داشتند. هر دو مورد در گروه PCR مثبت به‌طور معنی‌داری بیشتر بود. شایع‌ترین یافته‌های CT قفسه سینه، گراند گلس و پلورال افیوژن بود. نتیجه‌گیری: با توجه به شیوع بالا، سنکوپ را باید یکی از علائم احتمالی کووید دانست.",
+        "publicationType": ""
+      },
+      {
+        "code": "4002911",
+        "title": "Comparison between Kidney and Liver Transplant Recipients Admitted to a Referral Center Regarding Coronavirus-2019 Manifestations in the Northeast of Iran during three Peaks of Pandemic",
+        "journal": "Current Respiratory Medicine Reviews",
+        "authors": [
+          "Mohsen Aliakbarian",
+          "Rozita Khodashahi",
+          "Mahin Ghorban Sabbagh",
+          "Hamid Reza Naderi",
+          "Mandana Khodashahi",
+          "Shahrzad Jahanian",
+          "Maliheh Dadgar Moghaddam"
+        ],
+        "year": "2021",
+        "doi": "10.2174/1573398X17666211122160608",
+        "url": "",
+        "abstract": "مطالعه مقطعی روی ۵۲ گیرنده پیوند (۲۸ کلیه و ۲۴ کبد) در بیمارستان‌های امام رضا و منتصریه مشهد. کووید شدید در ۶۱٪ بیماران گزارش شد. بین دو گروه جز در سرفه و چند آزمایش (کراتینین، ALP، بیلی‌روبین تام و PTT) تفاوت معنی‌داری نبود. همه گیرندگان کلیه زنده ماندند، ولی دو بیمار گروه کبد فوت کردند که از نظر آماری معنی‌دار نبود. نتیجه‌گیری: مرگ‌ومیر در گیرندگان کبد بالاتر بود.",
+        "publicationType": ""
+      },
+      {
+        "code": "983655",
+        "title": "Model for End-Stage Liver Disease and Seven Derivations to Prioritize Liver Transplant Candidates: Which Is the Winner?",
+        "journal": "Experimental and Clinical Transplantation",
+        "authors": [
+          "Fariba Tohidinezhad",
+          "Saeid Eslami",
+          "Ameen Abu-Hanna",
+          "Mohsen Aliakbarian"
+        ],
+        "year": "2018",
+        "doi": "10.6002/ect.2017.0149",
+        "url": "",
+        "abstract": "مطالعه روی ۴۱۶ بیمار سیروزی در لیست انتظار پیوند کبد مشهد (۲۰۱۳ تا ۲۰۱۶) که MELD استاندارد را با هفت نسخه مشتق‌شده آن برای پیش‌بینی مرگ‌ومیر ۳ ماهه، ۶ ماهه و ۱ ساله مقایسه کرد. نسبت MELD به سدیم (MESO) در مجموع بهترین عملکرد را داشت و مدل‌های دارای آلبومین در ۶ ماه و ۱ سال تمایز بهتری نشان دادند. همه مدل‌ها کالیبراسیون ضعیف داشتند و مرگ‌ومیر را کمتر از واقع برآورد می‌کردند.",
+        "publicationType": ""
+      }
+    ],
     "slug": "brain-death",
     "fa": "مرگ مغزی",
     "en": "Brain Death",
@@ -648,15 +730,6 @@
       "neuro-icu"
     ],
     "description": "",
-    "officialUrl": "",
-    "targetPopulation": "",
-    "center": "",
-    "status": "",
-    "lastReviewedAt": "",
-    "startYear": "",
-    "registryType": "",
-    "dataSummary": "",
-    "researchContact": "",
-    "keyPublications": []
+    "officialUrl": ""
   }
 ]
