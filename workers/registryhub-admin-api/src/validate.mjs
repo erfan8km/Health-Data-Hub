@@ -1,4 +1,4 @@
-const REGISTRY_KEYS = new Set(["slug", "fa", "en", "country", "province", "city", "categories", "description", "officialUrl", "targetPopulation", "center", "status", "lastReviewedAt", "startYear", "registryType", "dataSummary", "dataSummaryFa", "dataSummaryEn", "researchContact", "keyPublications"]);
+const REGISTRY_KEYS = new Set(["slug", "fa", "en", "country", "province", "city", "categories", "description", "descriptionFa", "descriptionEn", "officialUrl", "targetPopulation", "targetPopulationFa", "targetPopulationEn", "center", "centerFa", "centerEn", "status", "statusFa", "statusEn", "lastReviewedAt", "startYear", "registryType", "registryTypeFa", "registryTypeEn", "dataSummary", "dataSummaryFa", "dataSummaryEn", "researchContact", "researchContactFa", "researchContactEn", "keyPublications"]);
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const MAX_REGISTRIES = 5000;
 const MAX_TEXT_LENGTH = 20000;
@@ -29,7 +29,7 @@ export function validateRegistryPayload(registries, categories, countries, provi
     for (const key of Object.keys(row)) {
       if (!REGISTRY_KEYS.has(key)) errors.push(`${label} has unsupported field "${key}"`);
     }
-    for (const key of ["slug", "fa", "en", "country", "province", "city", "description", "officialUrl", "targetPopulation", "center", "status", "lastReviewedAt", "startYear", "registryType", "researchContact"]) {
+    for (const key of ["slug", "fa", "en", "country", "province", "city", "description", "descriptionFa", "descriptionEn", "officialUrl", "targetPopulation", "targetPopulationFa", "targetPopulationEn", "center", "centerFa", "centerEn", "status", "statusFa", "statusEn", "lastReviewedAt", "startYear", "registryType", "registryTypeFa", "registryTypeEn", "researchContact", "researchContactFa", "researchContactEn"]) {
       if (typeof row[key] !== "string") errors.push(`${label}.${key} must be a string`);
       else if (row[key].length > MAX_TEXT_LENGTH) errors.push(`${label}.${key} is too long`);
     }
