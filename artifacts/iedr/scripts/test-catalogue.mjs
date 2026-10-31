@@ -95,7 +95,6 @@ test("all registry metadata fields exist with empty placeholders until entered i
       assert.equal(registry[field], "", registry.slug + ": " + field + " should remain blank until verified");
     }
     assert.ok(Array.isArray(registry.keyPublications), registry.slug + ": keyPublications should be an array");
-    assert.ok(Array.isArray(registry.keyPublications), registry.slug + ": keyPublications should be an array");
     assert.equal(registry.officialUrl, "");
   }
 });
