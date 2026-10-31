@@ -282,7 +282,7 @@ function App() {
                             const doi = (publication.doi || "").trim().replace(/^https?:\/\/(dx\.)?doi\.org\//i, "");
                             const doiLink = doi ? "https://doi.org/" + doi : "";
                             return (
-                              <article className="publication-card" key={publication.code || publication.doi || index}>
+                              <article className="publication-card" key={publication.doi || index}>
                                 <h4>{publication.title}</h4>
                                 <div className="publication-card-meta">
                                   {publication.journal && <span className="publication-journal">{publication.journal}</span>}
