@@ -80,7 +80,7 @@ for (const registry of registries) {
         errors.push(label + " must be an object");
         return;
       }
-      const textKeys = ["code", "title", "journal", "year", "doi", "url", "abstract", "publicationType"];
+      const textKeys = ["code", "title", "journal", "year", "doi", "url", "abstract", "abstractFa", "abstractEn", "publicationType"];
       for (const key of textKeys) {
         if (publication[key] !== undefined && typeof publication[key] !== "string") errors.push(label + "." + key + " must be a string");
       }
