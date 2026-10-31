@@ -95,7 +95,7 @@ test("all registry metadata fields exist with empty placeholders until entered i
       assert.equal(registry[field], "", registry.slug + ": " + field + " should remain blank until verified");
     }
     assert.ok(Array.isArray(registry.keyPublications), registry.slug + ": keyPublications should be an array");
-    assert.deepEqual(registry.keyPublications, []);
+    assert.ok(Array.isArray(registry.keyPublications), registry.slug + ": keyPublications should be an array");
     assert.equal(registry.officialUrl, "");
   }
 });
@@ -118,9 +118,28 @@ test("province directory includes all 31 provinces but enables only Razavi Khora
 });
 
 
-test("publication metadata arrays remain present and start empty", () => {
-  for (const registry of registries) {
-    assert.ok(Array.isArray(registry.keyPublications), registry.slug + ": keyPublications must be an array");
-    assert.deepEqual(registry.keyPublications, [], registry.slug + ": no publication information should be invented");
+test("the brain-death registry retains its four curated publications while other publication lists remain empty", () => {
+  const brainDeath = registries.find((registry) => registry.slug === "brain-death");
+  assert.ok(brainDeath, "the brain-death registry must exist");
+  assert.deepEqual(
+    brainDeath.keyPublications.map((publication) => publication.code),
+    ["4003490", "4003007", "4002911", "983655"],
+  );
+  assert.deepEqual(
+    brainDeath.keyPublications.map((publication) => publication.doi),
+    [
+      "10.2174/1573398X17666211209153335",
+      "10.2174/1573398X17666211201115653",
+      "10.2174/1573398X17666211122160608",
+      "10.6002/ect.2017.0149",
+    ],
+  );
+
+  for (const registry of registries.filter((row) => row.slug !== "brain-death")) {
+    assert.deepEqual(
+      registry.keyPublications,
+      [],
+      registry.slug + ": publication entries should only be added after review",
+    );
   }
 });
