@@ -86,7 +86,7 @@ for (const registry of registries) {
       }
       const structured = Boolean(
         publication.code || publication.journal || publication.year || publication.doi ||
-        publication.abstract || publication.publicationType ||
+        publication.abstract || publication.abstractFa || publication.abstractEn || publication.publicationType ||
         (Array.isArray(publication.authors) && publication.authors.length)
       );
       if (!structured) {
