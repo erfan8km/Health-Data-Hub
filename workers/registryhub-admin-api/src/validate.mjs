@@ -101,8 +101,8 @@ export function validateRegistryPayload(registries, categories, countries, provi
           if (typeof publication.code !== "string" || !publication.code.trim()) errors.push(publicationLabel + ".code is required for structured articles");
           if (typeof publication.title !== "string" || !publication.title.trim()) errors.push(publicationLabel + ".title is required");
           if (typeof publication.journal !== "string" || !publication.journal.trim()) errors.push(publicationLabel + ".journal is required for structured articles");
-          if (publication.year && !/^\\d{4}$/.test(publication.year)) errors.push(publicationLabel + ".year must use four digits or be empty");
-          if (publication.doi && !/^10\\.\\d{4,9}\\/\\S+$/i.test(publication.doi)) errors.push(publicationLabel + ".doi must be a valid DOI");
+          if (publication.year && !/^\d{4}$/.test(publication.year)) errors.push(publicationLabel + ".year must use four digits or be empty");
+          if (publication.doi && !/^10\.\d{4,9}\/\S+$/i.test(publication.doi)) errors.push(publicationLabel + ".doi must be a valid DOI");
           if (publication.authors !== undefined && (!Array.isArray(publication.authors) || publication.authors.length > 100 ||
               publication.authors.some((author) => typeof author !== "string" || !author.trim() || author.length > 300))) {
             errors.push(publicationLabel + ".authors must be an array of non-empty author names");
