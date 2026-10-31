@@ -56,7 +56,7 @@ for (const registry of registries) {
     const id = registry.categories[0];
     if (!categoryIds.has(id)) errors.push(`registry "${registry.slug}": unknown category "${id}"`);
   }
-  for (const key of ["description", "targetPopulation", "center", "status", "lastReviewedAt", "startYear", "registryType", "dataSummaryFa", "dataSummaryEn", "researchContact", "officialUrl"]) {
+  for (const key of ["description", "descriptionFa", "descriptionEn", "targetPopulation", "targetPopulationFa", "targetPopulationEn", "center", "centerFa", "centerEn", "status", "statusFa", "statusEn", "lastReviewedAt", "startYear", "registryType", "registryTypeFa", "registryTypeEn", "dataSummaryFa", "dataSummaryEn", "researchContact", "researchContactFa", "researchContactEn", "officialUrl"]) {
     if (typeof registry[key] !== "string") errors.push('registry "' + registry.slug + '": ' + key + " must be a string");
   }
   if (registry.lastReviewedAt && !/^\d{4}-\d{2}-\d{2}$/.test(registry.lastReviewedAt)) {
@@ -80,13 +80,13 @@ for (const registry of registries) {
         errors.push(label + " must be an object");
         return;
       }
-      const textKeys = ["code", "title", "journal", "year", "doi", "url", "abstract", "publicationType"];
+      const textKeys = ["code", "title", "journal", "year", "doi", "url", "abstract", "abstractFa", "abstractEn", "publicationType"];
       for (const key of textKeys) {
         if (publication[key] !== undefined && typeof publication[key] !== "string") errors.push(label + "." + key + " must be a string");
       }
       const structured = Boolean(
         publication.code || publication.journal || publication.year || publication.doi ||
-        publication.abstract || publication.publicationType ||
+        publication.abstract || publication.abstractFa || publication.abstractEn || publication.publicationType ||
         (Array.isArray(publication.authors) && publication.authors.length)
       );
       if (!structured) {
