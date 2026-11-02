@@ -107,12 +107,15 @@ test("registry metadata includes separate Persian and English selected-variable 
   assert.ok(brainDeath.targetPopulationFa.trim(), "the Persian target population must be preserved");
   assert.ok(brainDeath.centerFa.trim(), "the Persian center must be preserved");
   assert.ok(brainDeath.statusFa.trim(), "the Persian status must be preserved");
+  assert.ok(brainDeath.targetPopulationEn.trim(), "the reviewed English target population must be preserved");
+  assert.ok(brainDeath.centerEn.trim(), "the reviewed English center must be preserved");
+  assert.ok(brainDeath.statusEn.trim(), "the reviewed English status must be preserved");
   assert.ok(brainDeath.dataSummaryFa.trim(), "the Persian summary entered for brain-death must be preserved");
-  assert.equal(brainDeath.descriptionEn, "", "English descriptions must remain blank until translated and reviewed");
-  assert.equal(brainDeath.dataSummaryEn, "", "the English summary remains blank until translated and reviewed");
+  assert.ok(brainDeath.descriptionEn.trim(), "the reviewed English description must be preserved");
+  assert.ok(brainDeath.dataSummaryEn.trim(), "the reviewed English summary must be preserved");
   for (const publication of brainDeath.keyPublications) {
     assert.equal(publication.abstractFa, publication.abstract, "legacy Persian abstracts should be preserved");
-    assert.equal(publication.abstractEn, "", "English abstracts remain blank until translated and reviewed");
+    assert.ok(publication.abstractEn.trim(), "reviewed English publication abstracts must be preserved");
   }
   assert.deepEqual(brainDeath.keyPublications.map((publication) => publication.code), ["4003490", "4003007", "4002911", "983655"]);
 });
