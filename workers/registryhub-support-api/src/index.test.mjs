@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 import worker from "./index.mjs";
 
 const env = {
-  PUBLIC_ORIGIN: "https://registryhub.erfan8km.workers.dev",
+  PUBLIC_ORIGIN: "https://registryhub.ir",
   CATALOG_URL: "https://registryhub.erfan8km.workers.dev/data/registries.json",
   DAILY_MESSAGE_LIMIT: "1000"
 };
@@ -15,6 +15,28 @@ test("rejects requests from unapproved origins", async () => {
     body: JSON.stringify({ message: "hello" })
   });
   const response = await worker.fetch(request, env);
+  assert.equal(response.status, 403);
+});
+
+test("allows preflight requests from the canonical production site", async () => {
+  const response = await worker.fetch(new Request("https://support.example/api/chat", {
+    method: "OPTIONS",
+    headers: {
+      Origin: "https://registryhub.ir",
+      "access-control-request-method": "POST",
+      "access-control-request-headers": "content-type"
+    }
+  }), env);
+  assert.equal(response.status, 204);
+  assert.equal(response.headers.get("access-control-allow-origin"), "https://registryhub.ir");
+  assert.match(response.headers.get("access-control-allow-methods"), /POST/);
+});
+
+test("rejects preflight requests from the obsolete workers.dev origin", async () => {
+  const response = await worker.fetch(new Request("https://support.example/api/chat", {
+    method: "OPTIONS",
+    headers: { Origin: "https://registryhub.erfan8km.workers.dev" }
+  }), env);
   assert.equal(response.status, 403);
 });
 
