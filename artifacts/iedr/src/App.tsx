@@ -327,7 +327,7 @@ function App() {
                   const category = categories.find((item) => item.id === id);
                   return <button key={id} type="button" className="detail-tag" onClick={() => navigate("category/" + id + "/" + (route.provinceId || ACTIVE_PROVINCE_ID))}>{getText(category, english)} <ArrowDownLeft size={13} /></button>;
                 })}</div>
-                {selectedRegistry.officialUrl.trim() && <a className="official-link-button" href={selectedRegistry.officialUrl} target="_blank" rel="noopener noreferrer"><ExternalLink size={17} />{english ? "Official university link" : "لینک رسمی دانشگاه"}<ArrowLeft size={15} /></a>}
+                {selectedRegistry.officialUrl.trim() && <a className="official-link-button" href={selectedRegistry.officialUrl} target="_blank" rel="noopener noreferrer"><ExternalLink size={17} />{english ? "Institution website / related link" : "وب‌سایت مرکز یا لینک مرتبط"}<ArrowLeft size={15} /></a>}
               </article>
               <aside className="detail-side-card">
                 <div className="side-card-header"><MapPin size={17} /><strong>{english ? "Geographic information" : "اطلاعات جغرافیایی"}</strong></div>
