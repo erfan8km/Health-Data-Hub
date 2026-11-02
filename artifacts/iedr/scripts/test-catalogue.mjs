@@ -97,7 +97,10 @@ test("registry metadata includes separate Persian and English selected-variable 
       }
     }
     assert.ok(Array.isArray(registry.keyPublications), registry.slug + ": keyPublications should be an array");
-    assert.equal(registry.officialUrl, "");
+    assert.equal(typeof registry.officialUrl, "string", registry.slug + ": officialUrl should be a string");
+    if (registry.officialUrl) {
+      assert.equal(new URL(registry.officialUrl).protocol, "https:", registry.slug + ": officialUrl must use HTTPS");
+    }
   }
   const brainDeath = registries.find((registry) => registry.slug === "brain-death");
   assert.ok(brainDeath.descriptionFa.trim(), "the Persian description must be preserved");
