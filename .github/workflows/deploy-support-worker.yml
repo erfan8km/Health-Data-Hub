@@ -1,0 +1,55 @@
+name: Deploy RegistryHub Support Worker
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-support-worker
+  cancel-in-progress: false
+
+jobs:
+  deploy-support:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Require Cloudflare deployment secrets
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          missing=0
+          if [[ -z "$CLOUDFLARE_API_TOKEN" ]]; then
+            echo "::error::Missing repository secret CLOUDFLARE_API_TOKEN."
+            missing=1
+          fi
+          if [[ -z "$CLOUDFLARE_ACCOUNT_ID" ]]; then
+            echo "::error::Missing repository secret CLOUDFLARE_ACCOUNT_ID."
+            missing=1
+          fi
+          if [[ "$missing" -ne 0 ]]; then
+            exit 1
+          fi
+
+      - name: Validate support Worker configuration
+        shell: bash
+        run: |
+          test -f workers/registryhub-support-api/wrangler.jsonc
+          test -f workers/registryhub-support-api/src/index.mjs
+          grep -q '"PUBLIC_ORIGIN": "https://registryhub.ir"' workers/registryhub-support-api/wrangler.jsonc
+
+      - name: Wrangler dry run (no deployment)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx --yes wrangler@4 deploy --config workers/registryhub-support-api/wrangler.jsonc --dry-run
+
+      - name: Deploy only RegistryHub Support Worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx --yes wrangler@4 deploy --config workers/registryhub-support-api/wrangler.jsonc
