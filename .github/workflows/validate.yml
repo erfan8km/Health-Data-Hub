@@ -21,13 +21,14 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - run: pnpm install --no-frozen-lockfile
+      # Match the deterministic dependency-install mode used by Cloudflare Workers Builds.
+      - run: pnpm install --frozen-lockfile
       - run: pnpm validate
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm run build
         env:
-          SITE_URL: https://example.invalid/
+          SITE_URL: https://registryhub.ir/
           VITE_CESIUM_ION_TOKEN: ${{ secrets.CESIUM_ION_TOKEN }}
       - name: Validate admin Worker bundle without deploying
         working-directory: workers/registryhub-admin-api
