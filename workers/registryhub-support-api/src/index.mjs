@@ -10,7 +10,7 @@ For questions asking whether a registry or topic is available, answer the yes/no
 Keep answers concise but informative. For questions about registry metadata, distinguish clearly between information that is present and information that is missing.
 Return only valid JSON with this shape: {"answer":"...","registry_slugs":["exact-slug"]}. registry_slugs must contain only exact slugs copied from the supplied catalogue. If none apply, use an empty array.`;
 
-const MAX_MESSAGE_CHARSconst MAX_MESSAGE_CHARS = 1200;
+const MAX_MESSAGE_CHARS = 1200;
 const MAX_REPORT_CHARS = 2000;
 const MODEL = "@cf/meta/llama-3.1-8b-instruct-fast";
 
