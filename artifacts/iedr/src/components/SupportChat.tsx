@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { FormEvent } from "react";
 import { MessageCircle, Send, X, ExternalLink, LoaderCircle, Flag, Trash2 } from "lucide-react";
@@ -16,9 +16,15 @@ export default function SupportChat({ english, open, onClose }: Props) {
   const [question, setQuestion] = useState("");
   const [report, setReport] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const threadRef = useRef<HTMLDivElement | null>(null);
   const [ticket, setTicket] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    const thread = threadRef.current;
+    if (thread) thread.scrollTop = thread.scrollHeight;
+  }, [messages]);
 
   async function ask(event: FormEvent) {
     event.preventDefault();
@@ -26,7 +32,7 @@ export default function SupportChat({ english, open, onClose }: Props) {
     if (!message || busy) return;
     setBusy(true); setError(""); setTicket("");
     try {
-      const history = messages.slice(-HISTORY_LIMIT).map(({ role, content }) => ({ role, content }));
+      const history = messages.slice(-HISTORY_LIMIT).map(({ role, content }) => ({ role, content: content.slice(0, 400) }));
       const response = await fetch(API + "/api/chat", {
         method: "POST", headers: { "content-type": "application/json" },
         body: JSON.stringify({ message, history })
@@ -81,7 +87,7 @@ export default function SupportChat({ english, open, onClose }: Props) {
         <label htmlFor="rh-support-question">{english ? "Your question" : "پرسش شما"}</label>
         <textarea id="rh-support-question" value={question} maxLength={1200} onChange={e => setQuestion(e.target.value)} placeholder={english ? "e.g. Which cancer registries are listed?" : "مثلاً چه ریجستری‌هایی در حوزه سرطان وجود دارد؟"} />
         <button className="rh-support-submit" disabled={busy || !question.trim()} type="submit">{busy ? <LoaderCircle size={16} className="rh-support-spin" /> : <Send size={16} />}{english ? "Send question" : "ارسال پرسش"}</button>
-        {messages.length > 0 && <div className="rh-support-thread" aria-live="polite" aria-relevant="additions text">
+        {messages.length > 0 && <div ref={threadRef} className="rh-support-thread" aria-live="polite" aria-relevant="additions text">
           {messages.map((item, index) => <article key={`${item.role}-${index}`} className={`rh-support-message rh-support-message-${item.role}`}>
             <p>{item.content}</p>
             {item.registries?.map(registry => <div className="rh-support-result" key={registry.slug}>
