@@ -18,6 +18,7 @@ assert.match(canonicalTags[0], /href=["']https:\/\/registryhub\.ir\/["']/i, "can
 assert.match(html, /<html\s+lang="fa"\s+dir="rtl">/i, "built HTML must default to Persian RTL");
 assert.match(html, /<title>[^<]+<\/title>/i, "built HTML must contain a page title");
 
+const metaTags = [...html.matchAll(/<meta\b[^>]*>/gi)].map((match) => match[0]);
 for (const [attribute, name] of [
   ["name", "description"],
   ["property", "og:title"],
@@ -29,9 +30,8 @@ for (const [attribute, name] of [
   ["name", "twitter:description"],
   ["name", "twitter:url"],
 ]) {
-  const escaped = name.replace(/[.*+?^{}()|[\]\\]/g, "\\$&");
-  const pattern = new RegExp("<meta\\s+" + attribute + "=[\\"']" + escaped + "[\\"'][^>]*>", "i");
-  assert.match(html, pattern, "built HTML must include " + attribute + "=" + name);
+  const pattern = new RegExp("\\b" + attribute + "=[\\x22\\x27]" + name + "[\\x22\\x27]", "i");
+  assert.ok(metaTags.some((tag) => pattern.test(tag)), "built HTML must include " + attribute + "=" + name);
 }
 
 const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/gi)].map((match) => match[1].trim());
