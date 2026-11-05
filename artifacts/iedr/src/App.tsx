@@ -166,7 +166,7 @@ function App() {
     return !text || [registry.fa, registry.en, registry.slug].some((value) => value.toLocaleLowerCase().includes(text));
   }), [visibleRegistries, query, route.view, route.slug]);
   const categoryBlurb = (id: string) => (english ? englishBlurbs[id] : persianBlurbs[id]) || "";
-  const missingMetadataText = english ? "Not provided in the public catalogue" : "در نسخه عمومی کاتالوگ ثبت نشده";
+  const missingMetadataText = english ? "Not completed yet" : "هنوز تکمیل نشده";
 
   return (
     <main className={"app-root" + ((route.view === "category" || route.view === "registry") ? " app-root-paper" : " app-root-space")}>
