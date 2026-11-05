@@ -14,9 +14,9 @@ const [html, app, generator] = await Promise.all([
 
 test("source HTML starts in Persian RTL and declares RegistryHub as its canonical site", () => {
   assert.match(html, /<html\s+lang="fa"\s+dir="rtl">/i);
-  assert.match(html, /<link\s+rel="canonical"\s+href="https:\/\/registryhub\.ir\/">/i);
-  assert.match(html, /<meta\s+property="og:url"\s+content="https:\/\/registryhub\.ir\/">/i);
-  assert.match(html, /<meta\s+name="twitter:url"\s+content="https:\/\/registryhub\.ir\/">/i);
+  assert.match(html, /<link\s+rel="canonical"\s+href="https:\/\/registryhub\.ir\/"\s*\/?>/i);
+  assert.match(html, /<meta\s+property="og:url"\s+content="https:\/\/registryhub\.ir\/"\s*\/?>/i);
+  assert.match(html, /<meta\s+name="twitter:url"\s+content="https:\/\/registryhub\.ir\/"\s*\/?>/i);
 });
 
 test("SEO generation uses only the production canonical origin and emits sitemap and robots", () => {
