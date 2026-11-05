@@ -8,28 +8,24 @@ const CANONICAL_ORIGIN = "https://registryhub.ir";
 const CANONICAL_SITE_URL = CANONICAL_ORIGIN + "/";
 const rawSiteUrl = process.env.SITE_URL;
 
-if (!rawSiteUrl) {
-  console.error("SITE_URL is required at build time. Set it to https://registryhub.ir/.");
-  process.exit(1);
-}
+// SEO URLs must always identify the public production site, including preview builds.
+// Cloudflare Workers Builds can retain a legacy SITE_URL for branch previews, so treat
+// that setting as diagnostic only instead of failing an otherwise valid build.
+if (rawSiteUrl) {
+  let configuredSiteUrl;
+  try {
+    configuredSiteUrl = new URL(rawSiteUrl);
+  } catch {
+    configuredSiteUrl = null;
+  }
 
-let requestedSiteUrl;
-try {
-  requestedSiteUrl = new URL(rawSiteUrl);
-} catch {
-  console.error("SITE_URL must be a valid HTTPS URL.");
-  process.exit(1);
-}
-
-if (
-  requestedSiteUrl.protocol !== "https:" ||
-  requestedSiteUrl.origin !== CANONICAL_ORIGIN ||
-  requestedSiteUrl.pathname !== "/" ||
-  requestedSiteUrl.search ||
-  requestedSiteUrl.hash
-) {
-  console.error("SITE_URL must be exactly https://registryhub.ir/ so production metadata cannot point to a preview or workers.dev host.");
-  process.exit(1);
+  if (!configuredSiteUrl || configuredSiteUrl.origin !== CANONICAL_ORIGIN || configuredSiteUrl.protocol !== "https:") {
+    console.warn(
+      "Ignoring non-canonical SITE_URL setting; SEO metadata will use " + CANONICAL_SITE_URL + "."
+    );
+  }
+} else {
+  console.warn("SITE_URL is not set; SEO metadata will use " + CANONICAL_SITE_URL + ".");
 }
 
 const siteUrl = CANONICAL_SITE_URL;
