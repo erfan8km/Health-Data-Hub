@@ -139,3 +139,14 @@
 .publication-card-links a{display:inline-flex;align-items:center;gap:4px;color:#087b78;font-size:10px;font-weight:750;text-decoration:none}
 .publication-card-links a:hover{text-decoration:underline;text-underline-offset:3px}
 @media(max-width:680px){.publication-card-grid{grid-template-columns:1fr}.publication-card{padding:13px}}
+
+/* Conversational RegistryHub support history */
+.rh-support-clear{display:grid;place-items:center;width:30px;height:30px;border:0;border-radius:8px;background:#ffffff12;color:#e4f7f5;cursor:pointer}
+.rh-support-clear:hover{background:#ffffff24}
+.rh-support-thread{display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto;padding:9px;border:1px solid #e2eaed;border-radius:10px;background:#f8fbfc;scrollbar-width:thin}
+.rh-support-message{max-width:96%;padding:9px 11px;border:1px solid #e1e9ec;border-radius:11px;color:#294651;font-size:12px;line-height:1.85;overflow-wrap:anywhere}
+.rh-support-message p{margin:0;white-space:pre-wrap}
+.rh-support-message-user{align-self:flex-start;border-color:#d1ebe5;background:#eaf8f4}
+.rh-support-message-assistant{align-self:flex-end;background:#fff}
+.rh-support-message-assistant p{margin:0 0 6px}
+.rh-support-message .rh-support-result{margin-top:6px;padding:8px}
