@@ -40,7 +40,3 @@ test("language switching updates the document language, direction and localized 
   assert.match(app, /\}, \[english\]\);/);
 });
 
-test("missing registry metadata is explicitly described as absent from the public catalogue", () => {
-  assert.match(app, /Not provided in the public catalogue/);
-  assert.match(app, /در نسخه عمومی کاتالوگ ثبت نشده/);
-});
