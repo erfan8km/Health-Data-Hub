@@ -21,6 +21,11 @@ export default defineConfig({
     outDir: path.resolve(appRoot, "../..", "dist"),
     emptyOutDir: true,
     chunkSizeWarningLimit: 5000,
+    // Cloudflare Git builds run with a lower file-descriptor limit than CI.
+    // Limit Rollup's concurrent file operations to avoid EMFILE during Vite transforms.
+    rollupOptions: {
+      maxParallelFileOps: 4,
+    },
   },
   server: {
     port,
