@@ -105,6 +105,29 @@ function App() {
   }, [dataReady, route.view, route.provinceId, provinces]);
 
   useEffect(() => {
+    const root = document.documentElement;
+    const pageTitle = english
+      ? "RegistryHub | Health Registry Catalogue"
+      : "RegistryHub | کاتالوگ ریجستری‌های سلامت";
+    const pageDescription = english
+      ? "RegistryHub is a bilingual catalogue of health and medical registries in Iran."
+      : "RegistryHub، کاتالوگ دوزبانه ریجستری‌های سلامت و پزشکی در ایران است.";
+
+    root.lang = english ? "en" : "fa";
+    root.dir = english ? "ltr" : "rtl";
+    document.title = pageTitle;
+
+    const updateMeta = (selector: string, content: string) => {
+      document.head.querySelector<HTMLMetaElement>(selector)?.setAttribute("content", content);
+    };
+    updateMeta('meta[name="description"]', pageDescription);
+    updateMeta('meta[property="og:title"]', pageTitle);
+    updateMeta('meta[property="og:description"]', pageDescription);
+    updateMeta('meta[name="twitter:title"]', pageTitle);
+    updateMeta('meta[name="twitter:description"]', pageDescription);
+  }, [english]);
+
+  useEffect(() => {
     let active = true;
     Promise.all([
       fetch(BASE + "data/categories.json").then((r) => { if (!r.ok) throw new Error("categories"); return r.json(); }),
