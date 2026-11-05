@@ -21,6 +21,7 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
+      # Match the deterministic dependency-install mode used by Cloudflare Workers Builds.
       - run: pnpm install --frozen-lockfile
       - run: pnpm validate
       - run: pnpm typecheck
