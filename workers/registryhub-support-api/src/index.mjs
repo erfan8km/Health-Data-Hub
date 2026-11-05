@@ -263,7 +263,7 @@ function relevantCatalogueForQuestion(catalogue, question) {
 }
 function safePublications(publications, includeAbstracts = false) {
   if (!Array.isArray(publications)) return [];
-  return publications.slice(0,3).map((item) => {
+  return publications.slice(0, includeAbstracts ? 5 : 3).map((item) => {
     if (typeof item === "string") return item.slice(0,500);
     if (!item || typeof item !== "object") return null;
     const result = {
@@ -310,7 +310,7 @@ async function handleChat(request, env, origin) {
 
   const searchQuestion = [...history.map((item) => item.content), message].join(" ");
   const modelCatalogue = relevantCatalogueForQuestion(catalogue, searchQuestion);
-  const includePublicationAbstracts = /article|publication|paper|study|research|abstract|مقاله|مقالات|پژوهش|مطالعه|چکیده/iu.test(message);
+  const includePublicationAbstracts = /article|publication|paper|study|research|abstract|مقاله|مقالات|پژوهش|مطالعه|چکیده/iu.test(searchQuestion);
   const context = modelCatalogue.map((r) => ({
     slug: r.slug, name_fa: r.fa || "", name_en: r.en || "", country: r.country || "",
     province: r.province || "", city: r.city || "", categories: Array.isArray(r.categories) ? r.categories : [],
