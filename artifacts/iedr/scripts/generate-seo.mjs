@@ -35,24 +35,24 @@ let html = await readFile(htmlPath, "utf8");
 
 function updateMeta(attribute, key, content) {
   const escapedContent = escapeHtml(content);
-  const pattern = new RegExp("<meta\\s+" + attribute + "=\"" + key + "\"[^>]*>", "i");
+  const pattern = new RegExp("<meta\s+" + attribute + "=\"" + key + "\"[^>]*>", "i");
   const tag = "<meta " + attribute + "=\"" + key + "\" content=\"" + escapedContent + "\" />";
   if (pattern.test(html)) html = html.replace(pattern, tag);
-  else html = html.replace("</head>", "  " + tag + "\\n  </head>");
+  else html = html.replace("</head>", "  " + tag + "\n  </head>");
 }
 
 const title = "RegistryHub | کاتالوگ ریجستری‌های سلامت";
 const description = "RegistryHub is a bilingual catalogue of health and medical registries. کاتالوگ دوزبانه ریجستری‌های سلامت و پزشکی.";
-html = html.replace(/<title>[\\s\\S]*?<\\/title>/i, "<title>" + escapeHtml(title) + "</title>");
+html = html.replace(/<title>[\s\\S]*?<\/title>/i, "<title>" + escapeHtml(title) + "</title>");
 updateMeta("name", "description", description);
 updateMeta("property", "og:title", title);
 updateMeta("property", "og:description", description);
 updateMeta("name", "twitter:title", title);
 updateMeta("name", "twitter:description", description);
 const canonicalTag = "<link rel=\\"canonical\\" href=\\"" + escapeHtml(siteUrl) + "\\" />";
-const canonicalPattern = /<link\\s+rel=["']canonical["'][^>]*>/i;
+const canonicalPattern = /<link\s+rel=["']canonical["'][^>]*>/i;
 if (canonicalPattern.test(html)) html = html.replace(canonicalPattern, canonicalTag);
-else html = html.replace("</head>", "  " + canonicalTag + "\\n  </head>");
+else html = html.replace("</head>", "  " + canonicalTag + "\n  </head>");
 await writeFile(htmlPath, html);
 
 const registries = await readJson("registries.json");
@@ -93,7 +93,7 @@ for (const registry of registries) {
       const href = publication.doi
         ? "https://doi.org/" + encodeURIComponent(publication.doi).replaceAll("%2F", "/")
         : publication.url;
-      const safeHref = typeof href === "string" && /^https:\\/\\//i.test(href) ? href : "";
+      const safeHref = typeof href === "string" && /^https:\/\//i.test(href) ? href : "";
       const label = [publication.title, publication.journal, publication.year].filter(Boolean).join(" — ");
       return safeHref
         ? '<li><a href="' + escapeHtml(safeHref) + '" rel="noopener noreferrer">' + escapeHtml(label || "Publication") + "</a></li>"
@@ -170,10 +170,10 @@ for (const registry of registries) {
   await writeFile(resolve(pageDir, "index.html"), registryHtml, "utf8");
 }
 
-const sitemap = '<?xml version="1.0" encoding="UTF-8"?>\\n' +
-  '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\\n' +
-  urls.map((url) => "  <url><loc>" + escapeXml(url) + "</loc></url>").join("\\n") +
-  "\\n</urlset>\\n";
+const sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n' +
+  '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+  urls.map((url) => "  <url><loc>" + escapeXml(url) + "</loc></url>").join("\n") +
+  "\n</urlset>\n";
 await writeFile(resolve(outputDir, "sitemap.xml"), sitemap, "utf8");
-await writeFile(resolve(outputDir, "robots.txt"), "User-agent: *\\nAllow: /\\nSitemap: " + siteUrl + "sitemap.xml\\n", "utf8");
+await writeFile(resolve(outputDir, "robots.txt"), "User-agent: *\nAllow: /\nSitemap: " + siteUrl + "sitemap.xml\n", "utf8");
 console.log("SEO metadata, " + (urls.length - 1) + " registry pages, and sitemap generated for " + siteUrl + ".");
