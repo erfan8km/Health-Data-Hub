@@ -35,7 +35,7 @@ let html = await readFile(htmlPath, "utf8");
 
 function updateMeta(attribute, key, content) {
   const escapedContent = escapeHtml(content);
-  const pattern = new RegExp("<meta\s+" + attribute + "=\"" + key + "\"[^>]*>", "i");
+  const pattern = new RegExp("<meta\\s+" + attribute + "=\\\"" + key + "\\\"[^>]*>", "i");
   const tag = "<meta " + attribute + "=\"" + key + "\" content=\"" + escapedContent + "\" />";
   if (pattern.test(html)) html = html.replace(pattern, tag);
   else html = html.replace("</head>", "  " + tag + "\n  </head>");
@@ -43,7 +43,7 @@ function updateMeta(attribute, key, content) {
 
 const title = "RegistryHub | کاتالوگ ریجستری‌های سلامت";
 const description = "RegistryHub is a bilingual catalogue of health and medical registries. کاتالوگ دوزبانه ریجستری‌های سلامت و پزشکی.";
-html = html.replace(/<title>[\s\\S]*?<\/title>/i, "<title>" + escapeHtml(title) + "</title>");
+html = html.replace(/<title>[\s\S]*?<\/title>/i, "<title>" + escapeHtml(title) + "</title>");
 updateMeta("name", "description", description);
 updateMeta("property", "og:title", title);
 updateMeta("property", "og:description", description);
