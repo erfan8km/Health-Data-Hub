@@ -49,7 +49,7 @@ updateMeta("property", "og:title", title);
 updateMeta("property", "og:description", description);
 updateMeta("name", "twitter:title", title);
 updateMeta("name", "twitter:description", description);
-const canonicalTag = "<link rel=\\"canonical\\" href=\\"" + escapeHtml(siteUrl) + "\\" />";
+const canonicalTag = '<link rel="canonical" href="' + escapeHtml(siteUrl) + '" />';
 const canonicalPattern = /<link\s+rel=["']canonical["'][^>]*>/i;
 if (canonicalPattern.test(html)) html = html.replace(canonicalPattern, canonicalTag);
 else html = html.replace("</head>", "  " + canonicalTag + "\n  </head>");
