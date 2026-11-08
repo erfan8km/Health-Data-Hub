@@ -272,7 +272,7 @@ function relevantCatalogueForQuestion(catalogue, question) {
   const limit = wantsCompleteList(question) ? catalogue.length : 5;
   const matches = ranked.filter((item) => item.score > 0)
     .sort((a,b) => b.score-a.score || a.index-b.index).slice(0,limit).map((item) => item.record);
-  return matches;
+  return matches.length ? matches : catalogue;
 }
 function safePublications(publications, includeAbstracts = false) {
   if (!Array.isArray(publications)) return [];
