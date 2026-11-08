@@ -6,6 +6,7 @@
   "triggers": { "crons": ["17 3 * * *"] },
   "vars": {
     "PUBLIC_ORIGIN": "https://registryhub.ir",
+    "ALLOWED_ORIGINS": "https://www.registryhub.ir",
     "CATALOG_URL": "https://registryhub.erfan8km.workers.dev/data/registries.json",
     "PER_IP_MINUTE_LIMIT": "10",
     "PER_IP_DAILY_MESSAGE_LIMIT": "10",

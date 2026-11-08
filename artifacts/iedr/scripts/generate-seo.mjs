@@ -5,21 +5,9 @@ import { fileURLToPath } from "node:url";
 const appRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const outputDir = resolve(appRoot, "../..", "dist");
 const dataDir = resolve(appRoot, "public", "data");
-const rawSiteUrl = process.env.SITE_URL;
-if (!rawSiteUrl) {
-  console.error("SITE_URL is required at build time so canonical metadata and sitemap use the correct public URL.");
-  process.exit(1);
-}
-
-let siteUrl;
-try {
-  const parsed = new URL(rawSiteUrl);
-  if (!["http:", "https:"].includes(parsed.protocol)) throw new Error();
-  siteUrl = parsed.href.endsWith("/") ? parsed.href : parsed.href + "/";
-} catch {
-  console.error("SITE_URL must be a valid http(s) URL, e.g. https://example.com/.");
-  process.exit(1);
-}
+// RegistryHub's canonical public origin is fixed. Never derive SEO URLs from
+// a preview or workers.dev hostname supplied by a build environment.
+const siteUrl = "https://registryhub.ir/";
 
 const escapeHtml = (value) => String(value ?? "")
   .replaceAll("&", "&amp;")
@@ -168,6 +156,10 @@ for (const registry of registries) {
   const pageDir = resolve(outputDir, "registry", registry.slug);
   await mkdir(pageDir, { recursive: true });
   await writeFile(resolve(pageDir, "index.html"), registryHtml, "utf8");
+}
+
+if (urls.some((url) => new URL(url).origin !== new URL(siteUrl).origin)) {
+  throw new Error("Generated SEO URLs must all use the canonical RegistryHub origin.");
 }
 
 const sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n' +
