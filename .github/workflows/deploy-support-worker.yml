@@ -2,6 +2,12 @@ name: Deploy RegistryHub Support Worker
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "workers/registryhub-support-api/**"
+      - ".github/workflows/deploy-support-worker.yml"
 
 permissions:
   contents: read
