@@ -45,7 +45,6 @@ jobs:
       - run: pnpm install --no-frozen-lockfile
       - run: pnpm run build
         env:
-          SITE_URL: https://registryhub.ir/
           VITE_CESIUM_ION_TOKEN: ${{ secrets.CESIUM_ION_TOKEN }}
       - name: Deploy public RegistryHub site
         shell: bash
