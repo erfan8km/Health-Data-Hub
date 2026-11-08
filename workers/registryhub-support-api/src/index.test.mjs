@@ -802,3 +802,92 @@ test("publication requests supply article abstracts and bibliography without URL
     if (originalCaches) Object.defineProperty(globalThis, "caches", originalCaches); else delete globalThis.caches;
   }
 });
+
+
+test("allows the www site alias to call the support API", async () => {
+  const wwwEnv = { ...env, ALLOWED_ORIGINS: "https://www.registryhub.ir" };
+  const response = await worker.fetch(new Request("https://support.example/api/chat", {
+    method: "OPTIONS",
+    headers: {
+      Origin: "https://www.registryhub.ir",
+      "access-control-request-method": "POST",
+      "access-control-request-headers": "content-type"
+    }
+  }), wwwEnv);
+  assert.equal(response.status, 204);
+  assert.equal(response.headers.get("access-control-allow-origin"), "https://www.registryhub.ir");
+});
+
+test("Google indexing and site navigation questions reach the assistant", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalCaches = Object.getOwnPropertyDescriptor(globalThis, "caches");
+  let aiCalls = 0;
+  let systemPrompt = "";
+  globalThis.caches = { default: { match: async () => undefined, put: async () => undefined } };
+  globalThis.fetch = async () => new Response("[]", {
+    status: 200, headers: { "content-type": "application/json" }
+  });
+  const fakeEnv = {
+    ...env,
+    RATE_LIMIT_SALT: "test-only-salt",
+    DB: { prepare() { return { bind() { return this; }, first: async () => ({ request_count: 1 }) }; } },
+    AI: { run: async (_model, input) => {
+      aiCalls++;
+      systemPrompt = input.messages.find((item) => item.role === "system").content;
+      return { response: { answer: "برای بررسی ایندکس، جزئیات Page indexing را در Search Console ببینید.", registry_slugs: [] } };
+    } }
+  };
+  try {
+    const response = await worker.fetch(new Request("https://support.example/api/chat", {
+      method: "POST",
+      headers: { Origin: env.PUBLIC_ORIGIN, "content-type": "application/json", "CF-Connecting-IP": "192.0.2.91" },
+      body: JSON.stringify({ message: "Why is my page not indexed by Google?" })
+    }), fakeEnv);
+    assert.equal(response.status, 200);
+    assert.equal(aiCalls, 1);
+    assert.match(systemPrompt, /cannot access the site's Search Console/);
+    assert.match(systemPrompt, /bilingual directory/);
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalCaches) Object.defineProperty(globalThis, "caches", originalCaches);
+    else delete globalThis.caches;
+  }
+});
+
+test("a catalogue search with no matches does not send unrelated records to the model", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalCaches = Object.getOwnPropertyDescriptor(globalThis, "caches");
+  const catalogue = [
+    { slug: "known-registry", fa: "رجیستری شناخته‌شده", en: "Known Registry" }
+  ];
+  let supplied = null;
+  globalThis.caches = { default: { match: async () => undefined, put: async () => undefined } };
+  globalThis.fetch = async () => new Response(JSON.stringify(catalogue), {
+    status: 200, headers: { "content-type": "application/json" }
+  });
+  const fakeEnv = {
+    ...env,
+    RATE_LIMIT_SALT: "test-only-salt",
+    DB: { prepare() { return { bind() { return this; }, first: async () => ({ request_count: 1 }) }; } },
+    AI: { run: async (_model, input) => {
+      const user = input.messages.find((item) => item.role === "user").content;
+      const match = user.match(/<catalogue_data_json>\n([\s\S]*?)\n<\/catalogue_data_json>/);
+      supplied = match ? JSON.parse(match[1]) : null;
+      return { response: { answer: "اطلاعاتی در کاتالوگ فعلی پیدا نکردم.", registry_slugs: ["known-registry"] } };
+    } }
+  };
+  try {
+    const response = await worker.fetch(new Request("https://support.example/api/chat", {
+      method: "POST",
+      headers: { Origin: env.PUBLIC_ORIGIN, "content-type": "application/json", "CF-Connecting-IP": "192.0.2.92" },
+      body: JSON.stringify({ message: "In RegistryHub, is a rare congenital syndrome registry listed?" })
+    }), fakeEnv);
+    assert.equal(response.status, 200);
+    assert.deepEqual(supplied, []);
+    assert.deepEqual((await response.json()).registries, []);
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalCaches) Object.defineProperty(globalThis, "caches", originalCaches);
+    else delete globalThis.caches;
+  }
+});
