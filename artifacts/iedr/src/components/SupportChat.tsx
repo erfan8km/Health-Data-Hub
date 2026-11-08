@@ -39,10 +39,14 @@ export default function SupportChat({ english, open, onClose }: Props) {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || (english ? "The assistant is temporarily unavailable." : "دستیار موقتاً در دسترس نیست."));
+      const answer = typeof data.answer === "string" ? data.answer.trim() : "";
+      if (!answer) throw new Error(english
+        ? "The assistant returned an empty answer. Please try again or report the issue."
+        : "پاسخ معتبری دریافت نشد. دوباره تلاش کنید یا مشکل را گزارش دهید.");
       const registries = Array.isArray(data.registries) ? data.registries : [];
       const turns: ChatMessage[] = [
         { role: "user", content: message },
-        { role: "assistant", content: typeof data.answer === "string" ? data.answer : "", registries }
+        { role: "assistant", content: answer, registries }
       ];
       setMessages((current) => [...current, ...turns].slice(-20));
       setQuestion("");
