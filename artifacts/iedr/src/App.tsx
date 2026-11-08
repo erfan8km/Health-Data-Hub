@@ -93,6 +93,11 @@ function App() {
   }, [english]);
 
   useEffect(() => {
+    document.documentElement.lang = english ? "en" : "fa";
+    document.documentElement.dir = english ? "ltr" : "rtl";
+  }, [english]);
+
+  useEffect(() => {
     const update = () => { setRoute(parseRoute()); setQuery(""); setMobileMenu(false); setPublicationsExpanded(false); };
     window.addEventListener("hashchange", update);
     window.addEventListener("popstate", update);
