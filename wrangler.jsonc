@@ -1,8 +1,14 @@
 {
   "name": "registryhub",
+  "main": "./workers/registryhub-public-site/src/index.mjs",
   "compatibility_date": "2026-10-12",
+  "vars": {
+    "MAINTENANCE_MODE": "true"
+  },
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": true,
     "not_found_handling": "single-page-application"
   }
 }
