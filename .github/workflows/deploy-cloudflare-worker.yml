@@ -42,7 +42,7 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm install --frozen-lockfile
       - run: pnpm run build
         env:
           VITE_CESIUM_ION_TOKEN: ${{ secrets.CESIUM_ION_TOKEN }}

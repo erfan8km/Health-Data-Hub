@@ -1,5 +1,5 @@
 {
-  "name": "iedr-static-catalogue",
+  "name": "registryhub-static-catalogue",
   "version": "1.0.0",
   "private": true,
   "packageManager": "pnpm@10.26.1",
@@ -7,11 +7,11 @@
     "node": ">=20.19"
   },
   "scripts": {
-    "dev": "pnpm --filter @workspace/iedr run dev",
-    "typecheck": "pnpm --filter @workspace/iedr run typecheck",
-    "validate": "pnpm --filter @workspace/iedr run validate",
-    "test": "pnpm --filter @workspace/iedr run test && node --test workers/registryhub-admin-api/src/validate.test.mjs workers/registryhub-admin-api/src/reports.test.mjs workers/registryhub-support-api/src/index.test.mjs",
-    "build": "pnpm --filter @workspace/iedr run build",
-    "check-links": "pnpm --filter @workspace/iedr run check-links"
+    "dev": "pnpm --filter @registryhub/iedr run dev",
+    "typecheck": "pnpm --filter @registryhub/iedr run typecheck",
+    "validate": "pnpm --filter @registryhub/iedr run validate",
+    "test": "pnpm --filter @registryhub/iedr run test && node --test workers/registryhub-admin-api/src/validate.test.mjs workers/registryhub-admin-api/src/reports.test.mjs workers/registryhub-support-api/src/index.test.mjs",
+    "build": "pnpm --filter @registryhub/iedr run build",
+    "check-links": "pnpm --filter @registryhub/iedr run check-links"
   }
 }
