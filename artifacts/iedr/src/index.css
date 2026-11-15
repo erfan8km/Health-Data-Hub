@@ -150,3 +150,9 @@
 .rh-support-message-assistant{align-self:flex-end;background:#fff}
 .rh-support-message-assistant p{margin:0 0 6px}
 .rh-support-message .rh-support-result{margin-top:6px;padding:8px}
+
+/* Official RegistryHub wordmark (favicon remains a separate asset) */
+.brand-lockup,.paper-brand{gap:0}
+.brand-logo-image{display:block;width:clamp(150px,22vw,220px);max-width:44vw;max-height:70px;height:auto;object-fit:contain;background:#fff;border-radius:7px}
+.paper-brand .brand-logo-image{width:210px;max-height:68px}
+@media(max-width:520px){.brand-logo-image{width:clamp(132px,42vw,174px);max-width:46vw;max-height:58px}.paper-brand .brand-logo-image{width:clamp(132px,42vw,174px);max-height:56px}}
