@@ -156,8 +156,7 @@ function App() {
 
       {(route.view === "globe" || route.view === "provinces" || route.view === "categories") && <header className="space-header">
         <a href="#/" className="brand-lockup" aria-label="RegistryHub Home">
-          <span className="brand-symbol"><Globe2 size={19} /></span>
-          <span className="brand-words"><strong>RegistryHub</strong><small>HEALTH REGISTRY DIRECTORY</small></span>
+          <img className="brand-logo-image" src={`${BASE}RegistryHub_logo_4x.png`} alt="RegistryHub — EXPLORE · CONNECT · DISCOVER" />
         </a>
         <div className="header-actions">
           <button className="subtle-button language-button" type="button" onClick={() => setEnglish((value) => !value)}>{english ? "فارسی" : "EN"}</button>
@@ -213,7 +212,7 @@ function App() {
 
       {(route.view === "category" || route.view === "registry") && <div className="paper-shell" dir={english ? "ltr" : "rtl"}>
         <header className="paper-header">
-          <a href="#/" className="paper-brand"><span className="paper-brand-mark"><Globe2 size={19} /></span><span><strong>RegistryHub</strong><small>HEALTH REGISTRY DIRECTORY</small></span></a>
+          <a href="#/" className="paper-brand" aria-label="RegistryHub Home"><img className="brand-logo-image" src={`${BASE}RegistryHub_logo_4x.png`} alt="RegistryHub — EXPLORE · CONNECT · DISCOVER" /></a>
           <div className="paper-header-actions"><button type="button" className="subtle-button" onClick={() => setEnglish((value) => !value)}>{english ? "فارسی" : "EN"}</button><button type="button" className="icon-button menu-button" aria-label={english ? "Open menu" : "بازکردن منو"} onClick={() => setMobileMenu((value) => !value)}>{mobileMenu ? <X size={19} /> : <Menu size={19} />}</button><button type="button" className="paper-back" onClick={() => navigate("categories/" + (route.provinceId || ACTIVE_PROVINCE_ID))}><ArrowRight size={16} /> {english ? "Clinical categories" : "دسته‌های بالینی"}</button></div>
         {mobileMenu && <nav className="mobile-menu" aria-label={english ? "Main menu" : "منوی اصلی"} dir={english ? "ltr" : "rtl"}>
           <button type="button" onClick={() => { setMobileMenu(false); setAboutOpen(true); }}>{english ? "About us" : "درباره ما"}</button>
