@@ -8,6 +8,7 @@ type ChatMessage = { role: "user" | "assistant"; content: string; registries?: R
 type Props = { english: boolean; open: boolean; onClose: () => void };
 
 const HISTORY_LIMIT = 6;
+const CHAT_TIMEOUT_MS = 30_000;
 
 const API = "https://registryhub-support.erfan8km.workers.dev";
 
@@ -31,14 +32,30 @@ export default function SupportChat({ english, open, onClose }: Props) {
     const message = question.trim();
     if (!message || busy) return;
     setBusy(true); setError(""); setTicket("");
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), CHAT_TIMEOUT_MS);
     try {
       const history = messages.slice(-HISTORY_LIMIT).map(({ role, content }) => ({ role, content: content.slice(0, 400) }));
       const response = await fetch(API + "/api/chat", {
-        method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ message, history })
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ message, history }),
+        signal: controller.signal
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || (english ? "The assistant is temporarily unavailable." : "دستیار موقتاً در دسترس نیست."));
+
+      const responseText = await response.text();
+      let data: { message?: string; answer?: string; registries?: RegistryLink[] };
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        throw new Error(english
+          ? "The support service returned an unreadable response. Please try again."
+          : "پاسخ سرویس پشتیبانی قابل‌خواندن نبود. لطفاً دوباره تلاش کنید.");
+      }
+
+      if (!response.ok) {
+        throw new Error(data.message || (english ? "The assistant is temporarily unavailable." : "دستیار موقتاً در دسترس نیست."));
+      }
       const answer = typeof data.answer === "string" ? data.answer.trim() : "";
       if (!answer) throw new Error(english
         ? "The assistant returned an empty answer. Please try again or report the issue."
@@ -51,8 +68,21 @@ export default function SupportChat({ english, open, onClose }: Props) {
       setMessages((current) => [...current, ...turns].slice(-20));
       setQuestion("");
     } catch (e) {
-      setError(e instanceof Error ? e.message : (english ? "Request failed. Please try again." : "ارسال پرسش ناموفق بود؛ دوباره تلاش کنید."));
-    } finally { setBusy(false); }
+      if (e instanceof Error && e.name === "AbortError") {
+        setError(english
+          ? "The request timed out after 30 seconds. Please try again."
+          : "مهلت دریافت پاسخ پس از ۳۰ ثانیه تمام شد. لطفاً دوباره تلاش کنید.");
+      } else if (e instanceof TypeError) {
+        setError(english
+          ? "A network error prevented the request. Check your connection and try again."
+          : "خطای ارتباط شبکه مانع ارسال پرسش شد. اتصال اینترنت را بررسی و دوباره تلاش کنید.");
+      } else {
+        setError(e instanceof Error ? e.message : (english ? "Request failed. Please try again." : "ارسال پرسش ناموفق بود؛ دوباره تلاش کنید."));
+      }
+    } finally {
+      window.clearTimeout(timeoutId);
+      setBusy(false);
+    }
   }
 
   async function sendReport(event: FormEvent) {
