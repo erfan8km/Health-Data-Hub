@@ -20,9 +20,6 @@ export default function SupportChat({ english, open, onClose }: Props) {
   const [ticket, setTicket] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [launcherOpen, setLauncherOpen] = useState(false);
-  const visible = open || launcherOpen;
-  const close = () => { setLauncherOpen(false); onClose(); };
 
   useEffect(() => {
     const thread = threadRef.current;
@@ -77,16 +74,13 @@ export default function SupportChat({ english, open, onClose }: Props) {
     } finally { setBusy(false); }
   }
 
-  return createPortal(<div className={`rh-support ${english ? "rh-support-en" : "rh-support-fa"}`} dir={english ? "ltr" : "rtl"}>
-    {!visible && <button type="button" className="rh-support-launcher" onClick={() => setLauncherOpen(true)} aria-label={english ? "Open RegistryHub support" : "باز کردن پشتیبانی RegistryHub"} aria-expanded={visible}>
-      <MessageCircle size={18} /><span>{english ? "Support" : "پشتیبانی"}</span>
-    </button>}
-    {visible && <section className="rh-support-panel" aria-label={english ? "RegistryHub support" : "پشتیبانی RegistryHub"}>
+  return createPortal(open ? <div className={`rh-support ${english ? "rh-support-en" : "rh-support-fa"}`} dir={english ? "ltr" : "rtl"}>
+    {open && <section className="rh-support-panel" aria-label={english ? "RegistryHub support" : "پشتیبانی RegistryHub"}>
       <header className="rh-support-header">
         <span className="rh-support-avatar"><MessageCircle size={18} /></span>
         <span className="rh-support-heading"><strong>{english ? "RegistryHub support" : "پشتیبانی RegistryHub"}</strong><small>{english ? "Ask about published registries" : "پرسش درباره ریجستری‌های منتشرشده"}</small></span>
         {mode === "chat" && messages.length > 0 && <button type="button" className="rh-support-clear" onClick={() => setMessages([])} aria-label={english ? "Clear conversation" : "پاک کردن گفتگو"} title={english ? "Clear conversation" : "پاک کردن گفتگو"}><Trash2 size={14} /></button>}
-        <button type="button" className="rh-support-close" onClick={close} aria-label={english ? "Close support" : "بستن پشتیبانی"}><X size={18} /></button>
+        <button type="button" className="rh-support-close" onClick={onClose} aria-label={english ? "Close support" : "بستن پشتیبانی"}><X size={18} /></button>
       </header>
       <nav className="rh-support-tabs">
         <button type="button" className={mode === "chat" ? "active" : ""} onClick={() => {setMode("chat");setError("");}}>{english ? "Ask a question" : "پرسش از کاتالوگ"}</button>
@@ -116,5 +110,5 @@ export default function SupportChat({ english, open, onClose }: Props) {
       </form>}
       {error && <p className="rh-support-error" role="alert">{error}</p>}
     </section>}
-  </div>, document.body);
+  </div> : null, document.body);
 }
