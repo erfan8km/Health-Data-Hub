@@ -273,12 +273,12 @@ export async function handleRequest(request, env) {
     }
   }
 
-  const deleteReportMatch = url.pathname.match(/^\\/api\\/reports\\/(\\d+)$/);
+  const deleteReportMatch = url.pathname.match(/^\/api\/reports\/(\d+)$/);
   if (deleteReportMatch) {
     if (request.method !== "DELETE") return json({ error: "method not allowed" }, 405);
     const session = await readAdminSession(request, env);
     if (!session) return json({ error: "authentication required" }, 401);
-    const expectedOrigin = String(env.ADMIN_ORIGIN || "").replace(/\\/$/, "");
+    const expectedOrigin = String(env.ADMIN_ORIGIN || "").replace(/\/$/, "");
     if (!expectedOrigin || request.headers.get("origin") !== expectedOrigin) return json({ error: "origin not allowed" }, 403);
     if (!env.SUPPORT_DB || typeof env.SUPPORT_DB.prepare !== "function") {
       return json({ error: "support reports are not configured" }, 503);
