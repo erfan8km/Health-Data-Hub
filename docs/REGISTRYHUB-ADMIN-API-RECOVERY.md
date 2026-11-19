@@ -28,7 +28,7 @@
 - **OAUTH_STATE_STORE**: binding به کلاس **OAuthStateStore**؛ migration tag فعلی **v1**
 - **AUTH_RATE_LIMITER**: سقف ۲۰ درخواست در ۶۰ ثانیه
 - **PROPOSAL_RATE_LIMITER**: سقف ۵ درخواست در ۶۰ ثانیه
-- **SUPPORT_DB**: binding به دیتابیس D1 با نام **registryhub-support**؛ endpoint گزارش‌ها فقط عملیات خواندن را انجام می‌دهد و باید صرفاً با نشست معتبر مدیر قابل دسترسی باشد.
+- **SUPPORT_DB**: binding به دیتابیس D1 با نام **registryhub-support**؛ مشاهده گزارش‌ها فقط با نشست معتبر مدیر ممکن است و حذف تکی نیز از مسیر `DELETE /api/reports/{id}` با کنترل Origin، محدودسازی درخواست و نشست مدیر انجام می‌شود.
 
 شناسه‌های namespace در پیکربندی مربوط به حساب فعلی هستند. اگر Worker را در حساب دیگری بازیابی می‌کنی، این شناسه‌ها باید با منابع تازهٔ همان حساب جایگزین شوند.
 
