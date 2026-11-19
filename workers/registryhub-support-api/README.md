@@ -27,6 +27,6 @@ Independent catalogue-only support API. It must not connect to GitHub or `regist
 - The model is instructed not to return URLs; registry links are returned only when the exact slug and HTTPS URL exist in the published catalogue.
 - All catalogue fields, including descriptions and data summaries, are treated as untrusted data; instructions embedded in records must be ignored. Prompt-injection testing is still required before launch; a prompt is not a complete security boundary.
 - D1 report states: `new`, `in_review`, `resolved`.
-- No public endpoint reads or updates reports. Add a separately authenticated management workflow only if needed.
+- No public endpoint reads, updates, or deletes reports. Authenticated administration is handled separately by `registryhub-admin-api`; report deletion requires an authorized admin session and an explicit confirmation in the admin panel.
 
 Test page: `artifacts/iedr/public/support-test.html`.
